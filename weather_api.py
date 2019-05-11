@@ -9,12 +9,12 @@ import pandas as pd
 days_back=118
 
 #Load the file that contains historical hourly weather data for 5 stations in Berlin
-weather_data=pd.read_csv('~/weather_data.csv')
-weather_data.set_index(['location','time'])
-weather_data['time'] = pd.to_datetime(weather_data['time'], format='%Y-%m-%d %H:%M:%S')
+old_data=pd.read_csv('~/weather_data.csv')
+old_data.set_index(['location','time'])
+old_data['time'] = pd.to_datetime(weather_data['time'], format='%Y-%m-%d %H:%M:%S')
 
 #Get the minimum date in the file
-min_date=weather_data['time'].min()
+min_date=old_data['time'].min()
 start_date=min_date
 
 #Credetianls
@@ -129,11 +129,13 @@ df=pd.DataFrame(tuples,columns = ['location' , 'longitude', 'latitude','time','t
 df.set_index(['location','time'])
 
 #Appending new tuples to historical file
-weather_data=weather_data.append(df,ignore_index=True)
+weather_data=old_data.append(df,ignore_index=True)
 weather_data.set_index(['location','time'])
 
 #Droping duplicates if any
-weather_data.drop_duplicates(keep=False,inplace=True)
+weather_data=weather_data.drop_duplicates(keep=False,inplace=True)
 
 #Saving csv with old and new tuples
 weather_data.to_csv(path_or_buf='~/weather_data.csv',index=False)
+
+print('success!')
