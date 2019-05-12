@@ -11,7 +11,7 @@ days_back=118
 #Load the file that contains historical hourly weather data for 5 stations in Berlin
 old_data=pd.read_csv('~/weather_data.csv')
 old_data.set_index(['location','time'])
-old_data['time'] = pd.to_datetime(weather_data['time'], format='%Y-%m-%d %H:%M:%S')
+old_data['time'] = pd.to_datetime(old_data['time'], format='%Y-%m-%d %H:%M:%S')
 
 #Get the minimum date in the file
 min_date=old_data['time'].min()
@@ -19,6 +19,7 @@ start_date=min_date
 
 #Credetianls
 forecastio_api_key = "677e17ccb348e07d52486ae3857a2d84"
+forecastio_api_key_2 = "fbb446671b7ea5471c62fe799748f099"
 owm = pyowm.OWM('48dae982f9e685eee268e90dafba5041') 
 
 #Getting the 5 closer points to Berlin Mitte
@@ -35,6 +36,12 @@ data_block_list=[]
 for d in range(days_back):
     for i,location in enumerate(lon_lat_list):
         forecast = forecastio.load_forecast(forecastio_api_key, lon_lat_list[i][2], lon_lat_list[i][1],time=start_date-timedelta(days=d))
+        data_block_list.append([forecast.hourly(),start_date-timedelta(days=d),lon_lat_list[i][0],lon_lat_list[i][1],lon_lat_list[i][2]])
+
+#Takes the second API secret and pulls more data
+for d in range(days_back,days_back*2):
+    for i,location in enumerate(lon_lat_list):
+        forecast = forecastio.load_forecast(forecastio_api_key_2, lon_lat_list[i][2], lon_lat_list[i][1],time=start_date-timedelta(days=d))
         data_block_list.append([forecast.hourly(),start_date-timedelta(days=d),lon_lat_list[i][0],lon_lat_list[i][1],lon_lat_list[i][2]])
 
 #Get the variables of interest for each hour in the time frame. Exceptions need to be handled due to missing observations for some points in time
@@ -133,7 +140,7 @@ weather_data=old_data.append(df,ignore_index=True)
 weather_data.set_index(['location','time'])
 
 #Droping duplicates if any
-weather_data=weather_data.drop_duplicates(keep=False,inplace=True)
+weather_data.sort_values(by=['location','time']).drop_duplicates(subset=['location', 'time'],inplace=True)
 
 #Saving csv with old and new tuples
 weather_data.to_csv(path_or_buf='~/weather_data.csv',index=False)
