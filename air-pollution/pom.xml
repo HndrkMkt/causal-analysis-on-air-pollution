@@ -20,13 +20,16 @@ under the License.
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.myorg.quickstart</groupId>
-	<artifactId>quickstart</artifactId>
-	<version>0.1</version>
+	<groupId>de.tuberlin.dima.bdapro</groupId>
+	<artifactId>air-pollution</artifactId>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Flink Quickstart Job</name>
-	<url>http://www.myorganization.org</url>
+	<name>Causal Analysis Pipeline for Air Pollution Data</name>
+	<organization>
+		<name>FG DIMA, TU Berlin</name>
+		<url>http://dima.tu-berlin.de/</url>
+	</organization>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -144,7 +147,7 @@ under the License.
 							</filters>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.myorg.quickstart.StreamingJob</mainClass>
+									<mainClass>de.tuberlin.dima.bdapro.job.BatchJob</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
