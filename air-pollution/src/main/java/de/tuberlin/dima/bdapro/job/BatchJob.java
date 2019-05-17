@@ -59,11 +59,10 @@ public class BatchJob {
         DataSet<PMS5003Reading> pms5003ReadingDataSet = readSensors(env, "**/*_pms5003_*.csv", PMS5003Reading.class, PMS5003Reading.getFields());
         DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, "**/*_pms7003_*.csv", PMS7003Reading.class, PMS7003Reading.getFields());
         DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, "**/*_ppd42ns_*.csv", PPD42NSReading.class, PPD42NSReading.getFields());
-        DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, "**/*sds011*.csv", SDS011Reading.class, SDS011Reading.getFields());
+        DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, "**/*sds011*.csv.gz", SDS011Reading.class, SDS011Reading.getFields());
 
-
-        List<PPD42NSReading> result = ppd42nsReadingDataSet.collect();
-
+        List<Integer> result = sds011ReadingDataSet.map(sds011Reading -> sds011Reading.location).distinct().collect();
+        
         // execute program
         env.execute("Flink Batch Java API Skeleton");
     }

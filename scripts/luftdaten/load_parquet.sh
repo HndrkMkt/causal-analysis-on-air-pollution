@@ -1,4 +1,4 @@
-#1/bin/bash
+#!/bin/bash
 d=$1
 while [ "$d" != "$2" ]; do
   month=$(date -ud "$d" +%Y-%m)
