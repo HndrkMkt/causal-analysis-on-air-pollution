@@ -4,6 +4,7 @@ import de.tuberlin.dima.bdapro.data.SensorReading;
 import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
 import org.apache.flink.api.common.io.DelimitedInputFormat;
 import org.apache.flink.core.fs.FileInputSplit;
+import org.apache.flink.core.fs.FileStatus;
 import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
@@ -39,6 +40,16 @@ public class NullableCsvInputFormat<T extends SensorReading> extends DelimitedIn
 
         if (this.splitStart == 0L) {
             this.readLine();
+        }
+    }
+
+    @Override
+    public boolean acceptFile(FileStatus fileStatus) {
+        if (fileStatus.isDir() && enumerateNestedFiles) {
+            String name = fileStatus.getPath().getName();
+            return !name.startsWith("_") && !name.startsWith(".");
+        } else {
+            return super.acceptFile(fileStatus);
         }
     }
 }

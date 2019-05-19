@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.core.fs.Path;
 
 /**
@@ -43,7 +44,7 @@ import org.apache.flink.core.fs.Path;
  * and run 'mvn clean package' on the command line.
  */
 public class BatchJob {
-    private static String sensorDataBasePath = "data/raw/2019-01-01";
+    private static String sensorDataBasePath = "data/raw/";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
@@ -59,19 +60,19 @@ public class BatchJob {
         DataSet<PMS5003Reading> pms5003ReadingDataSet = readSensors(env, "**/*_pms5003_*.csv", PMS5003Reading.class, PMS5003Reading.getFields());
         DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, "**/*_pms7003_*.csv", PMS7003Reading.class, PMS7003Reading.getFields());
         DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, "**/*_ppd42ns_*.csv", PPD42NSReading.class, PPD42NSReading.getFields());
-        DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, "**/*sds011*.csv.gz", SDS011Reading.class, SDS011Reading.getFields());
+        DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, "**/*_sds011_*.csv", SDS011Reading.class, SDS011Reading.getFields());
 
-        List<Integer> result = sds011ReadingDataSet.map(sds011Reading -> sds011Reading.location).distinct().collect();
+        List<SDS011Reading> result = sds011ReadingDataSet.collect();
         
         // execute program
         env.execute("Flink Batch Java API Skeleton");
     }
 
-    private static <T extends SensorReading> DataSet<T> readSensors(ExecutionEnvironment env, String pattern, Class<T> clazz, List<Field> fields) {
+    private static <T extends SensorReading> DataSource<T> readSensors(ExecutionEnvironment env, String pattern, Class<T> clazz, List<Field> fields) {
 
         NullableCsvInputFormat<T> fileFormat = new NullableCsvInputFormat<T>(new Path(sensorDataBasePath),
                 new SensorReadingParser<>(clazz, fields));
         fileFormat.setFilesFilter(new GlobFilePathFilter(Collections.singletonList(pattern), new ArrayList<>()));
-        return env.createInput(fileFormat, TypeInformation.of(clazz)).setParallelism(1);
+        return env.createInput(fileFormat, TypeInformation.of(clazz));
     }
 }
