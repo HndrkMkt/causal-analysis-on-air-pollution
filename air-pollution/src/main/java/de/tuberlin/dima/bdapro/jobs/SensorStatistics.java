@@ -16,26 +16,15 @@
  * limitations under the License.
  */
 
-package de.tuberlin.dima.bdapro.job;
+package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.NullableCsvInputFormat;
-import de.tuberlin.dima.bdapro.data.*;
-import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.io.GlobFilePathFilter;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
+import de.tuberlin.dima.bdapro.sensors.*;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
 import org.apache.flink.types.Row;
-import sun.management.Sensor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,20 +44,24 @@ public class SensorStatistics extends SensorJob {
         // set up the batch execution environment
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         final BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
+        // Datasets with loading issues:
+        DataSet<BME280Reading> bme280ReadingDataSet = readSensors(env, basePath, "**/*_bme280.csv.gz", BME280Reading.class, BME280Reading.getFields());
 
-        DataSet<BME280Reading> bme280ReadingDataSet = readSensors(env, basePath, "**/*_bme280_*.csv", BME280Reading.class, BME280Reading.getFields());
-        DataSet<BMP180Reading> bmp180ReadingDataSet = readSensors(env, basePath, "**/*_bmp180_*.csv", BMP180Reading.class, BMP180Reading.getFields());
-        DataSet<DHT22Reading> dht22ReadingDataSet = readSensors(env, basePath, "**/*_dht22_*.csv", DHT22Reading.class, DHT22Reading.getFields());
-        DataSet<DS18B20Reading> ds18b20ReadingDataSet = readSensors(env, basePath, "**/*_ds18b20_*.csv", DS18B20Reading.class, DS18B20Reading.getFields());
+        // Datasets without loading issues
         DataSet<HPMReading> hpmReadingDataSet = readSensors(env, basePath, "**/*_hpm.csv.gz", HPMReading.class, HPMReading.getFields());
-        DataSet<HTU21DReading> htu21DReadingDataSet = readSensors(env, basePath, "**/*_htu21d_*.csv", HTU21DReading.class, HTU21DReading.getFields());
-        DataSet<PMS3003Reading> pms3003ReadingDataSet = readSensors(env, basePath, "**/*_pms3003_*.csv", PMS3003Reading.class, PMS3003Reading.getFields());
-        DataSet<PMS5003Reading> pms5003ReadingDataSet = readSensors(env, basePath, "**/*_pms5003_*.csv", PMS5003Reading.class, PMS5003Reading.getFields());
-        DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, basePath, "**/*_pms7003_*.csv", PMS7003Reading.class, PMS7003Reading.getFields());
-        DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, basePath, "**/*_ppd42ns_*.csv", PPD42NSReading.class, PPD42NSReading.getFields());
+        DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, basePath, "**/*_ppd42ns.csv.gz", PPD42NSReading.class, PPD42NSReading.getFields());
+        DataSet<HTU21DReading> htu21DReadingDataSet = readSensors(env, basePath, "**/*_htu21d.csv.gz", HTU21DReading.class, HTU21DReading.getFields());
+        DataSet<DS18B20Reading> ds18b20ReadingDataSet = readSensors(env, basePath, "**/*_ds18b20.csv.gz", DS18B20Reading.class, DS18B20Reading.getFields());
+        DataSet<PMS3003Reading> pms3003ReadingDataSet = readSensors(env, basePath, "**/*_pms3003.csv.gz", PMS3003Reading.class, PMS3003Reading.getFields());
+        DataSet<PMS5003Reading> pms5003ReadingDataSet = readSensors(env, basePath, "**/*_pms5003.csv.gz", PMS5003Reading.class, PMS5003Reading.getFields());
+        DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, basePath, "**/*_pms7003.csv.gz", PMS7003Reading.class, PMS7003Reading.getFields());
+        DataSet<BMP180Reading> bmp180ReadingDataSet = readSensors(env, basePath, "**/*_bmp180.csv.gz", BMP180Reading.class, BMP180Reading.getFields());
+
+        // TODO: Check datasets
+        DataSet<DHT22Reading> dht22ReadingDataSet = readSensors(env, basePath, "**/*_dht22.csv.gz", DHT22Reading.class, DHT22Reading.getFields());
         DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, basePath, "**/*_sds011.csv.gz", SDS011Reading.class, SDS011Reading.getFields());
 
-        Table sensorStatistics = sensorStatistics(tEnv, sds011ReadingDataSet);
+        Table sensorStatistics = sensorStatistics(tEnv, dht22ReadingDataSet);
         DataSet<Row> sensorStatisticDataSet = tEnv.toDataSet(sensorStatistics, Row.class);
         List<Row> result  = sensorStatisticDataSet.collect();
         env.execute("Flink Batch Java API Skeleton");

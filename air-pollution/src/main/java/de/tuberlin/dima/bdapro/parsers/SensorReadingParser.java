@@ -1,7 +1,7 @@
 package de.tuberlin.dima.bdapro.parsers;
 
-import de.tuberlin.dima.bdapro.data.Field;
-import de.tuberlin.dima.bdapro.data.SensorReading;
+import de.tuberlin.dima.bdapro.sensors.Field;
+import de.tuberlin.dima.bdapro.sensors.SensorReading;
 
 import java.io.Serializable;
 import java.util.List;

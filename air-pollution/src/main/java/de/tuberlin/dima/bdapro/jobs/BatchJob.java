@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package de.tuberlin.dima.bdapro.job;
+package de.tuberlin.dima.bdapro.jobs;
 
 import de.tuberlin.dima.bdapro.NullableCsvInputFormat;
-import de.tuberlin.dima.bdapro.data.*;
 import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
+import de.tuberlin.dima.bdapro.sensors.*;
 import org.apache.flink.api.common.io.GlobFilePathFilter;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
