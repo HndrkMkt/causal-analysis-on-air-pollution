@@ -5,3 +5,6 @@ pyarrow
 pyowm
 python-forecastio
 shapely
+matplotlib
+descartes
+mpl_toolkits.basemap
