@@ -7,4 +7,5 @@ python-forecastio
 shapely
 matplotlib
 descartes
-mpl_toolkits.basemap
+pyowm
+python-forecastio
