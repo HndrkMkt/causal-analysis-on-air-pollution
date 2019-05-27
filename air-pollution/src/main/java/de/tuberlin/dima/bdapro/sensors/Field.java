@@ -1,13 +1,15 @@
 package de.tuberlin.dima.bdapro.sensors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 public class Field implements Serializable {
+    Logger LOG = LoggerFactory.getLogger(Field.class);
     private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2019-01-01T00:00:10
 
     private String name;
@@ -54,7 +56,8 @@ public class Field implements Serializable {
                 value = null;
             }
         } catch (Exception ex) {
-            throw ex;
+            value = null;
+            LOG.error(ex.toString());
         }
 
 

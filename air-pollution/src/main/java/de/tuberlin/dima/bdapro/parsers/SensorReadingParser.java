@@ -6,8 +6,11 @@ import de.tuberlin.dima.bdapro.sensors.SensorReading;
 import java.io.Serializable;
 import java.util.List;
 
-public class SensorReadingParser<T extends SensorReading> implements Serializable {
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
+public class SensorReadingParser<T extends SensorReading> implements Serializable {
+    Logger LOG = LoggerFactory.getLogger(SensorReadingParser.class);
     private static final String DELIMITER = ";";
 
     private Class<T> clazz;
@@ -34,7 +37,7 @@ public class SensorReadingParser<T extends SensorReading> implements Serializabl
                 clazz.getField(field.getName()).set(sensorReading, field.getValue());
             }
         } catch (Exception e) {
-            throw e;
+            LOG.error(e.toString());
         }
 
         return sensorReading;
