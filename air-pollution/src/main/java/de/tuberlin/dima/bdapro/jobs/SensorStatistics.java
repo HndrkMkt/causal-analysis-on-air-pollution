@@ -22,6 +22,8 @@ import de.tuberlin.dima.bdapro.sensors.*;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.PojoTypeInfo;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
 import org.apache.flink.table.sinks.CsvTableSink;
@@ -49,37 +51,21 @@ public class SensorStatistics extends SensorJob {
         // set up the batch execution environment
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         final BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
-        // Datasets with loading issues:
-        //DataSet<BME280Reading> bme280ReadingDataSet = readSensors(env, basePath, "**/*_bme280.csv.gz", BME280Reading.class, BME280Reading.getFields());
-        //DataSet<DHT22Reading> dht22ReadingDataSet = readSensors(env, basePath, "**/*_dht22.csv.gz", DHT22Reading.class, DHT22Reading.getFields());
 
-        // Datasets without loading issues
-        // DataSet<HPMReading> hpmReadingDataSet = readSensors(env, basePath, "**/*_hpm.csv.gz", HPMReading.class, HPMReading.getFields());
-        // DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, basePath, "**/*_ppd42ns.csv.gz", PPD42NSReading.class, PPD42NSReading.getFields());
-        // DataSet<HTU21DReading> htu21DReadingDataSet = readSensors(env, basePath, "**/*_htu21d.csv.gz", HTU21DReading.class, HTU21DReading.getFields());
-        // DataSet<DS18B20Reading> ds18b20ReadingDataSet = readSensors(env, basePath, "**/*_ds18b20.csv.gz", DS18B20Reading.class, DS18B20Reading.getFields());
-        // DataSet<PMS3003Reading> pms3003ReadingDataSet = readSensors(env, basePath, "**/*_pms3003.csv.gz", PMS3003Reading.class, PMS3003Reading.getFields());
-        // DataSet<PMS5003Reading> pms5003ReadingDataSet = readSensors(env, basePath, "**/*_pms5003.csv.gz", PMS5003Reading.class, PMS5003Reading.getFields());
-        // DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, basePath, "**/*_pms7003.csv.gz", PMS7003Reading.class, PMS7003Reading.getFields());
-        //DataSet<BMP180Reading> bmp180ReadingDataSet = readSensors(env, basePath, "**/*_bmp180.csv.gz", BMP180Reading.class, BMP180Reading.getFields());
 
-        // TODO: Check datasets
-        // DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, basePath, "**/*_sds011.csv.gz", SDS011Reading.class, SDS011Reading.getFields());
-
-//        Table sensorStatistics = sensorStatistics(tEnv, sds011ReadingDataSet);
-//        DataSet<Row> sensorStatisticDataSet = tEnv.toDataSet(sensorStatistics, Row.class);
-//        sensorStatisticDataSet.writeAsCsv("data/processed/statistics_hpm", "\n", ";");
-        collectStatistics(env, tEnv, "bme280", BME280Reading.class, BME280Reading.getFields());
-        collectStatistics(env, tEnv, "bmp180", BMP180Reading.class, BMP180Reading.getFields());
-        collectStatistics(env, tEnv, "dht22", DHT22Reading.class, DHT22Reading.getFields());
-        collectStatistics(env, tEnv, "ds18b20", DS18B20Reading.class, DS18B20Reading.getFields());
-        collectStatistics(env, tEnv, "hpm", HPMReading.class, HPMReading.getFields());
-        collectStatistics(env, tEnv, "htu21d", HTU21DReading.class, HTU21DReading.getFields());
-        collectStatistics(env, tEnv, "pms3003", PMS3003Reading.class, PMS3003Reading.getFields());
-        collectStatistics(env, tEnv, "pms5003", PMS5003Reading.class, PMS5003Reading.getFields());
-        collectStatistics(env, tEnv, "pms7003", PMS7003Reading.class, PMS7003Reading.getFields());
-        collectStatistics(env, tEnv, "ppd42ns", PPD42NSReading.class, PPD42NSReading.getFields());
-        collectStatistics(env, tEnv, "sds011", SDS011Reading.class, SDS011Reading.getFields());
+        ParameterTool params = ParameterTool.fromArgs(args);
+        final String dataDirectory = params.get("data_dir", "./");
+        collectStatistics(env, tEnv, "bme280", BME280Reading.class, BME280Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "bmp180", BMP180Reading.class, BMP180Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "dht22", DHT22Reading.class, DHT22Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "ds18b20", DS18B20Reading.class, DS18B20Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "hpm", HPMReading.class, HPMReading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "htu21d", HTU21DReading.class, HTU21DReading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "pms3003", PMS3003Reading.class, PMS3003Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "pms5003", PMS5003Reading.class, PMS5003Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "pms7003", PMS7003Reading.class, PMS7003Reading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "ppd42ns", PPD42NSReading.class, PPD42NSReading.getFields(), dataDirectory);
+        collectStatistics(env, tEnv, "sds011", SDS011Reading.class, SDS011Reading.getFields(), dataDirectory);
         env.execute("Sensor Statistics");
     }
 
@@ -90,8 +76,8 @@ public class SensorStatistics extends SensorJob {
         return result;
     }
 
-    private static <T extends SensorReading> void collectStatistics(ExecutionEnvironment env, BatchTableEnvironment tEnv, String sensorPattern, Class<T> clazz, List<Field> fields) {
-        DataSet<T> sensorReadingDataSet = readSensors(env, basePath, String.format("**/*_%s.csv.gz", sensorPattern), clazz, fields);
+    private static <T extends SensorReading> void collectStatistics(ExecutionEnvironment env, BatchTableEnvironment tEnv, String sensorPattern, Class<T> clazz, List<Field> fields, String dataDirectory) {
+        DataSet<T> sensorReadingDataSet = readSensors(env, (new Path(dataDirectory, basePath)).toString(), String.format("**/*_%s.csv.gz", sensorPattern), clazz, fields);
         Table sensorStatistics = sensorStatistics(tEnv, sensorReadingDataSet);
         TableSink<Row> sink = new CsvTableSink(String.format("data/processed/statistics/%s.csv", sensorPattern), ";",1, OVERWRITE);
         sensorStatistics.writeToSink(sink);
