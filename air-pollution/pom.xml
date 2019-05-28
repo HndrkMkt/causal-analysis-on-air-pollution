@@ -159,7 +159,7 @@ under the License.
 							</filters>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>de.tuberlin.dima.bdapro.jobs.BatchJob</mainClass>
+									<mainClass>de.tuberlin.dima.bdapro.jobs.SensorStatistics</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
