@@ -45,7 +45,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * and run 'mvn clean package' on the command line.
  */
 public class SensorStatistics extends SensorJob {
-    private static String basePath = "data/raw/csv_per_month";
+    private static String basePath = "raw/csv_per_month";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
@@ -79,7 +79,7 @@ public class SensorStatistics extends SensorJob {
     private static <T extends SensorReading> void collectStatistics(ExecutionEnvironment env, BatchTableEnvironment tEnv, String sensorPattern, Class<T> clazz, List<Field> fields, String dataDirectory) {
         DataSet<T> sensorReadingDataSet = readSensors(env, (new Path(dataDirectory, basePath)).toString(), String.format("**/*_%s.csv.gz", sensorPattern), clazz, fields);
         Table sensorStatistics = sensorStatistics(tEnv, sensorReadingDataSet);
-        TableSink<Row> sink = new CsvTableSink(String.format("data/processed/statistics/%s.csv", sensorPattern), ";",1, OVERWRITE);
+        TableSink<Row> sink = new CsvTableSink((new Path(dataDirectory, String.format("processed/statistics/%s.csv", sensorPattern)).toString()), ";",1, OVERWRITE);
         sensorStatistics.writeToSink(sink);
     }
 }
