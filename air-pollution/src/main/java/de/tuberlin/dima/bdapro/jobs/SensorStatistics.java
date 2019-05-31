@@ -19,6 +19,8 @@
 package de.tuberlin.dima.bdapro.jobs;
 
 import de.tuberlin.dima.bdapro.sensors.*;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.PojoTypeInfo;
@@ -54,7 +56,7 @@ public class SensorStatistics extends SensorJob {
 
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "./");
+        final String dataDirectory = params.get("data_dir", "data");
         collectStatistics(env, tEnv, "bme280", BME280Reading.class, BME280Reading.getFields(), dataDirectory);
         collectStatistics(env, tEnv, "bmp180", BMP180Reading.class, BMP180Reading.getFields(), dataDirectory);
         collectStatistics(env, tEnv, "dht22", DHT22Reading.class, DHT22Reading.getFields(), dataDirectory);
@@ -79,7 +81,10 @@ public class SensorStatistics extends SensorJob {
     private static <T extends SensorReading> void collectStatistics(ExecutionEnvironment env, BatchTableEnvironment tEnv, String sensorPattern, Class<T> clazz, List<Field> fields, String dataDirectory) {
         DataSet<T> sensorReadingDataSet = readSensors(env, (new Path(dataDirectory, basePath)).toString(), String.format("**/*_%s.csv.gz", sensorPattern), clazz, fields);
         Table sensorStatistics = sensorStatistics(tEnv, sensorReadingDataSet);
-        TableSink<Row> sink = new CsvTableSink((new Path(dataDirectory, String.format("processed/statistics/%s.csv", sensorPattern)).toString()), ";",1, OVERWRITE);
-        sensorStatistics.writeToSink(sink);
+        TypeInformation[] fieldTypes = {Types.INT, Types.STRING, Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP, Types.LONG};
+        TableSink<Row> sink = new CsvTableSink((new Path(dataDirectory, String.format("processed/statistics/%s.csv", sensorPattern)).toString()), ";", 1, OVERWRITE);
+        String[] fieldNames = {"sensorId", "sensorType", "location", "lat", "lon", "minTimestamp", "maxTimestamp", "readingCount"};
+        tEnv.registerTableSink(String.format("%sTable", sensorPattern), fieldNames, fieldTypes, sink);
+        sensorStatistics.insertInto(String.format("%sTable", sensorPattern));
     }
 }

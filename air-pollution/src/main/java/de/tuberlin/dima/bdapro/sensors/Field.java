@@ -5,12 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class Field implements Serializable {
     Logger LOG = LoggerFactory.getLogger(Field.class);
-    private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2019-01-01T00:00:10
+    private static final String TIMESTAMP_FORMATSTR = "yyyy-MM-dd'T'HH:mm:ss";
 
     private String name;
     private Class<?> clazz;
@@ -47,7 +46,7 @@ public class Field implements Serializable {
                     value = Double.parseDouble(str);
                 }
             } else if (clazz.equals(Timestamp.class)) {
-                value = new Timestamp(TIMESTAMP_FORMAT.parse(str).getTime());
+                value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMATSTR)).parse(str).getTime());
             } else if (clazz.equals(Boolean.class)) {
                 value = str.equals("1");
             } else if (clazz.equals(String.class)) {
@@ -59,8 +58,5 @@ public class Field implements Serializable {
             value = null;
             LOG.error(ex.toString());
         }
-
-
     }
-
 }

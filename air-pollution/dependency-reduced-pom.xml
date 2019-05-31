@@ -91,7 +91,7 @@
               </filters>
               <transformers>
                 <transformer>
-                  <mainClass>de.tuberlin.dima.bdapro.job.BatchJob</mainClass>
+                  <mainClass>de.tuberlin.dima.bdapro.jobs.SensorStatistics</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -107,6 +107,12 @@
         <dependency>
           <groupId>org.apache.flink</groupId>
           <artifactId>flink-java</artifactId>
+          <version>${flink.version}</version>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.flink</groupId>
+          <artifactId>flink-scala_${scala.binary.version}</artifactId>
           <version>${flink.version}</version>
           <scope>compile</scope>
         </dependency>
@@ -205,12 +211,12 @@
     </dependency>
   </dependencies>
   <properties>
-    <java.version>1.8</java.version>
     <scala.binary.version>2.11</scala.binary.version>
-    <flink.version>1.8.0</flink.version>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <flink.version>1.8.0</flink.version>
   </properties>
 </project>
 
