@@ -1,5 +1,8 @@
 package de.tuberlin.dima.bdapro.sensors;
 
+import org.apache.flink.api.java.tuple.Tuple12;
+
+import java.sql.Timestamp;
 import java.util.List;
 
 public class SDS011Reading extends SensorReading {
@@ -19,5 +22,21 @@ public class SDS011Reading extends SensorReading {
         fields.add(new Field("durP2", Double.class));
         fields.add(new Field("ratioP2", Double.class));
         return fields;
+    }
+
+    public Tuple12<Integer, String, Integer, Double, Double, Timestamp, Double, Double, Double, Double, Double, Double> toTuple() {
+        return new Tuple12<>(
+                sensorId,
+                sensorType,
+                location,
+                lat,
+                lon,
+                timestamp,
+                p1,
+                durP1,
+                ratioP1,
+                p2,
+                durP2,
+                ratioP2);
     }
 }
