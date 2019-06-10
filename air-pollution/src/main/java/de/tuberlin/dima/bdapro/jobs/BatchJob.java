@@ -21,18 +21,16 @@ package de.tuberlin.dima.bdapro.jobs;
 import de.tuberlin.dima.bdapro.NullableCsvInputFormat;
 import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
 import de.tuberlin.dima.bdapro.sensors.*;
-import de.tuberlin.dima.bdapro.weather.WeatherReading;
 import org.apache.flink.api.common.io.GlobFilePathFilter;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.core.fs.Path;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.flink.api.java.operators.DataSource;
-import org.apache.flink.core.fs.Path;
 
 /**
  * Skeleton for a Flink Batch Job.
@@ -62,7 +60,6 @@ public class BatchJob {
         DataSet<PMS7003Reading> pms7003ReadingDataSet = readSensors(env, "**/*_pms7003_*.csv", PMS7003Reading.class, PMS7003Reading.getFields());
         DataSet<PPD42NSReading> ppd42nsReadingDataSet = readSensors(env, "**/*_ppd42ns_*.csv", PPD42NSReading.class, PPD42NSReading.getFields());
         DataSet<SDS011Reading> sds011ReadingDataSet = readSensors(env, "**/*_sds011_*.csv", SDS011Reading.class, SDS011Reading.getFields());
-//        DataSet<WeatherReading> weatherDataSet = readSensors(env, "**/weather_data.csv",WeatherReading.class, WeatherReading.getFields());
 
         List<SDS011Reading> result = sds011ReadingDataSet.collect();
         

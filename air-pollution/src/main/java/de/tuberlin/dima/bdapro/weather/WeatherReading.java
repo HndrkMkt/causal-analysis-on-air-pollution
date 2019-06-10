@@ -1,13 +1,10 @@
 package de.tuberlin.dima.bdapro.weather;
 
-import de.tuberlin.dima.bdapro.sensors.Field;
-import de.tuberlin.dima.bdapro.sensors.SensorReading;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WeatherReading extends SensorReading{
+public class WeatherReading {
 
     public String location;
     public Timestamp time;
