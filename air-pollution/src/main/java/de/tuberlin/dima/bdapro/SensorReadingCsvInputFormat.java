@@ -1,7 +1,9 @@
 package de.tuberlin.dima.bdapro;
 
-import de.tuberlin.dima.bdapro.sensors.SensorReading;
 import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
+import de.tuberlin.dima.bdapro.sensors.SensorReading;
+import de.tuberlin.dima.bdapro.sensors.Type;
+import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
 import org.apache.flink.api.common.io.DelimitedInputFormat;
 import org.apache.flink.core.fs.FileInputSplit;
 import org.apache.flink.core.fs.FileStatus;
@@ -9,23 +11,23 @@ import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
 
-public class NullableCsvInputFormat<T extends SensorReading> extends DelimitedInputFormat<T> {
+public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSensorReading> {
     private static final long serialVersionUID = 1L;
     /**
      * The name of the charset to use for decoding.
      */
     private String charsetName = "UTF-8";
 
-    private SensorReadingParser<T> parser;
+    private SensorReadingParser parser;
 
 
-    public NullableCsvInputFormat(Path filePath, SensorReadingParser<T> parser) {
+    public SensorReadingCsvInputFormat(Path filePath, Type sensorType) {
         super(filePath, null);
-        this.parser = parser;
+        this.parser = new SensorReadingParser(sensorType);
     }
 
     @Override
-    public T readRecord(T reuse, byte[] bytes, int offset, int numBytes) throws IOException {
+    public UnifiedSensorReading readRecord(UnifiedSensorReading reuse, byte[] bytes, int offset, int numBytes) throws IOException {
         String line = new String(bytes, offset, numBytes, charsetName);
         try {
             return parser.readRecord(line);

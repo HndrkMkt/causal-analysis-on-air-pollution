@@ -38,8 +38,8 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * change the main class in the POM.xml file to this class (simply search for 'mainClass')
  * and run 'mvn clean package' on the command line.
  */
-public class Filtering extends SensorJob {
-    private static String sensorBasePath = "raw/csv_per_month/";
+public class Filtering extends UnifiedSensorJob {
+    private static String sensorBasePath = "raw/csv_per_month/2019-01";
     private static String filterBasePath = "intermediate/";
 
     public static void main(String[] args) throws Exception {
@@ -52,43 +52,21 @@ public class Filtering extends SensorJob {
 //        final double centerLongiture = params.getDouble("lon", 13.24);
 //        final double maxDistance = params.getDouble("distance", 25.0);
         DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
-//        DataSet<BME280Reading> sensorData = readSensors(env, filterBasePath, )
 
-//        collectStatistics(env, tEnv, "dht22", DHT22Reading.class, DHT22Reading.getFields(), dataDirectory);
-
-
-//        ArrayList<Tuple3<String, Class, List<Field>>> datasets = new ArrayList<>();
-//        datasets.add(new Tuple3("bme280", BME280Reading.class, BME280Reading.getFields()));
-//        datasets.add(new Tuple3("bmp180", BMP180Reading.class, BMP180Reading.getFields()));
-//        datasets.add(new Tuple3("dht22", DHT22Reading.class, DHT22Reading.getFields()));
-//        datasets.add(new Tuple3("ds18b20", DS18B20Reading.class, DS18B20Reading.getFields()));
-//        datasets.add(new Tuple3("hpm", HPMReading.class, HPMReading.getFields()));
-//        datasets.add(new Tuple3("htu21d", HTU21DReading.class, HTU21DReading.getFields()));
-//        datasets.add(new Tuple3("pms3003", PMS3003Reading.class, PMS3003Reading.getFields()));
-//        datasets.add(new Tuple3("pms5003", PMS5003Reading.class, PMS5003Reading.getFields()));
-//        datasets.add(new Tuple3("pms7003", PMS7003Reading.class, PMS7003Reading.getFields()));
-//        datasets.add(new Tuple3("ppd42ns", PPD42NSReading.class, PPD42NSReading.getFields()));
-//        datasets.add(new Tuple3("sds011", SDS011Reading.class, SDS011Reading.getFields()));
-
-        DataSet<PMS5003Reading> sensorData = readSensors(env, (new Path(dataDirectory, sensorBasePath)).toString(), String.format("**/*_%s.csv.gz", "pms5003"), PMS5003Reading.class, PMS5003Reading.getFields());
-        DataSet<PMS5003Reading> filteredData = filterSensors(sensorData, acceptedSensors);
-        filteredData.map(PMS5003Reading::toTuple).writeAsCsv((new Path(dataDirectory, String.format("intermediate/filtered/%s.csv", "pms5003")).toString()), "\n", ";", OVERWRITE).setParallelism(1);
+        for (Type sensorType : Type.values()) {
+            Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
+            DataSet<UnifiedSensorReading> sensorData = readSensor(sensorType, sensorDataBasePath.toString(), env);
+            DataSet<UnifiedSensorReading> filteredData = filterSensors(sensorData, acceptedSensors);
+            Path outputFilePath = new Path(dataDirectory, String.format("intermediate/filtered/%s.csv", getSensorPattern(sensorType)));
+            filteredData.map((UnifiedSensorReading reading) -> reading.toTuple(sensorType))
+                    .writeAsCsv(outputFilePath.toString(), "\n", ";", OVERWRITE).setParallelism(1);
+        }
         env.execute("Filter Dataset");
     }
-//    private static <T extends SensorReading> void collectStatistics(ExecutionEnvironment env, BatchTableEnvironment tEnv, String sensorPattern, Class<T> clazz, List<Field> fields, String dataDirectory) {
-//        DataSet<T> sensorReadingDataSet = readSensors(env, (new Path(dataDirectory, filterBasePath)).toString(), String.format("**/*_%s.csv.gz", sensorPattern), clazz, fields);
-//        Table sensorStatistics = sensorStatistics(tEnv, sensorReadingDataSet);
-//        TypeInformation[] fieldTypes = {Types.INT, Types.STRING, Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP, Types.LONG};
-//        TableSink<Row> sink = new CsvTableSink((new Path(dataDirectory, String.format("processed/statistics/%s.csv", sensorPattern)).toString()), ";", 1, OVERWRITE);
-//        String[] fieldNames = {"sensorId", "sensorType", "location", "lat", "lon", "minTimestamp", "maxTimestamp", "readingCount"};
-//        tEnv.registerTableSink(String.format("%sTable", sensorPattern), fieldNames, fieldTypes, sink);
-//        sensorStatistics.insertInto(String.format("%sTable", sensorPattern));
-//}
 
-
-    private static <T extends SensorReading> DataSet<T> filterSensors(DataSet<T> sensorData, DataSet<Integer> acceptedSensors) {
-        DataSet<Tuple2<T, Integer>> joinResult = sensorData.joinWithTiny(acceptedSensors).where((T reading) -> reading.sensorId).equalTo((Integer sensorId) -> sensorId);
-        return joinResult.map((Tuple2<T, Integer> tuple) -> tuple.f0);
+    private static DataSet<UnifiedSensorReading> filterSensors(DataSet<UnifiedSensorReading> sensorData, DataSet<Integer> acceptedSensors) {
+        DataSet<Tuple2<UnifiedSensorReading, Integer>> joinResult = sensorData.joinWithTiny(acceptedSensors).where((UnifiedSensorReading reading) -> reading.sensorId).equalTo((Integer sensorId) -> sensorId);
+        return joinResult.map((Tuple2<UnifiedSensorReading, Integer> tuple) -> tuple.f0);
     }
 
     protected static DataSet<Integer> readAcceptedSensors(ExecutionEnvironment env, String basePath) {
