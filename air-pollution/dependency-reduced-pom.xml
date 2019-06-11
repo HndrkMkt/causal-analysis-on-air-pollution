@@ -91,7 +91,7 @@
               </filters>
               <transformers>
                 <transformer>
-                  <mainClass>de.tuberlin.dima.bdapro.jobs.SensorStatistics</mainClass>
+                  <mainClass>de.tuberlin.dima.bdapro.jobs.Filtering</mainClass>
                 </transformer>
               </transformers>
             </configuration>
