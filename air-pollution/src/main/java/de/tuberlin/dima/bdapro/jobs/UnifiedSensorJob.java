@@ -50,7 +50,8 @@ abstract public class UnifiedSensorJob {
         SensorReadingCsvInputFormat fileFormat = new SensorReadingCsvInputFormat(new Path(sensorDataBasePath), sensorType);
         fileFormat.setNestedFileEnumeration(true);
         fileFormat.setFilesFilter(new GlobFilePathFilter(Arrays.asList("**/", sensorPattern), new ArrayList<>()));
-        return env.createInput(fileFormat, TypeInformation.of(UnifiedSensorReading.class)).setParallelism(1);
+        return env.createInput(fileFormat, TypeInformation.of(UnifiedSensorReading.class)).setParallelism(1)
+                .filter((UnifiedSensorReading reading) -> reading.sensorId != null);
     }
 
     protected static String getSensorPattern(Type sensorType) {
