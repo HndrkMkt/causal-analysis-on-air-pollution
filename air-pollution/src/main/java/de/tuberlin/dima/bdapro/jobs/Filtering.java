@@ -18,6 +18,7 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
+import de.tuberlin.dima.bdapro.SensorReadingFormatter;
 import de.tuberlin.dima.bdapro.sensors.*;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -39,7 +40,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * and run 'mvn clean package' on the command line.
  */
 public class Filtering extends UnifiedSensorJob {
-    private static String sensorBasePath = "raw/csv_per_month/2019-01";
+    private static String sensorBasePath = "raw/csv_per_month";
     private static String filterBasePath = "intermediate/";
 
     public static void main(String[] args) throws Exception {
@@ -58,8 +59,7 @@ public class Filtering extends UnifiedSensorJob {
             DataSet<UnifiedSensorReading> sensorData = readSensor(sensorType, sensorDataBasePath.toString(), env);
             DataSet<UnifiedSensorReading> filteredData = filterSensors(sensorData, acceptedSensors);
             Path outputFilePath = new Path(dataDirectory, String.format("intermediate/filtered/%s.csv", getSensorPattern(sensorType)));
-            filteredData.map((UnifiedSensorReading reading) -> reading.toTuple(sensorType))
-                    .writeAsCsv(outputFilePath.toString(), "\n", ";", OVERWRITE).setParallelism(1);
+            filteredData.writeAsFormattedText(outputFilePath.toString(), OVERWRITE, new SensorReadingFormatter(sensorType)).setParallelism(1);
         }
         env.execute("Filter Dataset");
     }

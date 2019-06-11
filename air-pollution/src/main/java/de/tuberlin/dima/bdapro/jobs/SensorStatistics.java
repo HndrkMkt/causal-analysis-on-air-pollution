@@ -44,7 +44,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * and run 'mvn clean package' on the command line.
  */
 public class SensorStatistics extends UnifiedSensorJob {
-    private static String basePath = "raw/csv_per_month/2019-01";
+    private static String basePath = "raw/csv_per_month";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
