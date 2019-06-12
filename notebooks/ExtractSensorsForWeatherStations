@@ -1,0 +1,400 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from geopy.distance import geodesic\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import pyowm\n",
+    "import utils\n",
+    "import time\n",
+    "from urllib3.response import ReadTimeoutError"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Import sensor statistics data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(18524, 4)"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sensor_types = [\"bme280\", \"bmp180\", \"dht22\", \"ds18b20\", \"hpm\", \"htu21d\", \"pms3003\", \"pms5003\", \"pms7003\", \"ppd42ns\", \"sds011\"]\n",
+    "\n",
+    "total_sensors = pd.DataFrame(columns=[\"sensorId\", \"location\", \"lat\", \"lon\"])\n",
+    "for sensor_type in sensor_types:\n",
+    "    current_df = pd.read_csv(f\"../data/processed/statistics/{sensor_type}.csv\", sep=\";\", names=[\"sensorId\", \"sensorType\", \"location\", \"lat\", \"lon\", \"minTimestamp\", \"maxTimestamp\", \"readingCount\"])\n",
+    "    total_sensors = total_sensors.append(current_df[[\"sensorId\", \"location\", \"lat\", \"lon\"]])\n",
+    "total_sensors.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "total_sensors  = total_sensors.dropna()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>sensorId</th>\n",
+       "      <th>location</th>\n",
+       "      <th>lat</th>\n",
+       "      <th>lon</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>399</th>\n",
+       "      <td>10064</td>\n",
+       "      <td>5071</td>\n",
+       "      <td>52.359</td>\n",
+       "      <td>13.135</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>401</th>\n",
+       "      <td>6827</td>\n",
+       "      <td>3451</td>\n",
+       "      <td>52.476</td>\n",
+       "      <td>13.316</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>402</th>\n",
+       "      <td>15750</td>\n",
+       "      <td>7976</td>\n",
+       "      <td>52.527</td>\n",
+       "      <td>13.327</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>621</th>\n",
+       "      <td>13695</td>\n",
+       "      <td>6919</td>\n",
+       "      <td>52.344</td>\n",
+       "      <td>14.518</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>625</th>\n",
+       "      <td>14333</td>\n",
+       "      <td>7250</td>\n",
+       "      <td>52.545</td>\n",
+       "      <td>13.417</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    sensorId location     lat     lon\n",
+       "399    10064     5071  52.359  13.135\n",
+       "401     6827     3451  52.476  13.316\n",
+       "402    15750     7976  52.527  13.327\n",
+       "621    13695     6919  52.344  14.518\n",
+       "625    14333     7250  52.545  13.417"
+      ]
+     },
+     "execution_count": 64,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "total_sensors.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Filter out sensors far from Berlin"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "MAX_DISTANCE = 100\n",
+    "def filter_sensors(sensor):\n",
+    "    sensor_tuple = (sensor[\"lat\"], sensor[\"lon\"]) #(lat, lon)\n",
+    "    berlin_tuple = (52.520008,  13.404954)\n",
+    "    return geodesic(sensor_tuple, berlin_tuple).km < MAX_DISTANCE\n",
+    "\n",
+    "total_sensors = total_sensors[total_sensors.apply(filter_sensors, axis=1)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(733, 4)"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "total_sensors.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Find closest weather station"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "credentials_1 = pyowm.OWM('48dae982f9e685eee268e90dafba5041')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n"
+     ]
+    }
+   ],
+   "source": [
+    "closest_weather_stations=[]\n",
+    "for index, sensor in total_sensors.iterrows():\n",
+    "    time.sleep(1)\n",
+    "    for attempt in range(10):\n",
+    "        try:\n",
+    "            stations = utils.get_closest_weather_station(sensor[\"lat\"],sensor[\"lon\"],credentials_1)\n",
+    "            break\n",
+    "        except Exception:\n",
+    "            print(f\"ReadTimeoutError, retry #{attempt + 1}\")\n",
+    "            time.sleep(30)\n",
+    "    if stations:\n",
+    "        location = stations[0].get_location()\n",
+    "        closest_weather_stations.append([sensor[\"sensorId\"],sensor[\"lon\"],sensor[\"lat\"],sensor[\"location\"],location.get_name(),location.get_lon(),location.get_lat()])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "733"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(closest_weather_stations)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_closest_weather_stations=np.unique(np.asarray(closest_weather_stations),axis=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([['10063', '13.135', '52.358999999999995', ..., 'Bergholz', '13.1',\n",
+       "        '52.35'],\n",
+       "       ['10064', '13.135', '52.358999999999995', ..., 'Bergholz', '13.1',\n",
+       "        '52.35'],\n",
+       "       ['10156', '13.622', '52.67100000000001', ..., 'Börnicke',\n",
+       "        '13.638', '52.6629'],\n",
+       "       ...,\n",
+       "       ['9810', '13.193', '52.513000000000005', ..., 'Karolinenhöhe',\n",
+       "        '13.1667', '52.5167'],\n",
+       "       ['9876', '12.985', '52.413000000000004', ..., 'Golm', '12.967',\n",
+       "        '52.4062'],\n",
+       "       ['9877', '12.985', '52.413000000000004', ..., 'Golm', '12.967',\n",
+       "        '52.4062']], dtype='<U32')"
+      ]
+     },
+     "execution_count": 67,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unique_closest_weather_stations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "berlin_enrichable_sensors = pd.DataFrame(unique_closest_weather_stations, columns=[\"sensorId\", \"lon\", \"lat\", \"location\", \"stationName\", \"stationLon\", \"stationLat\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "np.savetxt(\"../data/unique_closest_weather_stations.csv\", unique_closest_weather_stations, delimiter=\",\",fmt='%s')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "weather = pd.read_csv(\"../data/raw/weather_data.csv\", sep=\";\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_locations = weather[\"location\"].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def filter_for_weather_stations(sensor):\n",
+    "    return sensor[\"stationName\"] in unique_locations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(728, 7)"
+      ]
+     },
+     "execution_count": 73,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "berlin_enrichable_sensors.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "berlin_enrichable_sensors = berlin_enrichable_sensors[berlin_enrichable_sensors.apply(filter_for_weather_stations, axis=1)]\n",
+    "berlin_enrichable_sensors.to_csv(\"../data/raw/berlin_enrichable_sensors.csv\", sep=\",\", index=False)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "causal-air-pollution",
+   "language": "python",
+   "name": "causal-air-pollution"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

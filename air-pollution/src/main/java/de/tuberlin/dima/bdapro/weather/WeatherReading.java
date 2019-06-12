@@ -49,5 +49,4 @@ public class WeatherReading {
         fields.add(new Field("wind_speed", Double.class));
         return fields;
     }
-
 }

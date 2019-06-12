@@ -21,7 +21,6 @@ public class WeatherJob {
 
         DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, weatherDataPath, WeatherReading.class, WeatherReading.getFields());
 
-
         env.execute("Flink Batch Java API Skeleton");
     }
 

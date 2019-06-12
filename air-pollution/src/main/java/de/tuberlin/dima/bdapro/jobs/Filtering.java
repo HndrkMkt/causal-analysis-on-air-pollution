@@ -70,7 +70,7 @@ public class Filtering extends UnifiedSensorJob {
     }
 
     protected static DataSet<Integer> readAcceptedSensors(ExecutionEnvironment env, String basePath) {
-        DataSet<Tuple1<Double>> acceptedSensorData = env.readCsvFile(new Path(new Path(basePath, filterBasePath), "berlin_trunc_sensors.csv").toString())
+        DataSet<Tuple1<Double>> acceptedSensorData = env.readCsvFile(new Path(new Path(basePath, filterBasePath), "berlin_enrichable_sensors.csv").toString())
                 .fieldDelimiter(",").ignoreFirstLine().includeFields(0x1).types(Double.class);
         return acceptedSensorData.map((Tuple1<Double> tuple) -> (int) Math.round(tuple.f0));
     }
