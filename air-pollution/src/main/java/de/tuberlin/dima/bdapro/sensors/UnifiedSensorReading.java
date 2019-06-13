@@ -3,6 +3,7 @@ package de.tuberlin.dima.bdapro.sensors;
 import org.apache.flink.api.java.tuple.*;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class UnifiedSensorReading {
     // Common Fields
@@ -135,6 +136,6 @@ public class UnifiedSensorReading {
                 location + ";" +
                 lat + ";" +
                 lon + ";" +
-                timestamp;
+                (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(timestamp);
     }
 }
