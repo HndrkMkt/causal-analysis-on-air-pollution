@@ -1,12 +1,15 @@
 altair
+descartes
 geopy
 jupyterlab>=1.0.0a3
+matplotlib
+networkx
 pandas
 pyarrow
 pyowm
 python-forecastio
 shapely
-matplotlib
-descartes
-pyowm
-python-forecastio
+scipy
+sklearn
+Cython
+-e git://github.com/jakobrunge/tigramite.git@4.0.0-beta#egg=tigramite

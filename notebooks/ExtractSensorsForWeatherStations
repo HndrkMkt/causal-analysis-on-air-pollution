@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 19,
+   "execution_count": 1,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -28,9 +28,23 @@
    "metadata": {},
    "outputs": [
     {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/hendrik/projects/tu_berlin/bdapro/causal-analysis-on-air-pollution/env/lib/python3.7/site-packages/pandas/core/frame.py:6692: FutureWarning: Sorting because non-concatenation axis is not aligned. A future version\n",
+      "of pandas will change to not sort by default.\n",
+      "\n",
+      "To accept the future behavior, pass 'sort=False'.\n",
+      "\n",
+      "To retain the current behavior and silence the warning, pass 'sort=True'.\n",
+      "\n",
+      "  sort=sort)\n"
+     ]
+    },
+    {
      "data": {
       "text/plain": [
-       "(18524, 4)"
+       "(18524, 5)"
       ]
      },
      "execution_count": 2,
@@ -44,7 +58,7 @@
     "total_sensors = pd.DataFrame(columns=[\"sensorId\", \"location\", \"lat\", \"lon\"])\n",
     "for sensor_type in sensor_types:\n",
     "    current_df = pd.read_csv(f\"../data/processed/statistics/{sensor_type}.csv\", sep=\";\", names=[\"sensorId\", \"sensorType\", \"location\", \"lat\", \"lon\", \"minTimestamp\", \"maxTimestamp\", \"readingCount\"])\n",
-    "    total_sensors = total_sensors.append(current_df[[\"sensorId\", \"location\", \"lat\", \"lon\"]])\n",
+    "    total_sensors = total_sensors.append(current_df[[\"sensorId\", \"sensorType\", \"location\", \"lat\", \"lon\"]])\n",
     "total_sensors.shape"
    ]
   },
@@ -59,7 +73,316 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 64,
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>lat</th>\n",
+       "      <th>location</th>\n",
+       "      <th>lon</th>\n",
+       "      <th>sensorId</th>\n",
+       "      <th>sensorType</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>-33.513</td>\n",
+       "      <td>7505</td>\n",
+       "      <td>-70.764</td>\n",
+       "      <td>14828</td>\n",
+       "      <td>BME280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>-33.421</td>\n",
+       "      <td>8877</td>\n",
+       "      <td>-70.607</td>\n",
+       "      <td>17519</td>\n",
+       "      <td>BME280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>-33.389</td>\n",
+       "      <td>9929</td>\n",
+       "      <td>-70.617</td>\n",
+       "      <td>19565</td>\n",
+       "      <td>BME280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>19.103</td>\n",
+       "      <td>9861</td>\n",
+       "      <td>72.846</td>\n",
+       "      <td>19445</td>\n",
+       "      <td>BME280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>40.294</td>\n",
+       "      <td>10051</td>\n",
+       "      <td>-3.754</td>\n",
+       "      <td>19783</td>\n",
+       "      <td>BME280</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      lat location     lon sensorId sensorType\n",
+       "0 -33.513     7505 -70.764    14828     BME280\n",
+       "1 -33.421     8877 -70.607    17519     BME280\n",
+       "2 -33.389     9929 -70.617    19565     BME280\n",
+       "3  19.103     9861  72.846    19445     BME280\n",
+       "4  40.294    10051  -3.754    19783     BME280"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "total_sensors.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Filter out sensors far from Berlin"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "MAX_DISTANCE = 50\n",
+    "def filter_sensors(sensor):\n",
+    "    sensor_tuple = (sensor[\"lat\"], sensor[\"lon\"]) #(lat, lon)\n",
+    "    berlin_tuple = (52.520008,  13.404954)\n",
+    "    return geodesic(sensor_tuple, berlin_tuple).km < MAX_DISTANCE\n",
+    "total_sensors = total_sensors[total_sensors.apply(filter_sensors, axis=1)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(684, 5)"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "total_sensors.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Find closest weather station"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "credentials_1 = pyowm.OWM('48dae982f9e685eee268e90dafba5041')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n",
+      "ReadTimeoutError, retry #1\n"
+     ]
+    }
+   ],
+   "source": [
+    "closest_weather_stations=[]\n",
+    "for index, sensor in total_sensors.iterrows():\n",
+    "    time.sleep(1)\n",
+    "    for attempt in range(10):\n",
+    "        try:\n",
+    "            stations = utils.get_closest_weather_station(sensor[\"lat\"],sensor[\"lon\"],credentials_1)\n",
+    "            break\n",
+    "        except Exception:\n",
+    "            print(f\"ReadTimeoutError, retry #{attempt + 1}\")\n",
+    "            time.sleep(30)\n",
+    "    if stations:\n",
+    "        location = stations[0].get_location()\n",
+    "        closest_weather_stations.append([sensor[\"sensorId\"], sensor[\"sensorType\"],sensor[\"lon\"],sensor[\"lat\"],sensor[\"location\"],location.get_name(),location.get_lon(),location.get_lat()])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "684"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(closest_weather_stations)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_closest_weather_stations=np.unique(np.asarray(closest_weather_stations),axis=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([['10063', 'SDS011', '13.135', ..., 'Bergholz', '13.1', '52.35'],\n",
+       "       ['10064', 'BME280', '13.135', ..., 'Bergholz', '13.1', '52.35'],\n",
+       "       ['10156', 'SDS011', '13.622', ..., 'Börnicke', '13.638',\n",
+       "        '52.6629'],\n",
+       "       ...,\n",
+       "       ['9810', 'DHT22', '13.193', ..., 'Karolinenhöhe', '13.1667',\n",
+       "        '52.5167'],\n",
+       "       ['9876', 'SDS011', '12.985', ..., 'Golm', '12.967', '52.4062'],\n",
+       "       ['9877', 'DHT22', '12.985', ..., 'Golm', '12.967', '52.4062']],\n",
+       "      dtype='<U26')"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unique_closest_weather_stations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "berlin_enrichable_sensors = pd.DataFrame(unique_closest_weather_stations, columns=[\"sensorId\", \"sensorType\", \"lon\", \"lat\", \"location\", \"stationName\", \"stationLon\", \"stationLat\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "np.savetxt(\"../data/unique_closest_weather_stations.csv\", unique_closest_weather_stations, delimiter=\",\",fmt='%s')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "weather = pd.read_csv(\"../data/raw/weather_data.csv\", sep=\";\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_locations = weather[\"location\"].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def filter_for_weather_stations(sensor):\n",
+    "    return sensor[\"stationName\"] in unique_locations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(684, 8)"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "berlin_enrichable_sensors.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
    "metadata": {},
    "outputs": [
     {
@@ -84,295 +407,303 @@
        "    <tr style=\"text-align: right;\">\n",
        "      <th></th>\n",
        "      <th>sensorId</th>\n",
-       "      <th>location</th>\n",
-       "      <th>lat</th>\n",
+       "      <th>sensorType</th>\n",
        "      <th>lon</th>\n",
+       "      <th>lat</th>\n",
+       "      <th>location</th>\n",
+       "      <th>stationName</th>\n",
+       "      <th>stationLon</th>\n",
+       "      <th>stationLat</th>\n",
        "    </tr>\n",
        "  </thead>\n",
        "  <tbody>\n",
        "    <tr>\n",
-       "      <th>399</th>\n",
-       "      <td>10064</td>\n",
-       "      <td>5071</td>\n",
-       "      <td>52.359</td>\n",
+       "      <th>0</th>\n",
+       "      <td>10063</td>\n",
+       "      <td>SDS011</td>\n",
        "      <td>13.135</td>\n",
+       "      <td>52.358999999999995</td>\n",
+       "      <td>5071</td>\n",
+       "      <td>Bergholz</td>\n",
+       "      <td>13.1</td>\n",
+       "      <td>52.35</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>401</th>\n",
-       "      <td>6827</td>\n",
-       "      <td>3451</td>\n",
-       "      <td>52.476</td>\n",
-       "      <td>13.316</td>\n",
+       "      <th>1</th>\n",
+       "      <td>10064</td>\n",
+       "      <td>BME280</td>\n",
+       "      <td>13.135</td>\n",
+       "      <td>52.358999999999995</td>\n",
+       "      <td>5071</td>\n",
+       "      <td>Bergholz</td>\n",
+       "      <td>13.1</td>\n",
+       "      <td>52.35</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>402</th>\n",
-       "      <td>15750</td>\n",
-       "      <td>7976</td>\n",
-       "      <td>52.527</td>\n",
-       "      <td>13.327</td>\n",
+       "      <th>2</th>\n",
+       "      <td>10156</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.622</td>\n",
+       "      <td>52.67100000000001</td>\n",
+       "      <td>5119</td>\n",
+       "      <td>Börnicke</td>\n",
+       "      <td>13.638</td>\n",
+       "      <td>52.6629</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>621</th>\n",
-       "      <td>13695</td>\n",
-       "      <td>6919</td>\n",
-       "      <td>52.344</td>\n",
-       "      <td>14.518</td>\n",
+       "      <th>3</th>\n",
+       "      <td>10162</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.384</td>\n",
+       "      <td>52.556000000000004</td>\n",
+       "      <td>5123</td>\n",
+       "      <td>Berlin Pankow</td>\n",
+       "      <td>13.4019</td>\n",
+       "      <td>52.5693</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>625</th>\n",
-       "      <td>14333</td>\n",
-       "      <td>7250</td>\n",
-       "      <td>52.545</td>\n",
-       "      <td>13.417</td>\n",
+       "      <th>4</th>\n",
+       "      <td>10163</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.384</td>\n",
+       "      <td>52.556000000000004</td>\n",
+       "      <td>5123</td>\n",
+       "      <td>Berlin Pankow</td>\n",
+       "      <td>13.4019</td>\n",
+       "      <td>52.5693</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>10168</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.447000000000001</td>\n",
+       "      <td>52.528</td>\n",
+       "      <td>5126</td>\n",
+       "      <td>Berlin</td>\n",
+       "      <td>13.4105</td>\n",
+       "      <td>52.5244</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>10169</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.447000000000001</td>\n",
+       "      <td>52.528</td>\n",
+       "      <td>5126</td>\n",
+       "      <td>Berlin</td>\n",
+       "      <td>13.4105</td>\n",
+       "      <td>52.5244</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>10345</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.42</td>\n",
+       "      <td>52.513000000000005</td>\n",
+       "      <td>5219</td>\n",
+       "      <td>Land Berlin</td>\n",
+       "      <td>13.4167</td>\n",
+       "      <td>52.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>10385</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.359000000000002</td>\n",
+       "      <td>52.482</td>\n",
+       "      <td>5239</td>\n",
+       "      <td>Berlin Schoeneberg</td>\n",
+       "      <td>13.3484</td>\n",
+       "      <td>52.4746</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>10386</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.359000000000002</td>\n",
+       "      <td>52.482</td>\n",
+       "      <td>5239</td>\n",
+       "      <td>Berlin Schoeneberg</td>\n",
+       "      <td>13.3484</td>\n",
+       "      <td>52.4746</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>10393</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.427999999999999</td>\n",
+       "      <td>52.473</td>\n",
+       "      <td>5243</td>\n",
+       "      <td>Berlin Tempelhof</td>\n",
+       "      <td>13.4103</td>\n",
+       "      <td>52.4769</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>10394</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.427999999999999</td>\n",
+       "      <td>52.473</td>\n",
+       "      <td>5243</td>\n",
+       "      <td>Berlin Tempelhof</td>\n",
+       "      <td>13.4103</td>\n",
+       "      <td>52.4769</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>10563</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.585999999999999</td>\n",
+       "      <td>52.461999999999996</td>\n",
+       "      <td>5330</td>\n",
+       "      <td>Westend</td>\n",
+       "      <td>13.6</td>\n",
+       "      <td>52.45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>10564</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.585999999999999</td>\n",
+       "      <td>52.461999999999996</td>\n",
+       "      <td>5330</td>\n",
+       "      <td>Westend</td>\n",
+       "      <td>13.6</td>\n",
+       "      <td>52.45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>1080</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.424000000000001</td>\n",
+       "      <td>52.581</td>\n",
+       "      <td>529</td>\n",
+       "      <td>Niederschonhausen</td>\n",
+       "      <td>13.4027</td>\n",
+       "      <td>52.5848</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15</th>\n",
+       "      <td>1081</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.424000000000001</td>\n",
+       "      <td>52.581</td>\n",
+       "      <td>529</td>\n",
+       "      <td>Niederschonhausen</td>\n",
+       "      <td>13.4027</td>\n",
+       "      <td>52.5848</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16</th>\n",
+       "      <td>10829</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.427</td>\n",
+       "      <td>52.489</td>\n",
+       "      <td>5468</td>\n",
+       "      <td>Hermannplatz</td>\n",
+       "      <td>13.4251</td>\n",
+       "      <td>52.4866</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17</th>\n",
+       "      <td>10830</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.427</td>\n",
+       "      <td>52.489</td>\n",
+       "      <td>5468</td>\n",
+       "      <td>Hermannplatz</td>\n",
+       "      <td>13.4251</td>\n",
+       "      <td>52.4866</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18</th>\n",
+       "      <td>10936</td>\n",
+       "      <td>SDS011</td>\n",
+       "      <td>13.57</td>\n",
+       "      <td>52.442</td>\n",
+       "      <td>5521</td>\n",
+       "      <td>Berlin Koepenick</td>\n",
+       "      <td>13.5823</td>\n",
+       "      <td>52.4425</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>19</th>\n",
+       "      <td>10937</td>\n",
+       "      <td>DHT22</td>\n",
+       "      <td>13.57</td>\n",
+       "      <td>52.442</td>\n",
+       "      <td>5521</td>\n",
+       "      <td>Berlin Koepenick</td>\n",
+       "      <td>13.5823</td>\n",
+       "      <td>52.4425</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
        "</div>"
       ],
       "text/plain": [
-       "    sensorId location     lat     lon\n",
-       "399    10064     5071  52.359  13.135\n",
-       "401     6827     3451  52.476  13.316\n",
-       "402    15750     7976  52.527  13.327\n",
-       "621    13695     6919  52.344  14.518\n",
-       "625    14333     7250  52.545  13.417"
+       "   sensorId sensorType                 lon                 lat location  \\\n",
+       "0     10063     SDS011              13.135  52.358999999999995     5071   \n",
+       "1     10064     BME280              13.135  52.358999999999995     5071   \n",
+       "2     10156     SDS011              13.622   52.67100000000001     5119   \n",
+       "3     10162     SDS011              13.384  52.556000000000004     5123   \n",
+       "4     10163      DHT22              13.384  52.556000000000004     5123   \n",
+       "5     10168     SDS011  13.447000000000001              52.528     5126   \n",
+       "6     10169      DHT22  13.447000000000001              52.528     5126   \n",
+       "7     10345     SDS011               13.42  52.513000000000005     5219   \n",
+       "8     10385     SDS011  13.359000000000002              52.482     5239   \n",
+       "9     10386      DHT22  13.359000000000002              52.482     5239   \n",
+       "10    10393     SDS011  13.427999999999999              52.473     5243   \n",
+       "11    10394      DHT22  13.427999999999999              52.473     5243   \n",
+       "12    10563     SDS011  13.585999999999999  52.461999999999996     5330   \n",
+       "13    10564      DHT22  13.585999999999999  52.461999999999996     5330   \n",
+       "14     1080     SDS011  13.424000000000001              52.581      529   \n",
+       "15     1081      DHT22  13.424000000000001              52.581      529   \n",
+       "16    10829     SDS011              13.427              52.489     5468   \n",
+       "17    10830      DHT22              13.427              52.489     5468   \n",
+       "18    10936     SDS011               13.57              52.442     5521   \n",
+       "19    10937      DHT22               13.57              52.442     5521   \n",
+       "\n",
+       "           stationName stationLon stationLat  \n",
+       "0             Bergholz       13.1      52.35  \n",
+       "1             Bergholz       13.1      52.35  \n",
+       "2             Börnicke     13.638    52.6629  \n",
+       "3        Berlin Pankow    13.4019    52.5693  \n",
+       "4        Berlin Pankow    13.4019    52.5693  \n",
+       "5               Berlin    13.4105    52.5244  \n",
+       "6               Berlin    13.4105    52.5244  \n",
+       "7          Land Berlin    13.4167       52.5  \n",
+       "8   Berlin Schoeneberg    13.3484    52.4746  \n",
+       "9   Berlin Schoeneberg    13.3484    52.4746  \n",
+       "10    Berlin Tempelhof    13.4103    52.4769  \n",
+       "11    Berlin Tempelhof    13.4103    52.4769  \n",
+       "12             Westend       13.6      52.45  \n",
+       "13             Westend       13.6      52.45  \n",
+       "14   Niederschonhausen    13.4027    52.5848  \n",
+       "15   Niederschonhausen    13.4027    52.5848  \n",
+       "16        Hermannplatz    13.4251    52.4866  \n",
+       "17        Hermannplatz    13.4251    52.4866  \n",
+       "18    Berlin Koepenick    13.5823    52.4425  \n",
+       "19    Berlin Koepenick    13.5823    52.4425  "
       ]
      },
-     "execution_count": 64,
+     "execution_count": 18,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "total_sensors.head()"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## Filter out sensors far from Berlin"
+    "berlin_enrichable_sensors.head(20)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 10,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "MAX_DISTANCE = 100\n",
-    "def filter_sensors(sensor):\n",
-    "    sensor_tuple = (sensor[\"lat\"], sensor[\"lon\"]) #(lat, lon)\n",
-    "    berlin_tuple = (52.520008,  13.404954)\n",
-    "    return geodesic(sensor_tuple, berlin_tuple).km < MAX_DISTANCE\n",
-    "\n",
-    "total_sensors = total_sensors[total_sensors.apply(filter_sensors, axis=1)]"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 11,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "(733, 4)"
-      ]
-     },
-     "execution_count": 11,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "total_sensors.shape"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## Find closest weather station"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 13,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "credentials_1 = pyowm.OWM('48dae982f9e685eee268e90dafba5041')"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 50,
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "ReadTimeoutError, retry #1\n",
-      "ReadTimeoutError, retry #1\n",
-      "ReadTimeoutError, retry #1\n",
-      "ReadTimeoutError, retry #1\n",
-      "ReadTimeoutError, retry #1\n"
-     ]
-    }
-   ],
-   "source": [
-    "closest_weather_stations=[]\n",
-    "for index, sensor in total_sensors.iterrows():\n",
-    "    time.sleep(1)\n",
-    "    for attempt in range(10):\n",
-    "        try:\n",
-    "            stations = utils.get_closest_weather_station(sensor[\"lat\"],sensor[\"lon\"],credentials_1)\n",
-    "            break\n",
-    "        except Exception:\n",
-    "            print(f\"ReadTimeoutError, retry #{attempt + 1}\")\n",
-    "            time.sleep(30)\n",
-    "    if stations:\n",
-    "        location = stations[0].get_location()\n",
-    "        closest_weather_stations.append([sensor[\"sensorId\"],sensor[\"lon\"],sensor[\"lat\"],sensor[\"location\"],location.get_name(),location.get_lon(),location.get_lat()])"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 65,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "733"
-      ]
-     },
-     "execution_count": 65,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "len(closest_weather_stations)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 66,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "unique_closest_weather_stations=np.unique(np.asarray(closest_weather_stations),axis=0)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 67,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "array([['10063', '13.135', '52.358999999999995', ..., 'Bergholz', '13.1',\n",
-       "        '52.35'],\n",
-       "       ['10064', '13.135', '52.358999999999995', ..., 'Bergholz', '13.1',\n",
-       "        '52.35'],\n",
-       "       ['10156', '13.622', '52.67100000000001', ..., 'Börnicke',\n",
-       "        '13.638', '52.6629'],\n",
-       "       ...,\n",
-       "       ['9810', '13.193', '52.513000000000005', ..., 'Karolinenhöhe',\n",
-       "        '13.1667', '52.5167'],\n",
-       "       ['9876', '12.985', '52.413000000000004', ..., 'Golm', '12.967',\n",
-       "        '52.4062'],\n",
-       "       ['9877', '12.985', '52.413000000000004', ..., 'Golm', '12.967',\n",
-       "        '52.4062']], dtype='<U32')"
-      ]
-     },
-     "execution_count": 67,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "unique_closest_weather_stations"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 68,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "berlin_enrichable_sensors = pd.DataFrame(unique_closest_weather_stations, columns=[\"sensorId\", \"lon\", \"lat\", \"location\", \"stationName\", \"stationLon\", \"stationLat\"])"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 69,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "np.savetxt(\"../data/unique_closest_weather_stations.csv\", unique_closest_weather_stations, delimiter=\",\",fmt='%s')"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 70,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "weather = pd.read_csv(\"../data/raw/weather_data.csv\", sep=\";\")"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 71,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "unique_locations = weather[\"location\"].unique()"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 72,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "def filter_for_weather_stations(sensor):\n",
-    "    return sensor[\"stationName\"] in unique_locations"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 73,
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "(728, 7)"
-      ]
-     },
-     "execution_count": 73,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "berlin_enrichable_sensors.shape"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 74,
+   "execution_count": 19,
    "metadata": {},
    "outputs": [],
    "source": [
     "berlin_enrichable_sensors = berlin_enrichable_sensors[berlin_enrichable_sensors.apply(filter_for_weather_stations, axis=1)]\n",
-    "berlin_enrichable_sensors.to_csv(\"../data/raw/berlin_enrichable_sensors.csv\", sep=\",\", index=False)"
+    "berlin_enrichable_sensors.to_csv(\"../data/intermediate/berlin_enrichable_sensors.csv\", sep=\",\", index=False)"
    ]
   }
  ],
