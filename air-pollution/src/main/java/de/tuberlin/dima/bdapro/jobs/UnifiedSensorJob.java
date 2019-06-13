@@ -45,8 +45,13 @@ abstract public class UnifiedSensorJob {
         put(Type.UNIFIED, "unified");
     }};
 
-    protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env) {
-        String sensorPattern = String.format("**/*_%s.csv.gz", getSensorPattern(sensorType));
+    protected static String getSensorPattern(Type sensorType) {
+        return sensorPatterns.get(sensorType);
+    }
+
+    protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env, boolean compressed) {
+        String suffix = compressed ? ".csv.gz" : ".csv";
+        String sensorPattern = String.format("**/*%s" + suffix, getSensorPattern(sensorType));
         SensorReadingCsvInputFormat fileFormat = new SensorReadingCsvInputFormat(new Path(sensorDataBasePath), sensorType);
         fileFormat.setNestedFileEnumeration(true);
         fileFormat.setFilesFilter(new GlobFilePathFilter(Arrays.asList("**/", sensorPattern), new ArrayList<>()));
@@ -54,7 +59,7 @@ abstract public class UnifiedSensorJob {
                 .filter((UnifiedSensorReading reading) -> reading.sensorId != null);
     }
 
-    protected static String getSensorPattern(Type sensorType) {
-        return sensorPatterns.get(sensorType);
+    protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env) {
+        return readSensor(sensorType, sensorDataBasePath, env, false);
     }
 }

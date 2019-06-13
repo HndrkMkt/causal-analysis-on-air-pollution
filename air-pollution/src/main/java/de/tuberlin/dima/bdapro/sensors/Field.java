@@ -37,7 +37,9 @@ public class Field implements Serializable {
             return;
         }
         try {
-            if (clazz.equals(Integer.class)) {
+            if (str.equals("null")) {
+                value = null;
+            } else if (clazz.equals(Integer.class)) {
                 value = Integer.parseInt(str);
             } else if (clazz.equals(Double.class)) {
                 if (str.equalsIgnoreCase("NaN")) {
