@@ -7,6 +7,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
@@ -17,19 +18,23 @@ import static de.tuberlin.dima.bdapro.jobs.Filtering.readAcceptedSensors;
 import static de.tuberlin.dima.bdapro.jobs.WeatherJob.readWeather;
 
 public class Joining extends UnifiedSensorJob {
-    private static String sensorBasePath = "../data/intermediate/filtered/";
-    private static String filterBasePath = "../data/intermediate/";
+
     private static String weatherDataPath = "../data/raw/weather/weather_data.csv";
+    private static String sensorBasePath = "intermediate/filtered";
+    private static String filterBasePath = "intermediate/";
     private static boolean compressed = false;
 
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
 
-        Path sensorDataBasePath = new Path(sensorBasePath);
-        DataSet<Integer> acceptedSensors = readAcceptedSensors(env, filterBasePath);
+        ParameterTool params = ParameterTool.fromArgs(args);
+        final String dataDirectory = params.get("data_dir", "data");
 
-        DataSet<Tuple5<Double, Double, Double, Double, String>> acceptedSensorData = env.readCsvFile(new Path(filterBasePath, "berlin_enrichable_sensors.csv").toString())
+        Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
+        DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+
+        DataSet<Tuple5<Double, Double, Double, Double, String>> acceptedSensorData = env.readCsvFile(new Path(new Path(dataDirectory,filterBasePath), "berlin_enrichable_sensors.csv").toString())
                 .fieldDelimiter(",").ignoreFirstLine().includeFields("1111100").types(Double.class, Double.class, Double.class, Double.class, String.class);
 
         DataSet<UnifiedSensorReading> sensorReadings = readAllSensors(sensorDataBasePath.toString(), env);
@@ -301,7 +306,7 @@ public class Joining extends UnifiedSensorJob {
         DataSet<UnifiedSensorReading> sensorReadings = null;
 
         for (Type sensorType : Type.values()) {
-            Path sensorDataBasePath = new Path(sensorBasePath);
+            Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
             DataSet<UnifiedSensorReading> sensorReading = readSensor(sensorType, sensorDataBasePath.toString(), env, compressed);
             if (sensorReadings == null) {
                 sensorReadings = sensorReading;
