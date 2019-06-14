@@ -24,7 +24,7 @@ public class WeatherJob {
         env.execute("Flink Batch Java API Skeleton");
     }
 
-    private static <T extends WeatherReading> DataSet<T> readWeather(ExecutionEnvironment env, String weatherDataPath, Class<T> clazz, List<Field> fields) {
+    public static <T extends WeatherReading> DataSet<T> readWeather(ExecutionEnvironment env, String weatherDataPath, Class<T> clazz, List<Field> fields) {
         NullableCsvInputFormat<T> fileFormat = new NullableCsvInputFormat<>(new Path(weatherDataPath),
                 new WeatherReadingParser<>(clazz, fields));
         return env.createInput(fileFormat, TypeInformation.of(clazz)).setParallelism(1);
