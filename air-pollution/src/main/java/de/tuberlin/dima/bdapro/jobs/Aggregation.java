@@ -59,18 +59,17 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 public class Aggregation extends UnifiedSensorJob {
     private static String sensorBasePath = "intermediate/filtered";
     private static boolean compressed = false;
-    private static final int WINDOW_IN_MINUTES = 5;
-
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         final BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
 
-        tEnv.registerFunction("timeWindow", new TimeWindow(WINDOW_IN_MINUTES));
 
         ParameterTool params = ParameterTool.fromArgs(args);
         final String dataDirectory = params.get("data_dir", "data");
+        final int windowInMinutes = params.getInt("window_in_minutes", 5);
+        tEnv.registerFunction("timeWindow", new TimeWindow(windowInMinutes));
 
 
         DataSet<UnifiedSensorReading> sensorReadings = readAllSensors(dataDirectory, env);
@@ -94,7 +93,8 @@ public class Aggregation extends UnifiedSensorJob {
                 Types.LONG, Types.LONG, Types.BOOLEAN,
                 Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE,
                 Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE};
-        TableSink<Row> sink = new CsvTableSink(new Path(dataDirectory, "processed/output.csv").getPath(), ";", 1, OVERWRITE);
+        Path outputPath = new Path(dataDirectory, String.format("processed/output_%s.csv", windowInMinutes));
+        TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
         String[] fieldNames = {"location", "lat", "lon", "timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"};
         fieldNames = ArrayUtils.addAll(fieldNames, fields);
         tEnv.registerTableSink("output", fieldNames, fieldTypes, sink);
