@@ -60,6 +60,6 @@ abstract public class UnifiedSensorJob {
     }
 
     protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env) {
-        return readSensor(sensorType, sensorDataBasePath, env, false);
+        return readSensor(sensorType, sensorDataBasePath, env, true);
     }
 }
