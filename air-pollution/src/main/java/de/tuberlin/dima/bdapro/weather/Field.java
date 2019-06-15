@@ -1,5 +1,6 @@
 package de.tuberlin.dima.bdapro.weather;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,10 @@ public class Field implements Serializable {
 
     public Object getValue() {
         return value;
+    }
+
+    public TypeInformation getType() {
+        return  TypeInformation.of(clazz);
     }
 
     public void setValue(String str) throws Exception {

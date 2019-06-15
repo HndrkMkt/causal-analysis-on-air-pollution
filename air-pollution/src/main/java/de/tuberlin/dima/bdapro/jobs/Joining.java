@@ -3,26 +3,33 @@ package de.tuberlin.dima.bdapro.jobs;
 import de.tuberlin.dima.bdapro.sensors.Type;
 import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
 import de.tuberlin.dima.bdapro.weather.WeatherReading;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
+import org.apache.flink.table.sinks.CsvTableSink;
+import org.apache.flink.table.sinks.TableSink;
+import org.apache.flink.types.Row;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
-import static de.tuberlin.dima.bdapro.jobs.Filtering.readAcceptedSensors;
-import static de.tuberlin.dima.bdapro.jobs.WeatherJob.readWeather;
+import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
+
 
 public class Joining extends UnifiedSensorJob {
 
-    private static String weatherDataPath = "../data/raw/weather/weather_data.csv";
-    private static String sensorBasePath = "intermediate/filtered";
+    private static String weatherDataPath = "raw/weather/weather_data.csv";
     private static String filterBasePath = "intermediate/";
-    private static boolean compressed = false;
 
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -31,183 +38,132 @@ public class Joining extends UnifiedSensorJob {
         ParameterTool params = ParameterTool.fromArgs(args);
         final String dataDirectory = params.get("data_dir", "data");
 
-        Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
-        DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+        DataSet<Tuple4<Double, Double, Double, String>> acceptedSensorData = env.readCsvFile(new Path(new Path(dataDirectory, filterBasePath), "berlin_enrichable_sensors.csv").toString())
+                .fieldDelimiter(",").ignoreFirstLine().includeFields("00111100").types(Double.class, Double.class, Double.class, String.class);
+        Path weatherDataBasePath = new Path(dataDirectory, weatherDataPath);
 
-        DataSet<Tuple5<Double, Double, Double, Double, String>> acceptedSensorData = env.readCsvFile(new Path(new Path(dataDirectory,filterBasePath), "berlin_enrichable_sensors.csv").toString())
-                .fieldDelimiter(",").ignoreFirstLine().includeFields("1111100").types(Double.class, Double.class, Double.class, Double.class, String.class);
+        DataSet<WeatherReading> weatherReadingDataSet = WeatherJob.readWeather(env, weatherDataBasePath.getPath(), WeatherReading.class, WeatherReading.getFields());
 
-        DataSet<UnifiedSensorReading> sensorReadings = readAllSensors(sensorDataBasePath.toString(), env);
-        DataSet<UnifiedSensorReading> filteredData = filterSensors(sensorReadings, acceptedSensors);
-
-
-        DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, weatherDataPath, WeatherReading.class, WeatherReading.getFields());
-
-
-        tEnv.registerDataSet("accepted_sensors", acceptedSensorData, "sensor_id," +
-                "longitude," +
+        DataSet<UnifiedSensorReading> filteredSensorData = Filtering.getFilteredSensor(Type.BMP180, true, dataDirectory, env);
+        tEnv.registerTable("unified_sensor_data", Aggregation.aggregateSensorData(filteredSensorData, 60, env, tEnv));
+        tEnv.registerDataSet("weather", weatherReadingDataSet);
+        tEnv.registerDataSet("accepted_sensors", acceptedSensorData, "longitude," +
                 "latitude," +
                 "location," +
                 "closest_weather_station"
         );
 
-        tEnv.registerDataSet("unified_sensor_data", filteredData, "sensorId," +
-                "sensorType," +
-                "location," +
-                "lat," +
-                "lon," +
-                "timestamp," +
-                "pressure," +
-                "altitude," +
-                "pressure_sealevel," +
-                "temperature," +
-                "humidity," +
-                "p1," +
-                "p2," +
-                "p0," +
-                "durP1," +
-                "ratioP1," +
-                "durP2," +
-                "ratioP2");
+        Table distinctLocationMappings = tEnv.scan("accepted_sensors").distinct();
+        Table sensorsWithWeatherStationsNames = tEnv.sqlQuery(
+                "SELECT s.*, a.closest_weather_station FROM unified_sensor_data s JOIN " + distinctLocationMappings + " a ON s.location=a.location");
 
-        tEnv.registerDataSet("weather", weatherReadingDataSet, "location," +
-                "time," +
-                "longitude," +
-                "latitude," +
-                "temperature," +
-                "apparent_temperature," +
-                "cloud_cover," +
-                "dew_point," +
-                "humidity," +
-                "ozone," +
-                "precip_intensity," +
-                "precip_probability," +
-                "precip_type," +
-                "pressure," +
-                "uv_index," +
-                "visibility," +
-                "wind_bearing," +
-                "wind_gust," +
-                "wind_speed");
-
-        Table result_1 = tEnv.sqlQuery(
-                "SELECT s.*,a.closest_weather_station FROM unified_sensor_data s LEFT JOIN accepted_sensors a ON s.sensorId=CAST(a.sensor_id AS int)");
-
-        DataSet<JoinStations> joinStationsResult = tEnv.toDataSet(result_1, JoinStations.class);
-
-        joinStationsResult.print();
-
-        tEnv.registerDataSet("sensors_stations", joinStationsResult, "sensorId," +
-                "sensorType," +
-                "location," +
-                "lat," +
-                "lon," +
-                "timestamp," +
-                "pressure," +
-                "altitude," +
-                "pressure_sealevel," +
-                "temperature," +
-                "humidity," +
-                "p1," +
-                "p2," +
-                "p0," +
-                "durP1," +
-                "ratioP1," +
-                "durP2," +
-                "ratioP2," +
-                "closest_weather_station");
-
-        StringBuilder sqlBuilder = new StringBuilder()
-                .append("select a.*,w.apparent_temperature,w.cloud_cover,w.dew_point,w.ozone,w.precip_intensity, ")
-                .append("w.precip_probability,w.precip_type,w.uv_index,w.visibility,w.wind_bearing,w.wind_gust,w.wind_speed ")
-                .append("from sensors_stations a ")
-                .append("left join weather w ")
-                .append("ON (a.closest_weather_station=w.location AND EXTRACT(year FROM a.`timestamp`)=EXTRACT(year FROM w.`time`) and EXTRACT(month FROM a.`timestamp`)=EXTRACT(month FROM w.`time`) ")
-                .append("AND EXTRACT(day FROM a.`timestamp`)=EXTRACT(day FROM w.`time`) AND EXTRACT(hour FROM a.`timestamp`)=EXTRACT(hour FROM w.`time`))");
+        StringBuilder sqlBuilder = new StringBuilder();
+        List<String> aggregatedFielNames = new ArrayList<>();
+        for (String fieldName : Aggregation.getAggregationFieldNames()) {
+            aggregatedFielNames.add(String.format("a.`%s`", fieldName));
+        }
+        String aggregatedFields = StringUtils.join(aggregatedFielNames, ", ");
+        sqlBuilder.append("SELECT " + aggregatedFields);
+        for (String fieldName : WeatherReading.getMeasurementFieldNames()) {
+            sqlBuilder.append(String.format(", w.`%s`", fieldName));
+        }
+        sqlBuilder.append(" FROM " + sensorsWithWeatherStationsNames + " a ")
+                .append("JOIN weather w ")
+                .append("ON a.closest_weather_station = w.location AND FLOOR(a.`timestamp` TO HOUR) = FLOOR(w.`time` TO HOUR)");
 
         String spatio_temporal_join = sqlBuilder.toString();
 
         Table result = tEnv.sqlQuery(spatio_temporal_join);
+        Path outputPath = new Path(dataDirectory, "processed/causalDiscoveryData.csv");
+        TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
 
-        DataSet<JoinWeather> joinWeatherResult = tEnv.toDataSet(result, JoinWeather.class);
+        String[] fieldNames = Aggregation.getAggregationFieldNames();
+        fieldNames = ArrayUtils.addAll(fieldNames, WeatherReading.getMeasurementFieldNames());
 
+        TypeInformation[] fieldTypes = Aggregation.getAggregationFieldTypes();
+        fieldTypes = ArrayUtils.addAll(fieldTypes, WeatherReading.getMeasurementFieldTypes());
+        tEnv.registerTableSink("output", fieldNames, fieldTypes, sink);
+        result.insertInto("output");
+
+//        DataSet<JoinWeather> joinWeatherResult = tEnv.toDataSet(result, JoinWeather.class);
+//        List<JoinWeather> foo = joinWeatherResult.collect();
         env.execute("Joined Dataset");
 
     }
-
-    public static class JoinStations {
-        // Common Fields
-        public Integer sensorId;
-        public String sensorType;
-        public Integer location;
-        public Double lat;
-        public Double lon;
-        public Timestamp timestamp;
-
-        // Sensor specific fields
-        public Double pressure;
-        public Double altitude;
-        public Double pressure_sealevel;
-        public Double temperature;
-        public Double humidity;
-
-        public Double p1;
-        public Double p2;
-        public Double p0;
-        public Double durP1;
-        public Double ratioP1;
-        public Double durP2;
-        public Double ratioP2;
-
-        // weather station
-        public String closest_weather_station;
-
-        public JoinStations(Integer sensorId, String sensorType, Integer location, Double lat,Double lon,Timestamp timestamp,
-                            Double pressure,Double altitude,Double pressure_sealevel,Double temperature, Double humidity,Double p1,
-                            Double p2,Double p0,Double durP1,Double ratioP1,Double durP2,Double ratioP2,String closest_weather_station) {
-            super();
-            this.sensorId = sensorId;
-            this.sensorType = sensorType;
-            this.location = location;
-            this.lat = lat;
-            this.lon = lon;
-            this.timestamp = timestamp;
-            this.pressure = pressure;
-            this.altitude = altitude;
-            this.pressure_sealevel = pressure_sealevel;
-            this.temperature = temperature;
-            this.humidity = humidity;
-            this.p1 = p1;
-            this.p2 = p2;
-            this.p0 = p0;
-            this.durP1 = durP1;
-            this.ratioP1 = ratioP1;
-            this.durP2 = durP2;
-            this.ratioP2 = ratioP2;
-            this.closest_weather_station = closest_weather_station;
-        }
-
-        public JoinStations() {
-            super();
-        }
-
-        //@Override
-        //public String toString() {
-        //    return "StationJoin [sensorID=" + sensorId + ", sensorType=" + sensorType + ", location=" + location +
-        //            ", lat=" + lat + ", lon=" + lon + ", timestamp=" + timestamp + ", pressure="+ pressure+
-        //            ", altitude=" + altitude + ", pressure_sealevel=" + pressure_sealevel + ",temperature=" + temperature+
-        //            ", humidity="+ humidity+ ", p1="+ p1 + ", p2=" + p2 + ", p0=" + p0 +
-        //            ", durP1=" + durP1 +
-        //            ", ratioP1=" + ratioP1 + ", durP2=" +durP2 + ", ratioP2=" + ratioP2 +", closest_weather_station=" + closest_weather_station +
-        //            "]";
-        //}
-
-    }
+//
+//    public static class JoinStations {
+//        // Common Fields
+//        public Integer sensorId;
+//        public String sensorType;
+//        public Integer location;
+//        public Double lat;
+//        public Double lon;
+//        public Timestamp timestamp;
+//
+//        // Sensor specific fields
+//        public Double pressure;
+//        public Double altitude;
+//        public Double pressure_sealevel;
+//        public Double temperature;
+//        public Double humidity;
+//
+//        public Double p1;
+//        public Double p2;
+//        public Double p0;
+//        public Double durP1;
+//        public Double ratioP1;
+//        public Double durP2;
+//        public Double ratioP2;
+//
+//        // weather station
+//        public String closest_weather_station;
+//
+//        public JoinStations(Integer sensorId, String sensorType, Integer location, Double lat, Double lon, Timestamp timestamp,
+//                            Double pressure, Double altitude, Double pressure_sealevel, Double temperature, Double humidity, Double p1,
+//                            Double p2, Double p0, Double durP1, Double ratioP1, Double durP2, Double ratioP2, String closest_weather_station) {
+//            super();
+//            this.sensorId = sensorId;
+//            this.sensorType = sensorType;
+//            this.location = location;
+//            this.lat = lat;
+//            this.lon = lon;
+//            this.timestamp = timestamp;
+//            this.pressure = pressure;
+//            this.altitude = altitude;
+//            this.pressure_sealevel = pressure_sealevel;
+//            this.temperature = temperature;
+//            this.humidity = humidity;
+//            this.p1 = p1;
+//            this.p2 = p2;
+//            this.p0 = p0;
+//            this.durP1 = durP1;
+//            this.ratioP1 = ratioP1;
+//            this.durP2 = durP2;
+//            this.ratioP2 = ratioP2;
+//            this.closest_weather_station = closest_weather_station;
+//        }
+//
+//        public JoinStations() {
+//            super();
+//        }
+//
+//        //@Override
+//        //public String toString() {
+//        //    return "StationJoin [sensorID=" + sensorId + ", sensorType=" + sensorType + ", location=" + location +
+//        //            ", lat=" + lat + ", lon=" + lon + ", timestamp=" + timestamp + ", pressure="+ pressure+
+//        //            ", altitude=" + altitude + ", pressure_sealevel=" + pressure_sealevel + ",temperature=" + temperature+
+//        //            ", humidity="+ humidity+ ", p1="+ p1 + ", p2=" + p2 + ", p0=" + p0 +
+//        //            ", durP1=" + durP1 +
+//        //            ", ratioP1=" + ratioP1 + ", durP2=" +durP2 + ", ratioP2=" + ratioP2 +", closest_weather_station=" + closest_weather_station +
+//        //            "]";
+//        //}
+//
+//    }
 
     public static class JoinWeather {
         // Common Fields
-        public Integer sensorId;
-        public String sensorType;
+//        public Integer sensorId;
+//        public String sensorType;
         public Integer location;
         public Double lat;
         public Double lon;
@@ -243,15 +199,16 @@ public class Joining extends UnifiedSensorJob {
         public Double wind_gust;
         public Double wind_speed;
 
-        public JoinWeather(Integer sensorId, String sensorType, Integer location, Double lat,Double lon,Timestamp timestamp,
-                           Double pressure,Double altitude,Double pressure_sealevel,Double temperature, Double humidity,Double p1,
-                           Double p2,Double p0,Double durP1,Double ratioP1,Double durP2,Double ratioP2,String closest_weather_station,
-                           Double apparent_temperature,Double cloud_cover,Double dew_point,Double ozone, Double precip_intensity,
-                           Double precip_probability,String precip_type,Double uv_index,Double visibility,
-                           Double wind_bearing,Double wind_gust, Double wind_speed) {
+        public JoinWeather(//Integer sensorId, String sensorType,
+                           Integer location, Double lat, Double lon, Timestamp timestamp,
+                           Double pressure, Double altitude, Double pressure_sealevel, Double temperature, Double humidity, Double p1,
+                           Double p2, Double p0, Double durP1, Double ratioP1, Double durP2, Double ratioP2, String closest_weather_station,
+                           Double apparent_temperature, Double cloud_cover, Double dew_point, Double ozone, Double precip_intensity,
+                           Double precip_probability, String precip_type, Double uv_index, Double visibility,
+                           Double wind_bearing, Double wind_gust, Double wind_speed) {
             super();
-            this.sensorId = sensorId;
-            this.sensorType = sensorType;
+            //this.sensorId = sensorId;
+            //this.sensorType = sensorType;
             this.location = location;
             this.lat = lat;
             this.lon = lon;
@@ -286,35 +243,6 @@ public class Joining extends UnifiedSensorJob {
         public JoinWeather() {
             super();
         }
-
-        //@Override
-        //public String toString() {
-        //    return "WeatherResult [sensorID=" + sensorId + ", sensorType=" + sensorType + ", location=" + location +
-        //            ", lat=" + lat + ", lon=" + lon + ", timestamp=" + timestamp + ", p1=" + p1 + "durP1=" + durP1 +
-        //            ", ratioP1=" + ratioP1 + ", P2=" + p2 + ", durP2=" + ", ratioP2=" + ", closest_weather_station=" +
-        //            closest_weather_station + " , temperature=" + temperature +
-        //            "]";
-        //}
-    }
-
-    private static DataSet<UnifiedSensorReading> filterSensors(DataSet<UnifiedSensorReading> sensorData, DataSet<Integer> acceptedSensors) {
-        DataSet<Tuple2<UnifiedSensorReading, Integer>> joinResult = sensorData.joinWithTiny(acceptedSensors).where((UnifiedSensorReading reading) -> reading.sensorId).equalTo((Integer sensorId) -> sensorId);
-        return joinResult.map((Tuple2<UnifiedSensorReading, Integer> tuple) -> tuple.f0);
-    }
-
-    private static DataSet<UnifiedSensorReading> readAllSensors(String dataDirectory, ExecutionEnvironment env) {
-        DataSet<UnifiedSensorReading> sensorReadings = null;
-
-        for (Type sensorType : Type.values()) {
-            Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
-            DataSet<UnifiedSensorReading> sensorReading = readSensor(sensorType, sensorDataBasePath.toString(), env, compressed);
-            if (sensorReadings == null) {
-                sensorReadings = sensorReading;
-            } else {
-                sensorReadings = sensorReadings.union(sensorReading);
-            }
-        }
-        return sensorReadings;
     }
 }
 

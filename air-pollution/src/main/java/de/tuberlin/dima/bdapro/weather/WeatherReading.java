@@ -1,5 +1,7 @@
 package de.tuberlin.dima.bdapro.weather;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,13 @@ public class WeatherReading {
         fields.add(new Field("longitude", Double.class));
         fields.add(new Field("latitude", Double.class));
         fields.add(new Field("temperature", Double.class));
+        List<Field> measurementFields = getMeasurementFields();
+        fields.addAll(measurementFields);
+        return fields;
+    }
+
+    public static List<Field> getMeasurementFields() {
+        ArrayList<Field> fields = new ArrayList<>();
         fields.add(new Field("apparent_temperature", Double.class));
         fields.add(new Field("cloud_cover", Double.class));
         fields.add(new Field("dew_point", Double.class));
@@ -48,5 +57,23 @@ public class WeatherReading {
         fields.add(new Field("wind_gust", Double.class));
         fields.add(new Field("wind_speed", Double.class));
         return fields;
+    }
+
+    public static final String[] getMeasurementFieldNames() {
+        List<String> measurementFieldNames = new ArrayList<>();
+        for (Field field : getMeasurementFields()) {
+            measurementFieldNames.add(field.getName());
+        }
+        String[] result = new String[measurementFieldNames.size()];
+        return measurementFieldNames.toArray(result);
+    }
+
+    public static final TypeInformation[] getMeasurementFieldTypes() {
+        List<TypeInformation> measurementFieldTypes = new ArrayList<>();
+        for (Field field : getMeasurementFields()) {
+            measurementFieldTypes.add(field.getType());
+        }
+        TypeInformation[] result = new TypeInformation[measurementFieldTypes.size()];
+        return measurementFieldTypes.toArray(result);
     }
 }

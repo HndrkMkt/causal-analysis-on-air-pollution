@@ -59,6 +59,11 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 public class Aggregation extends UnifiedSensorJob {
     private static boolean compressed = false;
 
+    private static final TypeInformation[] FIELD_TYPES = {Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.LONG,
+            Types.LONG, Types.LONG, Types.BOOLEAN,
+            Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE,
+            Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE};
+
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -69,29 +74,27 @@ public class Aggregation extends UnifiedSensorJob {
         final String dataDirectory = params.get("data_dir", "data");
         final int windowInMinutes = params.getInt("window_in_minutes", 5);
 
-        Table aggregates = aggregateSensorData(dataDirectory, windowInMinutes, env, tEnv);
+        Table aggregates = aggregateSensorData(true, dataDirectory, windowInMinutes, env, tEnv);
 
         storeAggregatedSensorData(aggregates, dataDirectory, windowInMinutes, tEnv);
         env.execute("Filter Dataset");
     }
 
     public static void storeAggregatedSensorData(Table aggregates, String dataDirectory, int windowInMinutes, BatchTableEnvironment tEnv) {
-        TypeInformation[] fieldTypes = {Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.LONG,
-                Types.LONG, Types.LONG, Types.BOOLEAN,
-                Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE,
-                Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE};
         Path outputPath = new Path(dataDirectory, String.format("processed/output_%s.csv", windowInMinutes));
         TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
-        String[] fieldNames = {"location", "lat", "lon", "timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"};
-        fieldNames = ArrayUtils.addAll(fieldNames, UnifiedSensorReading.AGGREGATION_FIELDS);
-        tEnv.registerTableSink("output", fieldNames, fieldTypes, sink);
+
+        tEnv.registerTableSink("output", getAggregationFieldNames(), getAggregationFieldTypes(), sink);
         aggregates.insertInto("output");
     }
 
-    public static Table aggregateSensorData(String dataDirectory, int windowInMinutes, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
-        tEnv.registerFunction("timeWindow", new TimeWindow(windowInMinutes));
+    public static Table aggregateSensorData(boolean useCached, String dataDirectory, int windowInMinutes, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
+        DataSet<UnifiedSensorReading> sensorReadings = Filtering.getFilteredSensors(useCached, dataDirectory, env);
+        return aggregateSensorData(sensorReadings, windowInMinutes, env, tEnv);
+    }
 
-        DataSet<UnifiedSensorReading> sensorReadings = Filtering.getFilteredSensors(true, dataDirectory, env);
+    public static Table aggregateSensorData(DataSet<UnifiedSensorReading> sensorReadings, int windowInMinutes, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
+        tEnv.registerFunction("timeWindow", new TimeWindow(windowInMinutes));
 
         Table table = tEnv.fromDataSet(sensorReadings);
 
@@ -104,6 +107,16 @@ public class Aggregation extends UnifiedSensorJob {
         }
         Table aggregates = table.select("*, timeWindow(timestamp) AS currentWindow");
         return tEnv.sqlQuery("SELECT " + selectStatement.toString() + " FROM " + aggregates + " GROUP BY location, currentWindow");
+    }
+
+    public static final String[] getAggregationFieldNames() {
+        String[] fieldNames = {"location", "lat", "lon", "timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"};
+        fieldNames = ArrayUtils.addAll(fieldNames, UnifiedSensorReading.AGGREGATION_FIELDS);
+        return fieldNames;
+    }
+
+    public static final TypeInformation[] getAggregationFieldTypes() {
+        return FIELD_TYPES;
     }
 
 }

@@ -77,6 +77,16 @@ public class Filtering extends UnifiedSensorJob {
         }
     }
 
+    public static DataSet<UnifiedSensorReading> getFilteredSensor(Type sensorType, boolean cached, String dataDirectory, ExecutionEnvironment env) {
+        if (cached) {
+            Path sensorDataBasePath = new Path(dataDirectory, filteredSensorDataPath);
+            return readSensor(sensorType, sensorDataBasePath.getPath(), env, false);
+        } else {
+            DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+            return filterSensor(sensorType, dataDirectory, acceptedSensors, env);
+        }
+    }
+
     private static void cacheFilteredSensorData(String dataDirectory, ExecutionEnvironment env) {
         DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
         for (Type sensorType : Type.values()) {

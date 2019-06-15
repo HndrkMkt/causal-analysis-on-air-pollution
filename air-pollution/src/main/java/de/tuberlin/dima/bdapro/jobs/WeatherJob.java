@@ -13,7 +13,7 @@ import java.util.List;
 
 public class WeatherJob {
 
-    private static String weatherDataPath = "../data/raw/weather/weather_data.csv";
+    private static String weatherDataPath = "data/raw/weather/weather_data.csv";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
@@ -21,6 +21,7 @@ public class WeatherJob {
 
         DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, weatherDataPath, WeatherReading.class, WeatherReading.getFields());
 
+        List<WeatherReading> result = weatherReadingDataSet.collect();
         env.execute("Flink Batch Java API Skeleton");
     }
 
