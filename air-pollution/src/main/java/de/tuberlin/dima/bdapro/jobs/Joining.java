@@ -44,7 +44,7 @@ public class Joining extends UnifiedSensorJob {
 
         DataSet<WeatherReading> weatherReadingDataSet = WeatherJob.readWeather(env, weatherDataBasePath.getPath(), WeatherReading.class, WeatherReading.getFields());
 
-        DataSet<UnifiedSensorReading> filteredSensorData = Filtering.getFilteredSensor(Type.BMP180, true, dataDirectory, env);
+        DataSet<UnifiedSensorReading> filteredSensorData = Filtering.getFilteredSensors(true, dataDirectory, env);
         tEnv.registerTable("unified_sensor_data", Aggregation.aggregateSensorData(filteredSensorData, 60, env, tEnv));
         tEnv.registerDataSet("weather", weatherReadingDataSet);
         tEnv.registerDataSet("accepted_sensors", acceptedSensorData, "longitude," +
