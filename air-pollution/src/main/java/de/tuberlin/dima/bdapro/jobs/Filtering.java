@@ -20,12 +20,17 @@ package de.tuberlin.dima.bdapro.jobs;
 
 import de.tuberlin.dima.bdapro.SensorReadingFormatter;
 import de.tuberlin.dima.bdapro.sensors.*;
+import org.apache.flink.api.common.operators.Union;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
@@ -40,7 +45,8 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * and run 'mvn clean package' on the command line.
  */
 public class Filtering extends UnifiedSensorJob {
-    private static String sensorBasePath = "raw/csv_per_month";
+    private static String rawSensorDataPath = "raw/csv_per_month";
+    private static String filteredSensorDataPath = "intermediate/filtered";
     private static String filterBasePath = "intermediate/";
 
     public static void main(String[] args) throws Exception {
@@ -52,24 +58,46 @@ public class Filtering extends UnifiedSensorJob {
 //        final double centerLatitude = params.getDouble("lat", 52.31);
 //        final double centerLongiture = params.getDouble("lon", 13.24);
 //        final double maxDistance = params.getDouble("distance", 25.0);
-        DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+        cacheFilteredSensorData(dataDirectory, env);
 
-        for (Type sensorType : Type.values()) {
-            Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
-            DataSet<UnifiedSensorReading> sensorData = readSensor(sensorType, sensorDataBasePath.toString(), env);
-            DataSet<UnifiedSensorReading> filteredData = filterSensors(sensorData, acceptedSensors);
-            Path outputFilePath = new Path(dataDirectory, String.format("intermediate/filtered/%s.csv", getSensorPattern(sensorType)));
-            filteredData.writeAsFormattedText(outputFilePath.toString(), OVERWRITE, new SensorReadingFormatter(sensorType)).setParallelism(1);
-        }
         env.execute("Filter Dataset");
     }
 
-    private static DataSet<UnifiedSensorReading> filterSensors(DataSet<UnifiedSensorReading> sensorData, DataSet<Integer> acceptedSensors) {
+    public static DataSet<UnifiedSensorReading> getFilteredSensors(boolean cached, String dataDirectory, ExecutionEnvironment env) {
+        if (cached) {
+            Path sensorDataBasePath = new Path(dataDirectory, filteredSensorDataPath);
+            return readAllSensors(sensorDataBasePath.getPath(), env, false);
+        } else {
+            ArrayList<DataSet<UnifiedSensorReading>> filteredSensorList = new ArrayList<>();
+            DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+            for (Type sensorType : Type.values()) {
+                filteredSensorList.add(filterSensor(sensorType, dataDirectory, acceptedSensors, env));
+            }
+            return unionAll(filteredSensorList);
+        }
+    }
+
+    private static void cacheFilteredSensorData(String dataDirectory, ExecutionEnvironment env) {
+        DataSet<Integer> acceptedSensors = readAcceptedSensors(env, dataDirectory);
+        for (Type sensorType : Type.values()) {
+            DataSet<UnifiedSensorReading> filteredData = filterSensor(sensorType, dataDirectory, acceptedSensors, env);
+            Path outputFilePath = new Path(dataDirectory, String.format("intermediate/filtered/%s.csv", getSensorPattern(sensorType)));
+            filteredData.writeAsFormattedText(outputFilePath.toString(), OVERWRITE, new SensorReadingFormatter(sensorType)).setParallelism(1);
+        }
+    }
+
+    private static DataSet<UnifiedSensorReading> filterSensor(Type sensorType, String dataDirectory, DataSet<Integer> acceptedSensors, ExecutionEnvironment env) {
+        Path sensorDataBasePath = new Path(dataDirectory, rawSensorDataPath);
+        DataSet<UnifiedSensorReading> sensorData = readSensor(sensorType, sensorDataBasePath.toString(), env);
+        return filterSensorData(sensorData, acceptedSensors);
+    }
+
+    private static DataSet<UnifiedSensorReading> filterSensorData(DataSet<UnifiedSensorReading> sensorData, DataSet<Integer> acceptedSensors) {
         DataSet<Tuple2<UnifiedSensorReading, Integer>> joinResult = sensorData.joinWithTiny(acceptedSensors).where((UnifiedSensorReading reading) -> reading.sensorId).equalTo((Integer sensorId) -> sensorId);
         return joinResult.map((Tuple2<UnifiedSensorReading, Integer> tuple) -> tuple.f0);
     }
 
-    protected static DataSet<Integer> readAcceptedSensors(ExecutionEnvironment env, String basePath) {
+    private static DataSet<Integer> readAcceptedSensors(ExecutionEnvironment env, String basePath) {
         DataSet<Tuple1<Double>> acceptedSensorData = env.readCsvFile(new Path(new Path(basePath, filterBasePath), "berlin_enrichable_sensors.csv").toString())
                 .fieldDelimiter(",").ignoreFirstLine().includeFields(0x1).types(Double.class);
         return acceptedSensorData.map((Tuple1<Double> tuple) -> (int) Math.round(tuple.f0));

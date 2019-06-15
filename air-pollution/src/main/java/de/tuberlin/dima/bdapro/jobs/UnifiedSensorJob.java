@@ -62,4 +62,24 @@ abstract public class UnifiedSensorJob {
     protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env) {
         return readSensor(sensorType, sensorDataBasePath, env, true);
     }
+
+    protected static DataSet<UnifiedSensorReading> readAllSensors(String sensorDataBasePath, ExecutionEnvironment env, boolean compressed) {
+        ArrayList<DataSet<UnifiedSensorReading>> sensorReadingsList = new ArrayList<>();
+        for (Type sensorType : Type.values()) {
+            sensorReadingsList.add(readSensor(sensorType, sensorDataBasePath, env, compressed));
+        }
+        return unionAll(sensorReadingsList);
+    }
+
+    protected static <T> DataSet<T> unionAll(List<DataSet<T>> list) {
+        DataSet<T> unionDataset = null;
+        for (DataSet<T> dataset: list) {
+            if (unionDataset == null) {
+                unionDataset = dataset;
+            } else {
+                unionDataset = unionDataset.union(dataset);
+            }
+        }
+        return unionDataset;
+    }
 }

@@ -29,6 +29,9 @@ public class UnifiedSensorReading {
     public Double durP2;
     public Double ratioP2;
 
+    public static final String[] AGGREGATION_FIELDS = {"pressure", "altitude", "pressure_sealevel", "temperature", "humidity",
+            "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"};
+
     public Tuple18<Integer, String, Integer, Double, Double, Timestamp,
             Double, Double, Double, Double, Double,
             Double, Double, Double, Double, Double, Double, Double> toTuple() {

@@ -57,7 +57,6 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * and run 'mvn clean package' on the command line.
  */
 public class Aggregation extends UnifiedSensorJob {
-    private static String sensorBasePath = "intermediate/filtered";
     private static boolean compressed = false;
 
     public static void main(String[] args) throws Exception {
@@ -69,26 +68,14 @@ public class Aggregation extends UnifiedSensorJob {
         ParameterTool params = ParameterTool.fromArgs(args);
         final String dataDirectory = params.get("data_dir", "data");
         final int windowInMinutes = params.getInt("window_in_minutes", 5);
-        tEnv.registerFunction("timeWindow", new TimeWindow(windowInMinutes));
 
+        Table aggregates = aggregateSensorData(dataDirectory, windowInMinutes, env, tEnv);
 
-        DataSet<UnifiedSensorReading> sensorReadings = readAllSensors(dataDirectory, env);
+        storeAggregatedSensorData(aggregates, dataDirectory, windowInMinutes, tEnv);
+        env.execute("Filter Dataset");
+    }
 
-        Table table = tEnv.fromDataSet(sensorReadings);
-
-        String[] fields = {"pressure", "altitude", "pressure_sealevel", "temperature", "humidity",
-                "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"};
-
-        StringBuilder selectStatement = new StringBuilder("location, MIN(lat) AS lat, MIN(lon) AS lon, " +
-                "currentWindow AS `timestamp`, DAYOFYEAR(currentWindow) AS `dayOfYear`, " +
-                "(HOUR(currentWindow) * 60) + MINUTE(currentWindow) AS `minuteOfDay`, DAYOFWEEK(currentWindow) AS `dayOfWeek`," +
-                "(DAYOFWEEK(currentWindow) > 5) AS `isWeekend`");
-        for (String field : fields) {
-            selectStatement.append(String.format(", AVG(%s) AS %s", field, field));
-        }
-        Table aggregates = table.select("*, timeWindow(timestamp) AS currentWindow");
-        aggregates = tEnv.sqlQuery("SELECT " + selectStatement.toString() + " FROM " + aggregates + " GROUP BY location, currentWindow");
-
+    public static void storeAggregatedSensorData(Table aggregates, String dataDirectory, int windowInMinutes, BatchTableEnvironment tEnv) {
         TypeInformation[] fieldTypes = {Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.LONG,
                 Types.LONG, Types.LONG, Types.BOOLEAN,
                 Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE, Types.DOUBLE,
@@ -96,24 +83,27 @@ public class Aggregation extends UnifiedSensorJob {
         Path outputPath = new Path(dataDirectory, String.format("processed/output_%s.csv", windowInMinutes));
         TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
         String[] fieldNames = {"location", "lat", "lon", "timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"};
-        fieldNames = ArrayUtils.addAll(fieldNames, fields);
+        fieldNames = ArrayUtils.addAll(fieldNames, UnifiedSensorReading.AGGREGATION_FIELDS);
         tEnv.registerTableSink("output", fieldNames, fieldTypes, sink);
         aggregates.insertInto("output");
-        env.execute("Filter Dataset");
     }
 
-    private static DataSet<UnifiedSensorReading> readAllSensors(String dataDirectory, ExecutionEnvironment env) {
-        DataSet<UnifiedSensorReading> sensorReadings = null;
+    public static Table aggregateSensorData(String dataDirectory, int windowInMinutes, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
+        tEnv.registerFunction("timeWindow", new TimeWindow(windowInMinutes));
 
-        for (Type sensorType : Type.values()) {
-            Path sensorDataBasePath = new Path(dataDirectory, sensorBasePath);
-            DataSet<UnifiedSensorReading> sensorReading = readSensor(sensorType, sensorDataBasePath.toString(), env, compressed);
-            if (sensorReadings == null) {
-                sensorReadings = sensorReading;
-            } else {
-                sensorReadings = sensorReadings.union(sensorReading);
-            }
+        DataSet<UnifiedSensorReading> sensorReadings = Filtering.getFilteredSensors(true, dataDirectory, env);
+
+        Table table = tEnv.fromDataSet(sensorReadings);
+
+        StringBuilder selectStatement = new StringBuilder("location, MIN(lat) AS lat, MIN(lon) AS lon, " +
+                "currentWindow AS `timestamp`, DAYOFYEAR(currentWindow) AS `dayOfYear`, " +
+                "(HOUR(currentWindow) * 60) + MINUTE(currentWindow) AS `minuteOfDay`, DAYOFWEEK(currentWindow) AS `dayOfWeek`," +
+                "(DAYOFWEEK(currentWindow) > 5) AS `isWeekend`");
+        for (String field : UnifiedSensorReading.AGGREGATION_FIELDS) {
+            selectStatement.append(String.format(", AVG(%s) AS %s", field, field));
         }
-        return sensorReadings;
+        Table aggregates = table.select("*, timeWindow(timestamp) AS currentWindow");
+        return tEnv.sqlQuery("SELECT " + selectStatement.toString() + " FROM " + aggregates + " GROUP BY location, currentWindow");
     }
+
 }
