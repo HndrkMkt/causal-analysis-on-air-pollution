@@ -89,7 +89,7 @@ link_matrix = pcmci.return_significant_parents(pq_matrix=q_matrix,
 tp.plot_graph(
     val_matrix=results['val_matrix'],
     link_matrix=link_matrix,
-    var_names=var_names,
+    var_names=var_names(),
     link_colorbar_label='cross-MCI',
     node_colorbar_label='auto-MCI',
     figsize=(20, 20),
@@ -100,7 +100,7 @@ tp.plot_graph(
 tp.plot_time_series_graph(
     val_matrix=results['val_matrix'],
     link_matrix=link_matrix,
-    var_names=var_names,
+    var_names=var_names(),
     link_colorbar_label='MCI',
     figsize=(20, 20),
     save_name="time_series_graph"
