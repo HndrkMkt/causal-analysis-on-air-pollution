@@ -45,20 +45,20 @@ def create_tigramite_dataframe(dataset):
 dataframe = create_tigramite_dataframe(extract_dataset(load_data()))
 parcorr = ParCorr(significance='analytic')
 # cmi_knn = CMIknn(significance='shuffle_test', knn=0.1, shuffle_neighbors=5)
-pcmci = PCMCI(
-    dataframe=dataframe,
-    cond_ind_test=parcorr,
-    verbosity=1)
-
-
-# gpdc = GPDC(significance='analytic', gp_params=None)
-# # gpdc.generate_and_save_nulldists(sample_sizes=range(495, 501),
-# #     null_dist_filename='dc_nulldists.npz')
-# gpdc.null_dist_filename ='dc_nulldists.npz'
-# pcmci= PCMCI(
+# pcmci = PCMCI(
 #     dataframe=dataframe,
-#     cond_ind_test=gpdc,
+#     cond_ind_test=parcorr,
 #     verbosity=1)
+
+
+gpdc = GPDC(significance='analytic', gp_params=None)
+# gpdc.generate_and_save_nulldists(sample_sizes=range(495, 501),
+#     null_dist_filename='dc_nulldists.npz')
+gpdc.null_dist_filename ='dc_nulldists.npz'
+pcmci= PCMCI(
+    dataframe=dataframe,
+    cond_ind_test=gpdc,
+    verbosity=1)
 
 correlations = pcmci.get_lagged_dependencies(tau_max=20)
 
