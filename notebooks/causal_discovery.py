@@ -32,8 +32,8 @@ def extract_dataset(sensor_data):
 
 def var_names():
     return ["dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "temperature",
-            "humidity_sensor", "p1", "p2", "apparent_temperature", "cloud_cover", "dew_point", "humidity_weather", "precip_intensity", "precip_probability",
-            "visibility", "wind_bearing", "wind_gust", "wind_speed"]
+]##            "humidity_sensor", "p1", "p2", "apparent_temperature", "cloud_cover", "dew_point", "humidity_weather", "precip_intensity", "precip_probability",
+  ##          "visibility", "wind_bearing", "wind_gust", "wind_speed"]
 
 def create_tigramite_dataframe(dataset):
     data = dataset.loc[:, var_names()]
@@ -54,19 +54,23 @@ parcorr = ParCorr(significance='analytic')
 gpdc = GPDC(significance='analytic', gp_params=None)
 # gpdc.generate_and_save_nulldists(sample_sizes=range(495, 501),
 #     null_dist_filename='dc_nulldists.npz')
-gpdc.null_dist_filename ='dc_nulldists.npz'
+# gpdc.null_dist_filename ='dc_nulldists.npz'
+
+print(f"Variable names: {var_names()}")
+
 pcmci= PCMCI(
     dataframe=dataframe,
     cond_ind_test=gpdc,
+    selected_variables=[3, 4],
     verbosity=1)
 
-correlations = pcmci.get_lagged_dependencies(tau_max=20)
+# correlations = pcmci.get_lagged_dependencies(tau_max=2)
 
 # lag_func_matrix = tp.plot_lagfuncs(val_matrix=correlations, setup_args={'var_names':var_names,
 #                                                                         'x_base':5, 'y_base':.5})
 import time
 start = time.time()
-results = pcmci.run_pcmci(tau_max=4, pc_alpha=0.05)
+results = pcmci.run_pcmci(tau_max=2, pc_alpha=0.01, fdr_method='fdr_bh')
 end = time.time()
 
 print(f"Execution time: {round(end - start, 2)} seconds")
