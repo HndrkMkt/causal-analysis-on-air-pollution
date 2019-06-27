@@ -3,6 +3,7 @@ descartes
 geopy
 jupyterlab>=1.0.0a3
 matplotlib
+mpi4py
 networkx
 pandas
 pyarrow
