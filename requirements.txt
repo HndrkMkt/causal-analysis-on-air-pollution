@@ -1,4 +1,5 @@
 altair
+bokeh
 descartes
 geopy
 jupyterlab>=1.0.0a3
@@ -9,6 +10,7 @@ pandas
 pyarrow
 pyowm
 python-forecastio
+rpy2
 shapely
 scipy
 sklearn
