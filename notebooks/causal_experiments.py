@@ -51,7 +51,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max):
         link_colorbar_label='cross-MCI',
         node_colorbar_label='auto-MCI',
         figsize=(20, 20),
-        save_name=file_name_prefix + "_graph.jpg"
+        save_name=file_name_prefix + "_graph.png"
     )
 
     tp.plot_time_series_graph(
@@ -60,7 +60,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max):
         var_names=var_names,
         link_colorbar_label='MCI',
         figsize=(20, 20),
-        save_name=file_name_prefix + "_time_series_graph.jpg"
+        save_name=file_name_prefix + "_time_series_graph.png"
     )
 
 
