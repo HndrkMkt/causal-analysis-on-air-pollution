@@ -88,14 +88,14 @@ def subset(data,by_family=[],by_columns=[],start_date='',end_date=''):
 		if by_family:         
 			for i in by_family:
 				if i=='sensor_family':
-					for j in sensor_family:
-						final_feature_list.extend([j])
-				if i=='time_family':
-					for j in time_family:
-						final_feature_list.extend([j])
-				if i=='weather_family':
-					for j in weather_family:
-						final_feature_list.extend([j])
+					#for j in sensor_family:
+					final_feature_list.extend(sensor_family)
+				elif i=='time_family':
+					#for j in time_family:
+					final_feature_list.extend(time_family)
+				elif i=='weather_family':
+					#for j in weather_family:
+					final_feature_list.extend(weather_family)
 				else:
 					sys.exit()
 						
@@ -140,30 +140,29 @@ def localize(data,lat,lon,results=1):
 def input_na(data,columns,method=None,value=None):
 	must=['location','timestamp']
 	if all([i in list(data) for i in must]):
-		data.sort_values(by=["location", "timestamp"],inplace=True)
+		x=data.sort_values(by=["location", "timestamp"])
 		if 'precip_type' in columns and 'precip_type' in list(data):
-			data['precip_type'].replace(np.nan, 'no precip', regex=True,inplace=True)
+			x['precip_type'].replace(np.nan, 'no precip', regex=True,inplace=True)
 		else:
 			pass
 
 		if all([i in list(data) for i in columns]):
 			for i in columns:
-				if data[i].isnull().sum().sum()>0:
-					if method:
-						data[i].fillna(method=method,inplace=True)
-					elif value:
-						data[i].fillna(value,inplace=True)
+				if method!=None:
+					x[i].fillna(method=method,inplace=True)
+				elif value!=None:
+					x[i].fillna(value=value,inplace=True)
 		else:
 			sys.exit()
 		
 		no_nulls_list=[]
 		for j in list(data):
-			if data[j].isnull().sum().sum()==0:
+			if x[j].isnull().sum().sum()==0:
 				no_nulls_list.extend([j])
 		
-		data[no_nulls_list].dropna(inplace=True)
+		#x=x.dropna()
 		
-	return data[no_nulls_list]
+	return x
 
 def create_tigramite_dataframe(dataset,exclude):
 	must=['timestamp']
