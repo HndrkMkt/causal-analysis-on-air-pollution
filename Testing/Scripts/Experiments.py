@@ -1,23 +1,7 @@
-#%matplotlib notebook
-from numpy import genfromtxt
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import datetime
-from datetime import datetime
-#import utils
-import numpy as np
-from sklearn import preprocessing
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import r2_score
-from sklearn.linear_model import LinearRegression
-import sys
-from operator import itemgetter
-from tigramite import data_processing as pp
 import time
 from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb, RCOT
 from tigramite.pcmci import PCMCI
-from tigramite import plotting as tp
 import random
 from data_preparation_utils import load_data, subset, localize, input_na,create_tigramite_dataframe, sensor_family,time_family,weather_family,family_list
 
