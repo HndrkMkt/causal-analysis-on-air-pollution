@@ -117,6 +117,7 @@ not_include=['location','lat','lon','precip_type', 'altitude',
  'ratioP1',
  'durP2',
  'ratioP2','ozone','pressure']
+
 my_variables=my_procesed_dataset.iloc[:,~my_procesed_dataset.columns.isin(not_include)]
 
 for i in list(my_variables):
@@ -192,10 +193,23 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                             pcmci.verbosity = 1
                             results = pcmci.run_pcmci(tau_max=l, pc_alpha=a)
                             time_lapse = round(time.time() - start, 2)
-                            test_results.append([i[3], i[0], i[1], l,test[0],a,time_lapse])
+
+                            q_matrix = pcmci.get_corrected_pvalues(p_matrix=results['p_matrix'], fdr_method='fdr_bh')
+                            valid_parents = list(pcmci.return_significant_parents(pq_matrix=q_matrix,
+                                                                                  val_matrix=results['val_matrix'],
+                                                                                  alpha_level=a)['parents'].values())
+
+                            flat_list = []
+                            for sublist in valid_parents:
+                                for item in sublist:
+                                    flat_list.append(item)
+
+                            valid_links = len(flat_list)
+
+                            test_results.append([i[3], i[0], i[1], l,test[0],a,valid_links,time_lapse])
 
                             results_df = pd.DataFrame(test_results,
-                                                              columns=['representation', 'complexity', 'sample_size', 'max_lag','test','alpha',
+                                                              columns=['representation', 'complexity', 'sample_size', 'max_lag','test','alpha','valid_links_at_alpha',
                                                                        'learning_time'])
                             results_df.to_csv(
                                         '../Results/results.csv',
@@ -218,6 +232,8 @@ networks = generate_DF(complexity=[2,5,10,15],sample_sizes=[1000])
 print(str(len(networks)) + ' dataframes created ')
 
 test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','GPDC','RCOT'],limit = 1)
+
+#test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
 
 
 
