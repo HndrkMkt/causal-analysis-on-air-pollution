@@ -154,7 +154,7 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
         tests_to_evaluate.append(['CMIknn',cmiknn])
 
 
-    unique_complexities = list(set(l[0] for l in dataframes))
+    unique_complexities = list(set(l[1] for l in dataframes))
     counts = {}
     for i in unique_complexities:
         counts[i] = 0
@@ -166,7 +166,7 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                 while not stop:
                     try:
                         i = random.sample(dataframes,1)[0]
-                        if counts[i[0]] < limit:
+                        if counts[i[1]] < limit:
                             print('evaluating: ' + str(i[3]))
                             start = time.time()
                             pcmci = PCMCI(
@@ -199,7 +199,7 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                                         '../Results/results.csv',
                                         index=False)
 
-                            counts[i[0]] += 1
+                            counts[i[1]] += 1
                             if all(value == limit for value in counts.values()):
                                 stop = True
 
@@ -211,11 +211,11 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                     counts[i] = 0
 
 
-networks = generate_DF(complexity=[2,5,10,15],sample_sizes=[1000])
+networks = generate_DF(complexity=[10],sample_sizes=[500,1000,10000,20000])
 
 print(str(len(networks)) + ' dataframes created ')
 
-test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','GPDC','RCOT'],limit = 1)
+test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT','GPDC'],limit = 5)
 
 #test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
 
