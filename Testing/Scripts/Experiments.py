@@ -3,115 +3,114 @@ import time
 from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb, RCOT
 from tigramite.pcmci import PCMCI
 import random
-from data_preparation_utils import load_data, subset, localize, input_na,create_tigramite_dataframe, sensor_family,time_family,weather_family,family_list
+from causal_analysis.data_preparation import load_data, subset, localize, input_na, create_tigramite_dataframe
 
 pd.set_option('mode.chained_assignment', None)
-path='../../data/processed/causalDiscoveryData.csv'
+path = '../../data/processed/causalDiscoveryData.csv'
 
-my_dataset=load_data(path)
+my_dataset = load_data(path)
 
 print('data loaded')
 
-my_subset=subset(data=my_dataset,by_family=['sensor_family','time_family','weather_family'],start_date='2017-1-1',end_date='2019-6-8')
+my_subset = subset(data=my_dataset, by_family=['sensor_family', 'time_family', 'weather_family'], start_date='2017-1-1',
+                   end_date='2019-6-8')
 
 print('data subset created')
 
-my_localized_subset=localize(my_subset,lat=52.517,lon=13.425,results=1)
+my_localized_subset = localize(my_subset, lat=52.517, lon=13.425, results=1)
 
 print('localized data created')
 
-#pd.set_option('mode.chained_assignment', None)
-my_procesed_dataset=input_na(my_localized_subset,columns=['location',
- 'lat',
- 'lon',
- 'timestamp',
- 'dayOfYear',
- 'minuteOfDay',
- 'dayOfWeek',
- 'isWeekend',
- 'altitude',
- 'pressure_sealevel',
- 'temperature',
- 'humidity_1',
- 'p1',
- 'p2',
- 'p0',
- 'durP1',
- 'ratioP1',
- 'durP2',
- 'ratioP2',
- 'apparent_temperature',
- 'cloud_cover',
- 'dew_point',
- 'humidity',
- 'ozone',
- 'precip_intensity',
- 'precip_probability',
- 'precip_type',
- 'pressure',
- 'uv_index',
- 'visibility',
- 'wind_bearing',
- 'wind_gust',
- 'wind_speed'],method='bfill')
+# pd.set_option('mode.chained_assignment', None)
+my_procesed_dataset = input_na(my_localized_subset, columns=['location',
+                                                             'lat',
+                                                             'lon',
+                                                             'timestamp',
+                                                             'dayOfYear',
+                                                             'minuteOfDay',
+                                                             'dayOfWeek',
+                                                             'isWeekend',
+                                                             'altitude',
+                                                             'pressure_sealevel',
+                                                             'temperature',
+                                                             'humidity_1',
+                                                             'p1',
+                                                             'p2',
+                                                             'p0',
+                                                             'durP1',
+                                                             'ratioP1',
+                                                             'durP2',
+                                                             'ratioP2',
+                                                             'apparent_temperature',
+                                                             'cloud_cover',
+                                                             'dew_point',
+                                                             'humidity',
+                                                             'ozone',
+                                                             'precip_intensity',
+                                                             'precip_probability',
+                                                             'precip_type',
+                                                             'pressure',
+                                                             'uv_index',
+                                                             'visibility',
+                                                             'wind_bearing',
+                                                             'wind_gust',
+                                                             'wind_speed'], method='bfill')
 
-my_procesed_dataset=input_na(my_procesed_dataset,columns=['location',
- 'lat',
- 'lon',
- 'timestamp',
- 'dayOfYear',
- 'minuteOfDay',
- 'dayOfWeek',
- 'isWeekend',
- 'altitude',
- 'pressure_sealevel',
- 'temperature',
- 'humidity_1',
- 'p1',
- 'p2',
- 'p0',
- 'durP1',
- 'ratioP1',
- 'durP2',
- 'ratioP2',
- 'apparent_temperature',
- 'cloud_cover',
- 'dew_point',
- 'humidity',
- 'ozone',
- 'precip_intensity',
- 'precip_probability',
- 'precip_type',
- 'pressure',
- 'uv_index',
- 'visibility',
- 'wind_bearing',
- 'wind_gust',
- 'wind_speed'],value=0)
+my_procesed_dataset = input_na(my_procesed_dataset, columns=['location',
+                                                             'lat',
+                                                             'lon',
+                                                             'timestamp',
+                                                             'dayOfYear',
+                                                             'minuteOfDay',
+                                                             'dayOfWeek',
+                                                             'isWeekend',
+                                                             'altitude',
+                                                             'pressure_sealevel',
+                                                             'temperature',
+                                                             'humidity_1',
+                                                             'p1',
+                                                             'p2',
+                                                             'p0',
+                                                             'durP1',
+                                                             'ratioP1',
+                                                             'durP2',
+                                                             'ratioP2',
+                                                             'apparent_temperature',
+                                                             'cloud_cover',
+                                                             'dew_point',
+                                                             'humidity',
+                                                             'ozone',
+                                                             'precip_intensity',
+                                                             'precip_probability',
+                                                             'precip_type',
+                                                             'pressure',
+                                                             'uv_index',
+                                                             'visibility',
+                                                             'wind_bearing',
+                                                             'wind_gust',
+                                                             'wind_speed'], value=0)
 
 my_procesed_dataset.dropna(inplace=True)
 
 print('data na handled')
 
-not_include=['location','lat','lon','precip_type', 'altitude',
- 'pressure_sealevel',
- 'temperature',
- 'humidity_1', 'p0',
- 'durP1',
- 'ratioP1',
- 'durP2',
- 'ratioP2','ozone','pressure']
+not_include = ['location', 'lat', 'lon', 'precip_type', 'altitude',
+               'pressure_sealevel',
+               'temperature',
+               'humidity_1', 'p0',
+               'durP1',
+               'ratioP1',
+               'durP2',
+               'ratioP2', 'ozone', 'pressure']
 
-my_variables=my_procesed_dataset.iloc[:,~my_procesed_dataset.columns.isin(not_include)]
+my_variables = my_procesed_dataset.iloc[:, ~my_procesed_dataset.columns.isin(not_include)]
 
 for i in list(my_variables):
     if my_variables[i].dtype == 'int64':
         my_variables[i] = my_variables[i].astype('float64')
 
 
-
-def generate_DF(complexity = [5],instances = 1000,sample_sizes = [1000]):
-
+def generate_DF(complexity=[5], instances=1000, sample_sizes=[1000]):
     tigramite_dataframes = []
 
     for c in complexity:
@@ -119,40 +118,41 @@ def generate_DF(complexity = [5],instances = 1000,sample_sizes = [1000]):
             stop = False
             count = 0
             while not stop:
-                a = random.sample(range(my_variables.shape[1]),c)
+                a = random.sample(range(my_variables.shape[1]), c)
                 if all(a) != list(my_variables).index('timestamp'):
                     count += 1
                     a.extend([list(my_variables).index('timestamp')])
-                    l = list(my_variables.iloc[:,a])
-                    dataframe,var_names = create_tigramite_dataframe(my_variables.iloc[0:x+1,a],exclude=["timestamp"])
-                    tigramite_dataframes.append([c,x,dataframe,l])
+                    l = list(my_variables.iloc[:, a])
+                    dataframe, var_names = create_tigramite_dataframe(my_variables.iloc[0:x + 1, a],
+                                                                      exclude=["timestamp"])
+                    tigramite_dataframes.append([c, x, dataframe, l])
                     if count == instances:
-                        stop=True
-                    #print(str(l) + str(dataframe.values.shape))
+                        stop = True
+                    # print(str(l) + str(dataframe.values.shape))
                 else:
                     pass
     return tigramite_dataframes
 
-def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
+
+def test(dataframes, max_lags=[4], alpha=[None], tests=['ParCorr'], limit=1):
     test_results = []
     random.shuffle(dataframes)
-    total = limit*len(max_lags)*len(alpha)*len(tests)
+    total = limit * len(max_lags) * len(alpha) * len(tests)
     data_frame_iter = iter(dataframes)
 
-    tests_to_evaluate=[]
+    tests_to_evaluate = []
     if 'RCOT' in tests:
         rcot = RCOT()
-        tests_to_evaluate.append(['RCOT',rcot])
+        tests_to_evaluate.append(['RCOT', rcot])
     if 'GPDC' in tests:
         gpdc = GPDC()
         tests_to_evaluate.append(['GPDC', gpdc])
     if 'ParCorr' in tests:
         parcorr = ParCorr(significance='analytic')
-        tests_to_evaluate.append(['ParCorr',parcorr])
+        tests_to_evaluate.append(['ParCorr', parcorr])
     if 'CMIknn' in tests:
         cmiknn = CMIknn()
-        tests_to_evaluate.append(['CMIknn',cmiknn])
-
+        tests_to_evaluate.append(['CMIknn', cmiknn])
 
     unique_complexities = list(set(l[1] for l in dataframes))
     counts = {}
@@ -165,15 +165,15 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
             for a in alpha:
                 while not stop:
                     try:
-                        i = random.sample(dataframes,1)[0]
+                        i = random.sample(dataframes, 1)[0]
                         if counts[i[1]] < limit:
                             print('evaluating: ' + str(i[3]))
                             start = time.time()
                             pcmci = PCMCI(
-                                    dataframe=i[2],
-                                    cond_ind_test=test[1],
-                                    verbosity=0)
-                             # correlations = pcmci.get_lagged_dependencies(tau_max=20)
+                                dataframe=i[2],
+                                cond_ind_test=test[1],
+                                verbosity=0)
+                            # correlations = pcmci.get_lagged_dependencies(tau_max=20)
                             pcmci.verbosity = 1
                             results = pcmci.run_pcmci(tau_max=l, pc_alpha=a)
                             time_lapse = round(time.time() - start, 2)
@@ -190,14 +190,15 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
 
                             valid_links = len(flat_list)
 
-                            test_results.append([i[3], i[0], i[1], l,test[0],a,valid_links,time_lapse])
+                            test_results.append([i[3], i[0], i[1], l, test[0], a, valid_links, time_lapse])
 
                             results_df = pd.DataFrame(test_results,
-                                                              columns=['representation', 'complexity', 'sample_size', 'max_lag','test','alpha','valid_links_at_alpha',
-                                                                       'learning_time'])
+                                                      columns=['representation', 'complexity', 'sample_size', 'max_lag',
+                                                               'test', 'alpha', 'valid_links_at_alpha',
+                                                               'learning_time'])
                             results_df.to_csv(
-                                        '../Results/results.csv',
-                                        index=False)
+                                '../Results/results.csv',
+                                index=False)
 
                             counts[i[1]] += 1
                             if all(value == limit for value in counts.values()):
@@ -211,20 +212,10 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                     counts[i] = 0
 
 
-networks = generate_DF(complexity=[10],sample_sizes=[500,1000,10000,20000])
+networks = generate_DF(complexity=[10], sample_sizes=[500, 1000, 10000, 20000])
 
 print(str(len(networks)) + ' dataframes created ')
 
-test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT','GPDC'],limit = 5)
+test(dataframes=networks, max_lags=[4], alpha=[0.05], tests=['ParCorr', 'RCOT', 'GPDC'], limit=5)
 
-#test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
-
-
-
-
-
-
-
-
-
-
+# test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)

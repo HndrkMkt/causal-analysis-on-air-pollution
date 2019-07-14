@@ -17,6 +17,11 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Install causal analysis package:
+```
+pip install -e .
+```
+
 ## Downloading data
 The sensor data that the project uses by default is taken from the monthly `.zip` files on [http://archive.luftdaten.info/](http://archive.luftdaten.info/).
 To download these files and process them run the following steps:
