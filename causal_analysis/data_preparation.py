@@ -13,13 +13,14 @@ def feature_list():
             "timestamp",
             "dayOfYear",
             "minuteOfDay",
+            "minuteOfYear",
             "dayOfWeek",
             "isWeekend",
             "pressure_1",
             "altitude",
             "pressure_sealevel",
             "temperature",
-            "humidity_1",
+            "humidity_sensor",
             "p1",
             "p2",
             "p0",
@@ -49,7 +50,7 @@ def sensor_family():
 
 
 def time_family():
-    return ["timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"]
+    return ["timestamp", "dayOfYear", "minuteOfDay", "minuteOfYear", "dayOfWeek", "isWeekend"]
 
 
 def weather_family():
@@ -68,9 +69,12 @@ def family_list():
 
 
 def load_data(path):
-    sensor_data = pd.read_csv(path, sep=";", names=feature_list(), true_values=["true"], false_values=["false"])
+    features = feature_list()
+    features.remove("minuteOfYear")
+    sensor_data = pd.read_csv(path, sep=";", names=features, true_values=["true"], false_values=["false"])
 
     sensor_data["timestamp"] = pd.to_datetime(sensor_data["timestamp"])
+    sensor_data["minuteOfYear"] = sensor_data["dayOfYear"] * 60 + sensor_data["minuteOfDay"]
     sensor_data["isWeekend"] = sensor_data["isWeekend"].astype(int)
 
     sensor_data = sensor_data.sort_values(by=["location", "timestamp"])
@@ -92,14 +96,16 @@ def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
                     # for j in weather_family:
                     final_feature_list.extend(weather_family)
                 else:
-                    sys.exit()
+                    #TODO: BETTER EXCEPTION HANDLING
+                    raise Exception
 
         if by_columns:
             for i in by_columns:
                 if i in feature_list():
                     final_feature_list.extend([i])
                 else:
-                    sys.exit()
+                    #TODO: BETTER EXCEPTION HANDLING
+                    raise Exception
 
         final_feature_list = list(dict.fromkeys(final_feature_list))
         sensor_data = data[final_feature_list]
@@ -129,7 +135,8 @@ def localize(data, lat, lon, results=1):
         slices = [i[0] for i in distances[0:results]]
         localized_data = data.loc[data['location'].isin(slices)]
     else:
-        sys.exit()
+        #TODO: BETTER EXCEPTION HANDLING
+        raise Exception
 
     return localized_data
 
@@ -150,7 +157,8 @@ def input_na(data, columns, method=None, value=None):
                 elif value != None:
                     x[i].fillna(value=value, inplace=True)
         else:
-            sys.exit()
+            #TODO: BETTER EXCEPTION HANDLING
+            raise Exception
 
         no_nulls_list = []
         for j in list(data):
@@ -169,14 +177,16 @@ def create_tigramite_dataframe(dataset, exclude):
         for i in exclude:
             var_list.remove(i)
     else:
-        sys.exit()
+        #TODO: BETTER EXCEPTION HANDLING
+        raise Exception
 
     data = dataset[var_list]
 
     if 'timestamp' in list(dataset):
         datatime = dataset["timestamp"]
     else:
-        sys.exit()
+        #TODO: BETTER EXCEPTION HANDLING
+        raise Exception
 
     dataframe = pp.DataFrame(data.values, datatime=datatime.values, var_names=var_list)
     return dataframe, var_list
