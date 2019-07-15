@@ -134,25 +134,16 @@ def generate_DF(complexity=[5], instances=1000, sample_sizes=[1000]):
     return tigramite_dataframes
 
 
-def test(dataframes, max_lags=[4], alpha=[None], tests=['ParCorr'], limit=1):
+def test(dataframes, max_lags=[4], alpha=[None], tests=['RCOT'], limit=1, num_f=[2]):
     test_results = []
     random.shuffle(dataframes)
     total = limit * len(max_lags) * len(alpha) * len(tests)
     data_frame_iter = iter(dataframes)
 
     tests_to_evaluate = []
-    if 'RCOT' in tests:
-        rcot = RCOT()
-        tests_to_evaluate.append(['RCOT', rcot])
-    if 'GPDC' in tests:
-        gpdc = GPDC()
-        tests_to_evaluate.append(['GPDC', gpdc])
-    if 'ParCorr' in tests:
-        parcorr = ParCorr(significance='analytic')
-        tests_to_evaluate.append(['ParCorr', parcorr])
-    if 'CMIknn' in tests:
-        cmiknn = CMIknn()
-        tests_to_evaluate.append(['CMIknn', cmiknn])
+    for f in num_f:
+        rcot = RCOT(num_f=f)
+        tests_to_evaluate.append(['RCOT_' + str(f), rcot])
 
     unique_complexities = list(set(l[1] for l in dataframes))
     counts = {}
@@ -197,7 +188,7 @@ def test(dataframes, max_lags=[4], alpha=[None], tests=['ParCorr'], limit=1):
                                                                'test', 'alpha', 'valid_links_at_alpha',
                                                                'learning_time'])
                             results_df.to_csv(
-                                '../Results/results.csv',
+                                '../Results/results_fourier.csv',
                                 index=False)
 
                             counts[i[1]] += 1
@@ -212,10 +203,13 @@ def test(dataframes, max_lags=[4], alpha=[None], tests=['ParCorr'], limit=1):
                     counts[i] = 0
 
 
-networks = generate_DF(complexity=[10], sample_sizes=[500, 1000, 10000, 20000])
+networks = generate_DF(complexity=[10],sample_sizes=[1000])
 
 print(str(len(networks)) + ' dataframes created ')
 
-test(dataframes=networks, max_lags=[4], alpha=[0.05], tests=['ParCorr', 'RCOT', 'GPDC'], limit=5)
+test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['RCOT'],limit = 1,num_f=[2,4,6,8,10])
+
+#test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
+
 
 # test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
