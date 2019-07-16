@@ -18,7 +18,8 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.sensors.*;
+import de.tuberlin.dima.bdapro.sensor.Type;
+import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
@@ -52,7 +53,7 @@ public class SensorStatistics extends UnifiedSensorJob {
         final BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data");
+        final String dataDirectory = params.get("data_dir", "data_subset");
         for (Type sensorType : Type.values()) {
             collectStatistics(sensorType, dataDirectory, env, tEnv);
         }

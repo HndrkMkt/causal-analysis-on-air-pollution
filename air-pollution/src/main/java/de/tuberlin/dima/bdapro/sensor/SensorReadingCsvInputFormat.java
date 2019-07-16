@@ -1,8 +1,6 @@
-package de.tuberlin.dima.bdapro;
+package de.tuberlin.dima.bdapro.sensor;
 
 import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
-import de.tuberlin.dima.bdapro.sensors.Type;
-import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
 import org.apache.flink.api.common.io.DelimitedInputFormat;
 import org.apache.flink.core.fs.FileInputSplit;
 import org.apache.flink.core.fs.FileStatus;

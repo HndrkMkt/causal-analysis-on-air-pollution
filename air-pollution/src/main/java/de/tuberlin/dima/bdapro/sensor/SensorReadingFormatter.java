@@ -1,7 +1,5 @@
-package de.tuberlin.dima.bdapro;
+package de.tuberlin.dima.bdapro.sensor;
 
-import de.tuberlin.dima.bdapro.sensors.Type;
-import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
 import org.apache.flink.api.java.io.TextOutputFormat;
 
 public class SensorReadingFormatter implements TextOutputFormat.TextFormatter<UnifiedSensorReading> {

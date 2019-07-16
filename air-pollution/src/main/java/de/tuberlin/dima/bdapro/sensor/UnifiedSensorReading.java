@@ -1,9 +1,13 @@
-package de.tuberlin.dima.bdapro.sensors;
+package de.tuberlin.dima.bdapro.sensor;
 
 import org.apache.flink.api.java.tuple.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UnifiedSensorReading {
     // Common Fields
@@ -141,4 +145,48 @@ public class UnifiedSensorReading {
                 lon + ";" +
                 (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(timestamp);
     }
+
+
+    private static List<Field> getCommonSensorFields() {
+        ArrayList<Field> fields = new ArrayList<>();
+
+        return fields;
+    }
+
+    public static List<Field> getFields() {
+        ArrayList<Field> fields = new ArrayList<>();
+        fields.add(new Field("sensorId", Integer.class, false));
+        fields.add(new Field("sensorType", String.class, false));
+        fields.add(new Field("location", Integer.class, false));
+        fields.add(new Field("lat", Double.class, false));
+        fields.add(new Field("lon", Double.class, false));
+        fields.add(new Field("timestamp", Timestamp.class, false));
+
+        // Sensor specific fields
+        fields.add(new Field("pressure", Double.class, true));
+        fields.add(new Field("altitude", Double.class, false));
+        fields.add(new Field("pressure_sealevel", Double.class, true));
+        fields.add(new Field("temperature", Double.class, true));
+        fields.add(new Field("humidity", Double.class, true));
+
+        fields.add(new Field("p1", Double.class, true));
+        fields.add(new Field("p2", Double.class, true));
+        fields.add(new Field("p0", Double.class, true));
+        fields.add(new Field("durP1", Double.class, true));
+        fields.add(new Field("ratioP1", Double.class, true));
+        fields.add(new Field("durP2", Double.class, true));
+        fields.add(new Field("ratioP2", Double.class, true));
+
+        return fields;
+    }
+
+    public static Map<String, Field> getFieldMap() {
+        Map<String, Field> fieldMap = new HashMap<>();
+        for (Field field : getFields()) {
+            fieldMap.put(field.getName(), field);
+        }
+        return fieldMap;
+    }
+
+
 }

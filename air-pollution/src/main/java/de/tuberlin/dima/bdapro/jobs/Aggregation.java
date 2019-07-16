@@ -18,29 +18,26 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.SensorReadingFormatter;
+import de.tuberlin.dima.bdapro.featureTable.AbstractColumn;
+import de.tuberlin.dima.bdapro.featureTable.Column;
+import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
+import de.tuberlin.dima.bdapro.featureTable.IColumn;
 import de.tuberlin.dima.bdapro.functions.TimeWindow;
-import de.tuberlin.dima.bdapro.sensors.Type;
-import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
+import de.tuberlin.dima.bdapro.sensor.Field;
+import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
 import org.apache.flink.table.sinks.CsvTableSink;
 import org.apache.flink.table.sinks.TableSink;
-import org.apache.flink.table.sources.CsvTableSource;
 import org.apache.flink.types.Row;
 
-import java.sql.Array;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,8 +68,8 @@ public class Aggregation extends UnifiedSensorJob {
 
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data");
-        final int windowInMinutes = params.getInt("window_in_minutes", 5);
+        final String dataDirectory = params.get("data_dir", "data_subset");
+        final int windowInMinutes = params.getInt("window_in_minutes", 60);
 
         Table aggregates = aggregateSensorData(true, dataDirectory, windowInMinutes, env, tEnv);
 
@@ -113,6 +110,40 @@ public class Aggregation extends UnifiedSensorJob {
         String[] fieldNames = {"location", "lat", "lon", "timestamp", "dayOfYear", "minuteOfDay", "dayOfWeek", "isWeekend"};
         fieldNames = ArrayUtils.addAll(fieldNames, UnifiedSensorReading.AGGREGATION_FIELDS);
         return fieldNames;
+    }
+
+    public static FeatureTable generateFeatureTable(ExecutionEnvironment env, String dataDirectory, int windowInMinutes, BatchTableEnvironment batchTableEnvironment) {
+        Table aggregates = aggregateSensorData(true, dataDirectory, windowInMinutes, env, batchTableEnvironment);
+        List<IColumn> columns = getFeatureColumns();
+        List<IColumn> keyColumns = new ArrayList<>();
+        String[] keyColumnNames = {"location", "timestamp"};
+        for (String keyColumnName : keyColumnNames) {
+            for (IColumn column : columns) {
+                if (column.getName().equals(keyColumnName)) {
+                    keyColumns.add(column);
+                }
+            }
+        }
+        return new FeatureTable("sensor", aggregates, columns, keyColumns, batchTableEnvironment);
+    }
+
+    private static List<IColumn> getFeatureColumns() {
+        List<IColumn> featureColumns = new ArrayList<>();
+        featureColumns.add(new Column("location", Types.INT, false));
+        featureColumns.add(new Column("lat", Types.DOUBLE, false));
+        featureColumns.add(new Column("lon", Types.DOUBLE, false));
+        featureColumns.add(new Column("timestamp", Types.SQL_TIMESTAMP, true));
+        featureColumns.add(new Column("dayOfYear", Types.LONG, true));
+        featureColumns.add(new Column("minuteOfDay", Types.LONG, true));
+        featureColumns.add(new Column("dayOfWeek", Types.LONG, true));
+        featureColumns.add(new Column("isWeekend", Types.BOOLEAN, true));
+        List<? extends IColumn> sensorFields = UnifiedSensorReading.getFields();
+        for (IColumn column : sensorFields) {
+            if (column.isFeature()) {
+                featureColumns.add(column);
+            }
+        }
+        return featureColumns;
     }
 
     public static final TypeInformation[] getAggregationFieldTypes() {

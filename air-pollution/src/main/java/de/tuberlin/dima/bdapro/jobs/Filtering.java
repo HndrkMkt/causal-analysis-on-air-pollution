@@ -18,9 +18,9 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.SensorReadingFormatter;
-import de.tuberlin.dima.bdapro.sensors.*;
-import org.apache.flink.api.common.operators.Union;
+import de.tuberlin.dima.bdapro.sensor.SensorReadingFormatter;
+import de.tuberlin.dima.bdapro.sensor.Type;
+import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple1;
@@ -29,8 +29,6 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
@@ -54,10 +52,7 @@ public class Filtering extends UnifiedSensorJob {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data");
-//        final double centerLatitude = params.getDouble("lat", 52.31);
-//        final double centerLongiture = params.getDouble("lon", 13.24);
-//        final double maxDistance = params.getDouble("distance", 25.0);
+        final String dataDirectory = params.get("data_dir", "data_subset");
         cacheFilteredSensorData(dataDirectory, env);
 
         env.execute("Filter Dataset");

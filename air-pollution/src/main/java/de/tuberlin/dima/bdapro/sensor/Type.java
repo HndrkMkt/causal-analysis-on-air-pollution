@@ -1,4 +1,4 @@
-package de.tuberlin.dima.bdapro.sensors;
+package de.tuberlin.dima.bdapro.sensor;
 
 public enum Type {
     BME280,

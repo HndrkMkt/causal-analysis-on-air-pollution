@@ -7,23 +7,23 @@ import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
 
-public class NullableCsvInputFormat<T extends WeatherReading> extends DelimitedInputFormat<T> {
+public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReading> {
     private static final long serialVersionUID = 1L;
     /**
      * The name of the charset to use for decoding.
      */
     private String charsetName = "UTF-8";
 
-    private WeatherReadingParser<T> parser;
+    private WeatherReadingParser parser;
 
 
-    public NullableCsvInputFormat(Path filePath, WeatherReadingParser<T> parser) {
+    public WeatherReadingInputFormat(Path filePath, WeatherReadingParser parser) {
         super(filePath, null);
         this.parser = parser;
     }
 
     @Override
-    public T readRecord(T reuse, byte[] bytes, int offset, int numBytes) throws IOException {
+    public WeatherReading readRecord(WeatherReading reuse, byte[] bytes, int offset, int numBytes) throws IOException {
         String line = new String(bytes, offset, numBytes, charsetName);
         try {
             return parser.readRecord(line);

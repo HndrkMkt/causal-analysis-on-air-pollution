@@ -18,9 +18,9 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.SensorReadingCsvInputFormat;
-import de.tuberlin.dima.bdapro.sensors.Type;
-import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
+import de.tuberlin.dima.bdapro.sensor.SensorReadingCsvInputFormat;
+import de.tuberlin.dima.bdapro.sensor.Type;
+import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.apache.flink.api.common.io.GlobFilePathFilter;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;

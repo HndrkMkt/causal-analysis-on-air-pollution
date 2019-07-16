@@ -1,5 +1,8 @@
-package de.tuberlin.dima.bdapro.sensors;
+package de.tuberlin.dima.bdapro.sensor;
 
+import de.tuberlin.dima.bdapro.featureTable.AbstractColumn;
+import de.tuberlin.dima.bdapro.featureTable.IColumn;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,17 +10,19 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class Field implements Serializable {
+public class Field extends AbstractColumn implements IColumn, Serializable {
     Logger LOG = LoggerFactory.getLogger(Field.class);
     private static final String TIMESTAMP_FORMATSTR = "yyyy-MM-dd'T'HH:mm:ss";
 
     private String name;
     private Class<?> clazz;
     private Object value;
+    private boolean isFeature;
 
-    public Field(String name, Class<?> clazz) {
+    public Field(String name, Class<?> clazz, boolean isFeature) {
         this.name = name;
         this.clazz = clazz;
+        this.isFeature = isFeature;
     }
 
     public String getName() {
@@ -26,6 +31,16 @@ public class Field implements Serializable {
 
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public boolean isFeature() {
+        return isFeature;
+    }
+
+    @Override
+    public TypeInformation getTypeInformation() {
+        return TypeInformation.of(clazz);
     }
 
     public void setValue(String str) throws Exception {

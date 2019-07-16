@@ -8,19 +8,17 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.List;
 
-public class WeatherReadingParser<T extends WeatherReading> implements Serializable {
+public class WeatherReadingParser implements Serializable {
     Logger LOG = LoggerFactory.getLogger(WeatherReadingParser.class);
     private static final String DELIMITER = ";";
 
-    private Class<T> clazz;
     private List<Field> fields;
 
-    public WeatherReadingParser(Class<T> clazz, List<Field> fields) {
-        this.clazz = clazz;
+    public WeatherReadingParser(List<Field> fields) {
         this.fields = fields;
     }
 
-    public T readRecord(String input) throws Exception {
+    public WeatherReading readRecord(String input) throws Exception {
 
         String[] tokens = input.split(DELIMITER);
 
@@ -29,16 +27,16 @@ public class WeatherReadingParser<T extends WeatherReading> implements Serializa
             curr.setValue(tokens[i++]);
         }
 
-        T Weather = clazz.newInstance();
+        WeatherReading weatherReading = new WeatherReading();
 
         try {
             for (Field field : fields) {
-                clazz.getField(field.getName()).set(Weather, field.getValue());
+                WeatherReading.class.getField(field.getName()).set(weatherReading, field.getValue());
             }
         } catch (Exception e) {
             LOG.error(e.toString());
         }
 
-        return Weather;
+        return weatherReading;
     }
 }

@@ -30,50 +30,25 @@ public class WeatherReading {
 
     public static List<Field> getFields() {
         ArrayList<Field> fields = new ArrayList<>();
-        fields.add(new Field("location", String.class));
-        fields.add(new Field("time", Timestamp.class));
-        fields.add(new Field("longitude", Double.class));
-        fields.add(new Field("latitude", Double.class));
-        fields.add(new Field("temperature", Double.class));
-        List<Field> measurementFields = getMeasurementFields();
-        fields.addAll(measurementFields);
+        fields.add(new Field("location", String.class, false));
+        fields.add(new Field("time", Timestamp.class, false));
+        fields.add(new Field("longitude", Double.class, false));
+        fields.add(new Field("latitude", Double.class, false));
+        fields.add(new Field("temperature", Double.class, false));
+        fields.add(new Field("apparent_temperature", Double.class, true));
+        fields.add(new Field("cloud_cover", Double.class, true));
+        fields.add(new Field("dew_point", Double.class, true));
+        fields.add(new Field("humidity", Double.class, true));
+        fields.add(new Field("ozone", Double.class, true));
+        fields.add(new Field("precip_intensity", Double.class, true));
+        fields.add(new Field("precip_probability", Double.class, true));
+        fields.add(new Field("precip_type", String.class, true));
+        fields.add(new Field("pressure", Double.class, true));
+        fields.add(new Field("uv_index", Double.class, true));
+        fields.add(new Field("visibility", Double.class, true));
+        fields.add(new Field("wind_bearing", Double.class, true));
+        fields.add(new Field("wind_gust", Double.class, true));
+        fields.add(new Field("wind_speed", Double.class, true));
         return fields;
-    }
-
-    public static List<Field> getMeasurementFields() {
-        ArrayList<Field> fields = new ArrayList<>();
-        fields.add(new Field("apparent_temperature", Double.class));
-        fields.add(new Field("cloud_cover", Double.class));
-        fields.add(new Field("dew_point", Double.class));
-        fields.add(new Field("humidity", Double.class));
-        fields.add(new Field("ozone", Double.class));
-        fields.add(new Field("precip_intensity", Double.class));
-        fields.add(new Field("precip_probability", Double.class));
-        fields.add(new Field("precip_type", String.class));
-        fields.add(new Field("pressure", Double.class));
-        fields.add(new Field("uv_index", Double.class));
-        fields.add(new Field("visibility", Double.class));
-        fields.add(new Field("wind_bearing", Double.class));
-        fields.add(new Field("wind_gust", Double.class));
-        fields.add(new Field("wind_speed", Double.class));
-        return fields;
-    }
-
-    public static final String[] getMeasurementFieldNames() {
-        List<String> measurementFieldNames = new ArrayList<>();
-        for (Field field : getMeasurementFields()) {
-            measurementFieldNames.add(field.getName());
-        }
-        String[] result = new String[measurementFieldNames.size()];
-        return measurementFieldNames.toArray(result);
-    }
-
-    public static final TypeInformation[] getMeasurementFieldTypes() {
-        List<TypeInformation> measurementFieldTypes = new ArrayList<>();
-        for (Field field : getMeasurementFields()) {
-            measurementFieldTypes.add(field.getType());
-        }
-        TypeInformation[] result = new TypeInformation[measurementFieldTypes.size()];
-        return measurementFieldTypes.toArray(result);
     }
 }

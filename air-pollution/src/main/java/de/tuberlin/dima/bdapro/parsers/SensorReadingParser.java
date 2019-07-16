@@ -1,14 +1,15 @@
 package de.tuberlin.dima.bdapro.parsers;
 
-import de.tuberlin.dima.bdapro.sensors.Field;
-import de.tuberlin.dima.bdapro.sensors.UnifiedSensorReading;
+import de.tuberlin.dima.bdapro.sensor.Field;
+import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import de.tuberlin.dima.bdapro.sensors.Type;
+import de.tuberlin.dima.bdapro.sensor.Type;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -43,76 +44,86 @@ public class SensorReadingParser implements Serializable {
         return sensorReading;
     }
 
-    private static List<Field> getCommonSensorFields() {
-        ArrayList<Field> fields = new ArrayList<>();
-        fields.add(new Field("sensorId", Integer.class));
-        fields.add(new Field("sensorType", String.class));
-        fields.add(new Field("location", Integer.class));
-        fields.add(new Field("lat", Double.class));
-        fields.add(new Field("lon", Double.class));
-        fields.add(new Field("timestamp", Timestamp.class));
-        return fields;
+    private static List<String> getCommonSensorFieldNames() {
+        ArrayList<String> fieldNames = new ArrayList<>();
+        fieldNames.add("sensorId");
+        fieldNames.add("sensorType");
+        fieldNames.add("location");
+        fieldNames.add("lat");
+        fieldNames.add("lon");
+        fieldNames.add("timestamp");
+        return fieldNames;
     }
 
     private static List<Field> getSensorFields(Type type) {
-        List<Field> fields = getCommonSensorFields();
+        List<String> fieldNames  = getSensorFieldNames(type);
+        List<Field> fields = new ArrayList<>();
+        Map<String, Field> fieldMap = UnifiedSensorReading.getFieldMap();
+        for (String fieldName : fieldNames) {
+            fields.add(fieldMap.get(fieldName));
+        }
+        return fields;
+    }
+
+    private static List<String> getSensorFieldNames(Type type) {
+        List<String> fieldNames = getCommonSensorFieldNames();
         switch (type) {
             case BME280:
-                fields.add(new Field("pressure", Double.class));
-                fields.add(new Field("altitude", Double.class));
-                fields.add(new Field("pressure_sealevel", Double.class));
-                fields.add(new Field("temperature", Double.class));
-                fields.add(new Field("humidity", Double.class));
+                fieldNames.add("pressure");
+                fieldNames.add("altitude");
+                fieldNames.add("pressure_sealevel");
+                fieldNames.add("temperature");
+                fieldNames.add("humidity");
                 break;
             case BMP180:
-                fields.add(new Field("pressure", Double.class));
-                fields.add(new Field("altitude", Double.class));
-                fields.add(new Field("pressure_sealevel", Double.class));
-                fields.add(new Field("temperature", Double.class));
+                fieldNames.add("pressure");
+                fieldNames.add("altitude");
+                fieldNames.add("pressure_sealevel");
+                fieldNames.add("temperature");
                 break;
             case DHT22:
             case HTU21D:
-                fields.add(new Field("temperature", Double.class));
-                fields.add(new Field("humidity", Double.class));
+                fieldNames.add("temperature");
+                fieldNames.add("humidity");
                 break;
             case DS18B20:
-                fields.add(new Field("temperature", Double.class));
+                fieldNames.add("temperature");
                 break;
             case PMS3003:
             case PMS5003:
             case PMS7003:
-                fields.add(new Field("p1", Double.class));
-                fields.add(new Field("p2", Double.class));
-                fields.add(new Field("p0", Double.class));
+                fieldNames.add("p1");
+                fieldNames.add("p2");
+                fieldNames.add("p0");
                 break;
             case PPD42NS:
             case SDS011:
-                fields.add(new Field("p1", Double.class));
-                fields.add(new Field("durP1", Double.class));
-                fields.add(new Field("ratioP1", Double.class));
-                fields.add(new Field("p2", Double.class));
-                fields.add(new Field("durP2", Double.class));
-                fields.add(new Field("ratioP2", Double.class));
+                fieldNames.add("p1");
+                fieldNames.add("durP1");
+                fieldNames.add("ratioP1");
+                fieldNames.add("p2");
+                fieldNames.add("durP2");
+                fieldNames.add("ratioP2");
                 break;
             case HPM:
-                fields.add(new Field("p1", Double.class));
-                fields.add(new Field("p2", Double.class));
+                fieldNames.add("p1");
+                fieldNames.add("p2");
                 break;
             case UNIFIED:
-                fields.add(new Field("pressure", Double.class));
-                fields.add(new Field("altitude", Double.class));
-                fields.add(new Field("pressure_sealevel", Double.class));
-                fields.add(new Field("temperature", Double.class));
-                fields.add(new Field("humidity", Double.class));
-                fields.add(new Field("p1", Double.class));
-                fields.add(new Field("durP1", Double.class));
-                fields.add(new Field("ratioP1", Double.class));
-                fields.add(new Field("p2", Double.class));
-                fields.add(new Field("durP2", Double.class));
-                fields.add(new Field("ratioP2", Double.class));
-                fields.add(new Field("p0", Double.class));
+                fieldNames.add("pressure");
+                fieldNames.add("altitude");
+                fieldNames.add("pressure_sealevel");
+                fieldNames.add("temperature");
+                fieldNames.add("humidity");
+                fieldNames.add("p1");
+                fieldNames.add("durP1");
+                fieldNames.add("ratioP1");
+                fieldNames.add("p2");
+                fieldNames.add("durP2");
+                fieldNames.add("ratioP2");
+                fieldNames.add("p0");
                 break;
         }
-        return fields;
+        return fieldNames;
     }
 }
