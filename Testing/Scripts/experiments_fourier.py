@@ -207,7 +207,7 @@ networks = generate_DF(complexity=[10],sample_sizes=[1000])
 
 print(str(len(networks)) + ' dataframes created ')
 
-test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['RCOT'],limit = 1,num_f=[2,4,6,8,10])
+test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['RCOT'],limit = 1,num_f=[10,100,200,500,1000,2000,5000])
 
 #test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['ParCorr','RCOT'],limit = 1)
 
