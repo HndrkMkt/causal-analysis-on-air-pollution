@@ -68,7 +68,7 @@ public class Aggregation extends UnifiedSensorJob {
 
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data_subset");
+        final String dataDirectory = params.get("data_dir", "data");
         final int windowInMinutes = params.getInt("window_in_minutes", 60);
 
         Table aggregates = aggregateSensorData(true, dataDirectory, windowInMinutes, env, tEnv);

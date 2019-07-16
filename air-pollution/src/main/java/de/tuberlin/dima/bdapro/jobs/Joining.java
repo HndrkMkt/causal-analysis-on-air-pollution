@@ -36,7 +36,7 @@ public class Joining extends UnifiedSensorJob {
         BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data_subset");
+        final String dataDirectory = params.get("data_dir", "data");
         FeatureTable sensor = Aggregation.generateFeatureTable(env, dataDirectory, 60, tEnv);
         FeatureTable sensorStationMapping = generateSensorStationMappingFeatureTable(dataDirectory, env, tEnv);
         FeatureTable weather = WeatherJob.generateFeatureTable(env, tEnv);

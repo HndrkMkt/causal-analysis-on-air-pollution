@@ -53,7 +53,7 @@ public class SensorStatistics extends UnifiedSensorJob {
         final BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data_subset");
+        final String dataDirectory = params.get("data_dir", "data");
         for (Type sensorType : Type.values()) {
             collectStatistics(sensorType, dataDirectory, env, tEnv);
         }

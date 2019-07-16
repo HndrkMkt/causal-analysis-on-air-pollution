@@ -52,7 +52,7 @@ public class Filtering extends UnifiedSensorJob {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
         ParameterTool params = ParameterTool.fromArgs(args);
-        final String dataDirectory = params.get("data_dir", "data_subset");
+        final String dataDirectory = params.get("data_dir", "data");
         cacheFilteredSensorData(dataDirectory, env);
 
         env.execute("Filter Dataset");
