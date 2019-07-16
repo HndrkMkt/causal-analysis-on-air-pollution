@@ -12,6 +12,6 @@ public class TimeWindow extends ScalarFunction {
     }
 
     public Timestamp eval(Timestamp input) {
-        return new Timestamp(input.getTime() - (input.getTime() % windowInMillis));
+        return new Timestamp(input.getTime() + windowInMillis - (input.getTime() % windowInMillis));
     }
 }
