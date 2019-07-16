@@ -13,15 +13,17 @@ RCOT_15  = pickle.load(open("RCOT_15.pickle", "rb"))
 
 count = 0
 shared = 0
-for i in GPDC_15['link_matrix'].flatten().tolist():
-    for j in RCOT_15['link_matrix'].flatten().tolist():
+comparison_list = list(zip(GPDC_15['link_matrix'].flatten().tolist(),RCOT_15['link_matrix'].flatten().tolist()))
+
+for i,j in comparison_list:
+    if i or j:
         count += 1
-        if i == j:
-            shared +=1
+        if i and j:
+            shared += 1
         else:
             pass
 
-print(str(round(shared/count)*100))
+print('The percentage of shared links between GPDC and RCOT at complexity 15 is: ' + str(round(shared/count,2)*100) + ' percent')
 
 
 
