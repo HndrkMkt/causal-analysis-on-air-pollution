@@ -43,7 +43,7 @@ public class Field extends AbstractColumn implements IColumn, Serializable {
         return TypeInformation.of(clazz);
     }
 
-    public void setValue(String str) throws Exception {
+    public void setValue(String str) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class not supplied for token " + name);
         }
@@ -66,6 +66,7 @@ public class Field extends AbstractColumn implements IColumn, Serializable {
                 value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMATSTR)).parse(str).getTime());
             } else if (clazz.equals(Boolean.class)) {
                 value = str.equals("1");
+//                TODO: Fail on other values not implemented
             } else if (clazz.equals(String.class)) {
                 value = str;
             } else {
