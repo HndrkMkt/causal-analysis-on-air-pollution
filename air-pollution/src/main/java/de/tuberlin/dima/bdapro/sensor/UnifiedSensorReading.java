@@ -146,13 +146,6 @@ public class UnifiedSensorReading {
                 (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(timestamp);
     }
 
-
-    private static List<Field> getCommonSensorFields() {
-        ArrayList<Field> fields = new ArrayList<>();
-
-        return fields;
-    }
-
     public static List<Field> getFields() {
         ArrayList<Field> fields = new ArrayList<>();
         fields.add(new Field("sensorId", Integer.class, false));
