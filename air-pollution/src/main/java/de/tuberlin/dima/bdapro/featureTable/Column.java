@@ -2,6 +2,13 @@ package de.tuberlin.dima.bdapro.featureTable;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 
+/**
+ * Column is a simple implenmentation of the IColumn interface
+ *
+ * TODO: Write comment
+ *
+ * @author Hendrik Makait
+ */
 public class Column extends AbstractColumn implements IColumn{
     private String name;
     private TypeInformation typeInformation;
