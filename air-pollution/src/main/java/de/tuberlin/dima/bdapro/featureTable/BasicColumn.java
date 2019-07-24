@@ -3,9 +3,7 @@ package de.tuberlin.dima.bdapro.featureTable;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 
 /**
- * BasicColumn is a simple implenmentation of the IColumn interface
- * <p>
- * TODO: Write comment
+ * BasicColumn is a simple implementation of the {@link Column} abstract class.
  *
  * @author Hendrik Makait
  */
@@ -15,11 +13,11 @@ public class BasicColumn extends Column {
     private boolean isFeature;
 
     /**
-     * TODO: Comment
+     * Creates an new BasicColumn from the given input.
      *
-     * @param name
-     * @param typeInformation
-     * @param isFeature
+     * @param name            The name of the column.
+     * @param typeInformation The {@link TypeInformation} of the input.
+     * @param isFeature       Whether the column is a feature.
      */
     public BasicColumn(String name, TypeInformation typeInformation, boolean isFeature) {
         this.name = name;
@@ -32,20 +30,12 @@ public class BasicColumn extends Column {
         return name;
     }
 
-    /**
-     * TODO: Comment
-     *
-     * @return
-     */
+    @Override
     public TypeInformation getTypeInformation() {
         return typeInformation;
     }
 
-    /**
-     * TODO: Comment
-     *
-     * @return
-     */
+    @Override
     public boolean isFeature() {
         return isFeature;
     }
