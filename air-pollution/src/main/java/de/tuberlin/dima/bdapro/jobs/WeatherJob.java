@@ -2,7 +2,6 @@ package de.tuberlin.dima.bdapro.jobs;
 
 import de.tuberlin.dima.bdapro.featureTable.Column;
 import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
-import de.tuberlin.dima.bdapro.featureTable.IColumn;
 import de.tuberlin.dima.bdapro.parsers.WeatherReadingParser;
 import de.tuberlin.dima.bdapro.weather.Field;
 import de.tuberlin.dima.bdapro.weather.WeatherReadingInputFormat;
@@ -31,11 +30,11 @@ public class WeatherJob {
     public static FeatureTable generateFeatureTable(ExecutionEnvironment env, BatchTableEnvironment batchTableEnvironment) {
         DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, weatherDataPath, WeatherReading.getFields());
         Table weatherTable = batchTableEnvironment.fromDataSet(weatherReadingDataSet);
-        List<? extends IColumn> columns = WeatherReading.getFields();
-        List<IColumn> keyColumns = new ArrayList<>();
+        List<? extends Column> columns = WeatherReading.getFields();
+        List<Column> keyColumns = new ArrayList<>();
         String[] keyColumnNames = {"location", "time"};
         for (String keyColumnName : keyColumnNames) {
-            for (IColumn column : columns) {
+            for (Column column : columns) {
                 if (column.getName().equals(keyColumnName)) {
                     keyColumns.add(column);
                 }

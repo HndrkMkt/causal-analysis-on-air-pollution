@@ -3,33 +3,50 @@ package de.tuberlin.dima.bdapro.featureTable;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 
 /**
- * Column is a simple implenmentation of the IColumn interface
- *
- * TODO: Write comment
- *
- * @author Hendrik Makait
+ * TODO: Comment
  */
-public class Column extends AbstractColumn implements IColumn{
-    private String name;
-    private TypeInformation typeInformation;
-    private boolean isFeature;
+public abstract class Column {
+    private FeatureTable parentTable;
 
-    public Column(String name, TypeInformation typeInformation, boolean isFeature) {
-        this.name = name;
-        this.typeInformation = typeInformation;
-        this.isFeature = isFeature;
+    /**
+     * Sets the parent table of the column to the feature table.
+     * <p>
+     * The parent table of a column should be the feature table that holds its data.
+     *
+     * @param featureTable The parent table of the column.
+     */
+    public void setParentTable(FeatureTable featureTable) {
+        this.parentTable = featureTable;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    /**
+     * Returns the full name of the column following the pattern lt;parentTable.namegt;_lt;namegt;. This ensures
+     * globally unique full names within the table environment.
+     *
+     * @return The full name of the column
+     */
+    public final String getFullName() {
+        return String.format("%s_%s", parentTable.getName(), getName());
     }
 
-    public TypeInformation getTypeInformation() {
-        return typeInformation;
-    }
+    /**
+     * Returns the name of the column.
+     *
+     * @return The name of the column
+     */
+    abstract public String getName();
 
-    public boolean isFeature() {
-        return isFeature;
-    }
+    /**
+     * Returns the type information of the column.
+     *
+     * @return The type information of the column
+     */
+    abstract public TypeInformation getTypeInformation();
+
+    /**
+     * Returns whether or not the column is a feature.
+     *
+     * @return Whether or not the column is a feature
+     */
+    abstract public boolean isFeature();
 }

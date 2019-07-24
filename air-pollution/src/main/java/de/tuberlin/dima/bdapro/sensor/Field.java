@@ -1,7 +1,6 @@
 package de.tuberlin.dima.bdapro.sensor;
 
-import de.tuberlin.dima.bdapro.featureTable.AbstractColumn;
-import de.tuberlin.dima.bdapro.featureTable.IColumn;
+import de.tuberlin.dima.bdapro.featureTable.Column;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,10 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class Field extends AbstractColumn implements IColumn, Serializable {
+/**
+ * TODO: Comment
+ */
+public class Field extends Column implements Serializable {
     Logger LOG = LoggerFactory.getLogger(Field.class);
     private static final String TIMESTAMP_FORMATSTR = "yyyy-MM-dd'T'HH:mm:ss";
 
@@ -19,16 +21,34 @@ public class Field extends AbstractColumn implements IColumn, Serializable {
     private Object value;
     private boolean isFeature;
 
+    /**
+     * Creates a new field.
+     *
+     * @param name The name of the field.
+     * @param clazz The class of the field.
+     * @param isFeature Whether the field is a feature of a feature table.
+     */
     public Field(String name, Class<?> clazz, boolean isFeature) {
         this.name = name;
         this.clazz = clazz;
         this.isFeature = isFeature;
     }
 
+    /**
+     * Returns the name of the field.
+     *
+     * @return the name of the field
+     */
     public String getName() {
         return name;
     }
 
+
+    /**
+     * Returns the assigned value of the field.
+     *
+     * @return the assigned value of the field
+     */
     public Object getValue() {
         return value;
     }
@@ -43,6 +63,14 @@ public class Field extends AbstractColumn implements IColumn, Serializable {
         return TypeInformation.of(clazz);
     }
 
+    /**
+     * Parses the input string and sets its value to the parsed one or null in case of any parsing errors.
+     *
+     * On parsing errors, this method does throw an exception to be able to deal with errors in the input data.
+     * Instead, it sets the value to null and writes the error to the log.
+     *
+     * @param str The string representation of the field's value.
+     */
     public void setValue(String str) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class not supplied for token " + name);

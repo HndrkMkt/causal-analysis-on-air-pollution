@@ -18,12 +18,10 @@
 
 package de.tuberlin.dima.bdapro.jobs;
 
-import de.tuberlin.dima.bdapro.featureTable.AbstractColumn;
 import de.tuberlin.dima.bdapro.featureTable.Column;
+import de.tuberlin.dima.bdapro.featureTable.BasicColumn;
 import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
-import de.tuberlin.dima.bdapro.featureTable.IColumn;
 import de.tuberlin.dima.bdapro.functions.TimeWindow;
-import de.tuberlin.dima.bdapro.sensor.Field;
 import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -114,11 +112,11 @@ public class Aggregation extends UnifiedSensorJob {
 
     public static FeatureTable generateFeatureTable(ExecutionEnvironment env, String dataDirectory, int windowInMinutes, BatchTableEnvironment batchTableEnvironment) {
         Table aggregates = aggregateSensorData(true, dataDirectory, windowInMinutes, env, batchTableEnvironment);
-        List<IColumn> columns = getFeatureColumns();
-        List<IColumn> keyColumns = new ArrayList<>();
+        List<Column> columns = getFeatureColumns();
+        List<Column> keyColumns = new ArrayList<>();
         String[] keyColumnNames = {"location", "timestamp"};
         for (String keyColumnName : keyColumnNames) {
-            for (IColumn column : columns) {
+            for (Column column : columns) {
                 if (column.getName().equals(keyColumnName)) {
                     keyColumns.add(column);
                 }
@@ -127,18 +125,18 @@ public class Aggregation extends UnifiedSensorJob {
         return new FeatureTable("sensor", aggregates, columns, keyColumns, batchTableEnvironment);
     }
 
-    private static List<IColumn> getFeatureColumns() {
-        List<IColumn> featureColumns = new ArrayList<>();
-        featureColumns.add(new Column("location", Types.INT, false));
-        featureColumns.add(new Column("lat", Types.DOUBLE, false));
-        featureColumns.add(new Column("lon", Types.DOUBLE, false));
-        featureColumns.add(new Column("timestamp", Types.SQL_TIMESTAMP, true));
-        featureColumns.add(new Column("dayOfYear", Types.LONG, true));
-        featureColumns.add(new Column("minuteOfDay", Types.LONG, true));
-        featureColumns.add(new Column("dayOfWeek", Types.LONG, true));
-        featureColumns.add(new Column("isWeekend", Types.BOOLEAN, true));
-        List<? extends IColumn> sensorFields = UnifiedSensorReading.getFields();
-        for (IColumn column : sensorFields) {
+    private static List<Column> getFeatureColumns() {
+        List<Column> featureColumns = new ArrayList<>();
+        featureColumns.add(new BasicColumn("location", Types.INT, false));
+        featureColumns.add(new BasicColumn("lat", Types.DOUBLE, false));
+        featureColumns.add(new BasicColumn("lon", Types.DOUBLE, false));
+        featureColumns.add(new BasicColumn("timestamp", Types.SQL_TIMESTAMP, true));
+        featureColumns.add(new BasicColumn("dayOfYear", Types.LONG, true));
+        featureColumns.add(new BasicColumn("minuteOfDay", Types.LONG, true));
+        featureColumns.add(new BasicColumn("dayOfWeek", Types.LONG, true));
+        featureColumns.add(new BasicColumn("isWeekend", Types.BOOLEAN, true));
+        List<? extends Column> sensorFields = UnifiedSensorReading.getFields();
+        for (Column column : sensorFields) {
             if (column.isFeature()) {
                 featureColumns.add(column);
             }

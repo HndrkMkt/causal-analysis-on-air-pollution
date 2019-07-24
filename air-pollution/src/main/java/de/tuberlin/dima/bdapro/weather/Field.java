@@ -1,7 +1,6 @@
 package de.tuberlin.dima.bdapro.weather;
 
-import de.tuberlin.dima.bdapro.featureTable.AbstractColumn;
-import de.tuberlin.dima.bdapro.featureTable.IColumn;
+import de.tuberlin.dima.bdapro.featureTable.Column;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class Field extends AbstractColumn implements IColumn, Serializable {
+public class Field extends Column implements Serializable {
     Logger LOG = LoggerFactory.getLogger(Field.class);
     private static final String TIMESTAMP_FORMATSTR = "yyyy-MM-dd HH:mm:ss";
 

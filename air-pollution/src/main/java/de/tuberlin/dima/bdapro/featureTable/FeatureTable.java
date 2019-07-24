@@ -21,7 +21,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * metadata to create an intermediate dataset that contains all key columns and all feature columns.
  *
  * Feature tables can be joined by specifying a join predicate and referring to columns to their full names. The full
- * names should not change in nested joins when using {@link AbstractColumn}.
+ * names should not change in nested joins when using {@link Column}.
  *
  * @author Hendrik Makait
  */
@@ -29,8 +29,8 @@ public class FeatureTable {
 
     private String name;
     public Table data;
-    private List<IColumn> columns;
-    private List<IColumn> keyColumns;
+    private List<Column> columns;
+    private List<Column> keyColumns;
 
     /**
      * Creates a new feature table from the given data and metadata.
@@ -43,16 +43,16 @@ public class FeatureTable {
      * @param keyColumns       The columns forming a row key.
      * @param tableEnvironment The TableEnvironment in which the feature table shall be registered.
      */
-    public FeatureTable(String name, Table data, List<? extends IColumn> columns, List<? extends IColumn> keyColumns, TableEnvironment tableEnvironment) {
+    public FeatureTable(String name, Table data, List<? extends Column> columns, List<? extends Column> keyColumns, TableEnvironment tableEnvironment) {
         this.name = name;
-        this.columns = (List<IColumn>) columns;
-        for (IColumn column : columns) {
+        this.columns = (List<Column>) columns;
+        for (Column column : columns) {
             column.setParentTable(this);
         }
-        this.keyColumns = (List<IColumn>) keyColumns;
+        this.keyColumns = (List<Column>) keyColumns;
 
         StringJoiner renaming = new StringJoiner(", ");
-        for (IColumn column : columns) {
+        for (Column column : columns) {
             renaming.add(column.getName() + " as " + column.getFullName());
         }
         data = data.select(renaming.toString());
@@ -69,14 +69,14 @@ public class FeatureTable {
      * @param joinPredicate         The join predicate defining how to join the tables.
      * @param batchTableEnvironment The table environment in which the feature tables are registered.
      */
-    public FeatureTable(FeatureTable tableOne, FeatureTable tableTwo, List<? extends IColumn> keyColumns, String joinPredicate, BatchTableEnvironment batchTableEnvironment) {
+    public FeatureTable(FeatureTable tableOne, FeatureTable tableTwo, List<? extends Column> keyColumns, String joinPredicate, BatchTableEnvironment batchTableEnvironment) {
         Table data = batchTableEnvironment.sqlQuery("SELECT * FROM " + tableOne.getName() + " INNER JOIN " + tableTwo.getName() +
                 " ON " + joinPredicate);
         this.data = data;
         this.name = data.toString();
         this.columns = new ArrayList<>(tableOne.columns);
         columns.addAll(tableTwo.columns);
-        this.keyColumns = (List<IColumn>) keyColumns;
+        this.keyColumns = (List<Column>) keyColumns;
     }
 
     /**
@@ -100,12 +100,12 @@ public class FeatureTable {
 
         ArrayList<String> columnNameList = new ArrayList<>();
         ArrayList<TypeInformation> columnTypes = new ArrayList<>();
-        for (IColumn keyColumn : keyColumns) {
+        for (Column keyColumn : keyColumns) {
             columnNameList.add(keyColumn.getFullName());
             columnTypes.add(keyColumn.getTypeInformation());
         }
 
-        for (IColumn column : columns) {
+        for (Column column : columns) {
             if (column.isFeature() && !keyColumns.contains(column)) {
                 columnNameList.add(column.getFullName());
                 columnTypes.add(column.getTypeInformation());
@@ -126,7 +126,7 @@ public class FeatureTable {
      * @param joinPredicate         The join predicate defining how to join the tables.
      * @param batchTableEnvironment The table environment in which the feature tables are registered.
      */
-    public FeatureTable join(FeatureTable tableTwo, List<? extends IColumn> keyColumns, String joinPredicate,
+    public FeatureTable join(FeatureTable tableTwo, List<? extends Column> keyColumns, String joinPredicate,
                              BatchTableEnvironment batchTableEnvironment) {
         return new FeatureTable(this, tableTwo, keyColumns, joinPredicate, batchTableEnvironment);
     }
@@ -136,7 +136,7 @@ public class FeatureTable {
      *
      * @return the key columns of the feature table
      */
-    public List<IColumn> getKeyColumns() {
+    public List<Column> getKeyColumns() {
         return keyColumns;
     }
 }

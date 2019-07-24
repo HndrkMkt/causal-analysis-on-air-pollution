@@ -1,29 +1,19 @@
 package de.tuberlin.dima.bdapro.jobs;
 
 import de.tuberlin.dima.bdapro.featureTable.Column;
+import de.tuberlin.dima.bdapro.featureTable.BasicColumn;
 import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
-import de.tuberlin.dima.bdapro.featureTable.IColumn;
-import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
-import de.tuberlin.dima.bdapro.weather.WeatherReading;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.BatchTableEnvironment;
-import org.apache.flink.table.sinks.CsvTableSink;
-import org.apache.flink.table.sinks.TableSink;
-import org.apache.flink.types.Row;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
 
 public class Joining extends UnifiedSensorJob {
@@ -54,8 +44,8 @@ public class Joining extends UnifiedSensorJob {
                 .fieldDelimiter(",").ignoreFirstLine().includeFields("00001100").types(Double.class, String.class);
         Table table = tEnv.fromDataSet(acceptedSensorData,"location," + "closest_weather_station").distinct();
         List<Column> columns = new ArrayList<>();
-        columns.add(new Column("location", TypeInformation.of(Double.class), false));
-        columns.add(new Column("closest_weather_station", TypeInformation.of(String.class), false));
+        columns.add(new BasicColumn("location", TypeInformation.of(Double.class), false));
+        columns.add(new BasicColumn("closest_weather_station", TypeInformation.of(String.class), false));
         return new FeatureTable("sensor_station_mapping", table, columns, columns, tEnv);
     }
 }
