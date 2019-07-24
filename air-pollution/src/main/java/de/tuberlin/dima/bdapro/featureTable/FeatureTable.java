@@ -28,7 +28,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 public class FeatureTable {
 
     private String name;
-    public Table data;
+    public Table data; // TODO: Make private
     private List<Column> columns;
     private List<Column> keyColumns;
 

@@ -15,7 +15,9 @@ import org.apache.flink.table.api.java.BatchTableEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * TODO: Comment EVERYTHING
+ */
 public class Joining extends UnifiedSensorJob {
 
     private static String weatherDataPath = "raw/weather/weather_data.csv";

@@ -39,9 +39,11 @@ public class SensorReadingParser implements Serializable {
      *
      * @param input A string representing the sensor data.
      * @return a {@link UnifiedSensorReading} with the appropriate fields set to their values and all other fields null
-     * @throws Exception TODO: Comment
+     * @throws NoSuchFieldException TODO: Comment
+     * @throws IllegalArgumentException TODO: Comment
+     * @throws IllegalAccessException TODO: Comment
      */
-    public UnifiedSensorReading readRecord(String input) throws Exception {
+    public UnifiedSensorReading readRecord(String input) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
 
         String[] tokens = input.split(DELIMITER);
 
@@ -52,12 +54,8 @@ public class SensorReadingParser implements Serializable {
 
         UnifiedSensorReading sensorReading = new UnifiedSensorReading();
 
-        try {
-            for (Field field : fields) {
-                UnifiedSensorReading.class.getField(field.getName()).set(sensorReading, field.getValue());
-            }
-        } catch (Exception e) {
-            LOG.error(e.toString());
+        for (Field field : fields) {
+            UnifiedSensorReading.class.getField(field.getName()).set(sensorReading, field.getValue());
         }
 
         return sensorReading;

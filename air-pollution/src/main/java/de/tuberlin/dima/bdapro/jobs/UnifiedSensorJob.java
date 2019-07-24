@@ -29,6 +29,9 @@ import org.apache.flink.core.fs.Path;
 
 import java.util.*;
 
+/**
+ * TODO: Comment EVERYTHING
+ */
 abstract public class UnifiedSensorJob {
     protected static final Map<Type, String> sensorPatterns = new HashMap<Type, String>() {{
         put(Type.BME280, "bme280");

@@ -8,6 +8,9 @@ import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
 
+/**
+ * TODO: Comment EVERYTHING
+ */
 public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSensorReading> {
     private static final long serialVersionUID = 1L;
     /**

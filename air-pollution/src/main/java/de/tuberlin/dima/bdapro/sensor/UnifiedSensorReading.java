@@ -221,6 +221,4 @@ public class UnifiedSensorReading {
         }
         return fieldMap;
     }
-
-
 }

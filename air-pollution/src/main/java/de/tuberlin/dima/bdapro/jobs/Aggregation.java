@@ -42,14 +42,7 @@ import java.util.List;
 import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
 /**
- * Skeleton for a Flink Batch Job.
- *
- * <p>For a tutorial how to write a Flink batch application, check the
- * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
- *
- * <p>To package your application into a JAR file for execution,
- * change the main class in the POM.xml file to this class (simply search for 'mainClass')
- * and run 'mvn clean package' on the command line.
+ * TODO: Comment EVERYTHING
  */
 public class Aggregation extends UnifiedSensorJob {
     private static boolean compressed = false;
