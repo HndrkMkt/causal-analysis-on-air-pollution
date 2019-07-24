@@ -17,7 +17,11 @@ import java.util.StringJoiner;
 import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 
 /**
- * TODO: Comment
+ * The feature table is the core abstraction in the data processing component. It encapsulates all necessary data and
+ * metadata to create an intermediate dataset that contains all key columns and all feature columns.
+ *
+ * Feature tables can be joined by specifying a join predicate and referring to columns to their full names. The full
+ * names should not change in nested joins when using {@link AbstractColumn}.
  *
  * @author Hendrik Makait
  */
@@ -28,16 +32,15 @@ public class FeatureTable {
     private List<IColumn> columns;
     private List<IColumn> keyColumns;
 
-
     /**
      * Creates a new feature table from the given data and metadata.
-     *
+     * <p>
      * To allow for easy joining of the feature tables, the columns are renamed to <name>_<column.name>.
      *
-     * @param name The name of the feature table.
-     * @param data A Flink Table containing all relevant data for the feature table.
-     * @param columns The relevant columns of the feature table.
-     * @param keyColumns The columns forming a row key.
+     * @param name             The name of the feature table.
+     * @param data             A Flink Table containing all relevant data for the feature table.
+     * @param columns          The relevant columns of the feature table.
+     * @param keyColumns       The columns forming a row key.
      * @param tableEnvironment The TableEnvironment in which the feature table shall be registered.
      */
     public FeatureTable(String name, Table data, List<? extends IColumn> columns, List<? extends IColumn> keyColumns, TableEnvironment tableEnvironment) {
@@ -60,10 +63,10 @@ public class FeatureTable {
     /**
      * Creates a new feature table by joining two existing ones.
      *
-     * @param tableOne The first table to join.
-     * @param tableTwo The second table to join.
-     * @param keyColumns The columns forming a row key for the joined feature table.
-     * @param joinPredicate The join predicate defining how to join the tables.
+     * @param tableOne              The first table to join.
+     * @param tableTwo              The second table to join.
+     * @param keyColumns            The columns forming a row key for the joined feature table.
+     * @param joinPredicate         The join predicate defining how to join the tables.
      * @param batchTableEnvironment The table environment in which the feature tables are registered.
      */
     public FeatureTable(FeatureTable tableOne, FeatureTable tableTwo, List<? extends IColumn> keyColumns, String joinPredicate, BatchTableEnvironment batchTableEnvironment) {
@@ -86,10 +89,11 @@ public class FeatureTable {
     }
 
     /**
-     * TODO: Write comment
+     * Writes the key and feature columns of the feature table to a file in the given output path separated
+     * by a semicolon. If the file already exists, it is overwritten.
      *
-     * @param outputPath
-     * @param tEnv
+     * @param outputPath The file path of the output file including the full filename.
+     * @param tEnv The table environment to use.
      */
     public void write(Path outputPath, TableEnvironment tEnv) {
         TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
@@ -110,15 +114,16 @@ public class FeatureTable {
         String[] columnNames = columnNameList.toArray(new String[columnNameList.size()]);
 
         tEnv.registerTableSink("output", columnNames, columnTypes.toArray(new TypeInformation[columnTypes.size()]), sink);
+        // TODO: Add column names to file!
         data.select(StringUtils.join(columnNames, ", ")).insertInto("output");
     }
 
     /**
      * Creates a new feature table by joining the current table with another one.
      *
-     * @param tableTwo The table to join with.
-     * @param keyColumns The columns forming a row key for the joined feature table.
-     * @param joinPredicate The join predicate defining how to join the tables.
+     * @param tableTwo              The table to join with.
+     * @param keyColumns            The columns forming a row key for the joined feature table.
+     * @param joinPredicate         The join predicate defining how to join the tables.
      * @param batchTableEnvironment The table environment in which the feature tables are registered.
      */
     public FeatureTable join(FeatureTable tableTwo, List<? extends IColumn> keyColumns, String joinPredicate,
