@@ -4,7 +4,6 @@ import de.tuberlin.dima.bdapro.sensor.Field;
 import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,15 +12,35 @@ import de.tuberlin.dima.bdapro.sensor.Type;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+/**
+ * The SensorReadingParser splits input strings from the luftdaten.info data for a given sensor type and generates
+ * new {@link UnifiedSensorReading}s for each input, where it sets all appropriate fields to their values and leaves
+ * the rest null. The parsing logic of each individual field is specified in {@link Field}.
+ *
+ * @author Hendrik Makait
+ */
 public class SensorReadingParser implements Serializable {
     Logger LOG = LoggerFactory.getLogger(SensorReadingParser.class);
     private static final String DELIMITER = ";";
     private List<Field> fields;
 
+    /**
+     * Creates a new SensorReadingParser instance that can parse data of the given sensor type.
+     *
+     * @param type The type of the sensor data to parse.
+     */
     public SensorReadingParser(Type type) {
         this.fields = getSensorFields(type);
     }
 
+    /**
+     * Parses the input data and returns a new {@link UnifiedSensorReading} with the appropriate fields set to their
+     * values and all other fields null.
+     *
+     * @param input A string representing the sensor data.
+     * @return a {@link UnifiedSensorReading} with the appropriate fields set to their values and all other fields null
+     * @throws Exception TODO: Comment
+     */
     public UnifiedSensorReading readRecord(String input) throws Exception {
 
         String[] tokens = input.split(DELIMITER);
@@ -44,6 +63,28 @@ public class SensorReadingParser implements Serializable {
         return sensorReading;
     }
 
+    /**
+     * Returns the list of fields for a given sensor types in the order they appear in the data.
+     * This list is a subset of all the fields included in the {@link UnifiedSensorReading}.
+     *
+     * @param type The type of the sensor data to parse.
+     * @return the list of fields for a given sensor types
+     */
+    private static List<Field> getSensorFields(Type type) {
+        List<String> fieldNames = getSensorFieldNames(type);
+        List<Field> fields = new ArrayList<>();
+        Map<String, Field> fieldMap = UnifiedSensorReading.getFieldMap();
+        for (String fieldName : fieldNames) {
+            fields.add(fieldMap.get(fieldName));
+        }
+        return fields;
+    }
+
+    /**
+     * Returns the list of field names that are common among all sensor types.
+     *
+     * @return the list of field names that are common among all sensor types
+     */
     private static List<String> getCommonSensorFieldNames() {
         ArrayList<String> fieldNames = new ArrayList<>();
         fieldNames.add("sensorId");
@@ -55,16 +96,13 @@ public class SensorReadingParser implements Serializable {
         return fieldNames;
     }
 
-    private static List<Field> getSensorFields(Type type) {
-        List<String> fieldNames  = getSensorFieldNames(type);
-        List<Field> fields = new ArrayList<>();
-        Map<String, Field> fieldMap = UnifiedSensorReading.getFieldMap();
-        for (String fieldName : fieldNames) {
-            fields.add(fieldMap.get(fieldName));
-        }
-        return fields;
-    }
-
+    /**
+     * Returns the list of field names for a given sensor types in the order they appear in the data.
+     * This list is a subset of all the fields included in the {@link UnifiedSensorReading}.
+     *
+     * @param type The type of the sensor data to parse.
+     * @return the list of field names for the sensor type
+     */
     private static List<String> getSensorFieldNames(Type type) {
         List<String> fieldNames = getCommonSensorFieldNames();
         switch (type) {
