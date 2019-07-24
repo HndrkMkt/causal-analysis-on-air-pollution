@@ -1,5 +1,8 @@
 package de.tuberlin.dima.bdapro.sensor;
 
+/**
+ * Enum representing the different types of sensors in the luftdaten.info data.
+ */
 public enum Type {
     BME280,
     BMP180,
