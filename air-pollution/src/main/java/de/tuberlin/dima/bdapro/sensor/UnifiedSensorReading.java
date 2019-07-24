@@ -9,6 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is a unified representation of the different sensor types encountered in the luftdaten.info data.
+ * <p>
+ * A unified sensor reading contains all possible fields for the different sensor types and fields that do not belong to
+ * a certain sensor type can be null. The unified format allows for easy merging and aggregation over
+ * multiple different sensors.
+ *
+ * @author Hendrik Makait
+ */
 public class UnifiedSensorReading {
     // Common Fields
     public Integer sensorId;
@@ -33,9 +42,15 @@ public class UnifiedSensorReading {
     public Double durP2;
     public Double ratioP2;
 
+    // TODO: Comment
     public static final String[] AGGREGATION_FIELDS = {"pressure", "altitude", "pressure_sealevel", "temperature", "humidity",
             "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"};
 
+    /**
+     * Returns a tuple representation of this instance.
+     *
+     * @return a tuple representation of this instance
+     */
     public Tuple18<Integer, String, Integer, Double, Double, Timestamp,
             Double, Double, Double, Double, Double,
             Double, Double, Double, Double, Double, Double, Double> toTuple() {
@@ -64,6 +79,16 @@ public class UnifiedSensorReading {
                 ratioP2);
     }
 
+    /**
+     * Returns a String object that representing the value of all variables of this UnifiedSensorReading instance that
+     * belong to the given sensor type. The values are semicolon-separated.
+     * <p>
+     * If any other type than UNIFIED is given, the String contains only a subset of the fields in the order they appear
+     * in the luftdaten.info data.
+     *
+     * @param type The sensor type this instance represents.
+     * @return String representation of this instance
+     */
     public String toString(Type type) {
         String result;
         switch (type) {
@@ -137,6 +162,12 @@ public class UnifiedSensorReading {
         return result;
     }
 
+    /**
+     * Returns a String object that representing the value of all variables of this UnifiedSensorReading instance that
+     * are common among all sensor types. The values are semicolon-separated.
+     *
+     * @return a String representation of all common values
+     */
     private String commonFieldsToString() {
         return sensorId + ";" +
                 sensorType + ";" +
@@ -146,6 +177,11 @@ public class UnifiedSensorReading {
                 (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(timestamp);
     }
 
+    /**
+     * Returns a list that consists of the corresponding {@link Field} instances for each attribute of the class.
+     *
+     * @return a list that consists of the corresponding {@link Field} instances for each attribute of the class
+     */
     public static List<Field> getFields() {
         ArrayList<Field> fields = new ArrayList<>();
         fields.add(new Field("sensorId", Integer.class, false));
@@ -173,6 +209,11 @@ public class UnifiedSensorReading {
         return fields;
     }
 
+    /**
+     * Returns a map of attribute names to {@link Field} instances for all attributes of the class.
+     *
+     * @return a map of attribute names to {@link Field} instances for all attributes of the class
+     */
     public static Map<String, Field> getFieldMap() {
         Map<String, Field> fieldMap = new HashMap<>();
         for (Field field : getFields()) {
