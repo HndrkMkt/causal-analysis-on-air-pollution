@@ -1,5 +1,6 @@
 package tuberlin.dima.bdapro.sensor;
 
+import de.tuberlin.dima.bdapro.sensor.Type;
 import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -159,6 +160,34 @@ public class UnifiedSensorReadingTest {
         assertHashAndEquality(reading1, reading2, false);
         reading2.ratioP2 = 7.8;
         assertHashAndEquality(reading1, reading2, true);
+    }
+
+    @Test
+    void testToFormatString() {
+        UnifiedSensorReading reading = new UnifiedSensorReading();
+        reading.sensorId = 1;
+        reading.sensorType = "foo";
+        reading.location = 2;
+        reading.lat = 3.4;
+        reading.lon = 4.5;
+        reading.timestamp = Timestamp.valueOf("2019-01-01 12:00:00");
+        reading.pressure = 5.6;
+        reading.altitude = 6.7;
+        reading.pressure_sealevel = 7.8;
+        reading.temperature = 8.9;
+        reading.humidity = 9.0;
+        reading.p1 = 0.1;
+        reading.p2 = 1.2;
+        reading.p0 = 2.3;
+        reading.durP1 = 3.4;
+        reading.ratioP1 = 4.5;
+        reading.durP2 = 5.6;
+        reading.ratioP2 = 6.7;
+
+        Assertions.assertEquals("1;foo;2;3.4;4.5;2019-01-01T12:00:00;5.6;6.7;7.8;8.9;9.0;0.1;1.2;2.3;3.4;4.5;5.6;6.7",
+                reading.toString(Type.UNIFIED));
+        Assertions.assertEquals("1;foo;2;3.4;4.5;2019-01-01T12:00:00;5.6;6.7;7.8;8.9;9.0",
+                reading.toString(Type.BME280));
     }
 
     private void assertHashAndEquality(UnifiedSensorReading reading1, UnifiedSensorReading reading2, boolean match) {
