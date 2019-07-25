@@ -4,10 +4,7 @@ import org.apache.flink.api.java.tuple.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is a unified representation of the different sensor types encountered in the luftdaten.info data.
@@ -220,5 +217,39 @@ public class UnifiedSensorReading {
             fieldMap.put(field.getName(), field);
         }
         return fieldMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == this) return true;
+        if (!(o instanceof UnifiedSensorReading)) {
+            return false;
+        }
+        UnifiedSensorReading reading = (UnifiedSensorReading) o;
+        return Objects.equals(sensorId, reading.sensorId) &&
+                Objects.equals(sensorType, reading.sensorType) &&
+                Objects.equals(location, reading.location) &&
+                Objects.equals(lat, reading.lat) &&
+                Objects.equals(lon, reading.lon) &&
+                Objects.equals(timestamp, reading.timestamp) &&
+                Objects.equals(pressure, reading.pressure) &&
+                Objects.equals(altitude, reading.altitude) &&
+                Objects.equals(pressure_sealevel, reading.pressure_sealevel) &&
+                Objects.equals(temperature, reading.temperature) &&
+                Objects.equals(humidity, reading.humidity) &&
+                Objects.equals(p1, reading.p1) &&
+                Objects.equals(p2, reading.p2) &&
+                Objects.equals(p0, reading.p0) &&
+                Objects.equals(durP1, reading.durP1) &&
+                Objects.equals(ratioP1, reading.ratioP1) &&
+                Objects.equals(durP2, reading.durP2) &&
+                Objects.equals(ratioP2, reading.ratioP2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sensorId, sensorType, location, lat, lon, timestamp, pressure, altitude, pressure_sealevel,
+                temperature, humidity, p1, p2, p0, durP1, ratioP1, durP2, ratioP2);
     }
 }

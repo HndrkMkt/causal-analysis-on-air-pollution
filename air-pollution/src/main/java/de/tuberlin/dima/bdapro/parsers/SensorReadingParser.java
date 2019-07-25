@@ -47,6 +47,11 @@ public class SensorReadingParser implements Serializable {
 
         String[] tokens = input.split(DELIMITER);
 
+        // TODO: Test on entire dataset to ensure no regression
+        if (tokens.length != fields.size()) {
+            throw new IllegalArgumentException("The input contains a different number of fields than the sensor type");
+        }
+
         for (int i = 0, j = 0; i < tokens.length; j++) {
             Field curr = fields.get(j);
             curr.setValue(tokens[i++]);
