@@ -157,12 +157,12 @@ public class SensorReadingParser implements Serializable {
                 fieldNames.add("temperature");
                 fieldNames.add("humidity");
                 fieldNames.add("p1");
+                fieldNames.add("p2");
+                fieldNames.add("p0");
                 fieldNames.add("durP1");
                 fieldNames.add("ratioP1");
-                fieldNames.add("p2");
                 fieldNames.add("durP2");
                 fieldNames.add("ratioP2");
-                fieldNames.add("p0");
                 break;
         }
         return fieldNames;
