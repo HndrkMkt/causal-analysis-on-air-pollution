@@ -1,11 +1,14 @@
 package de.tuberlin.dima.bdapro.weather;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is a representation of the data variables available in the OpenWeatherMap web APIs
+ *
+ * @author Ricardo Salazar
+ */
 public class WeatherReading {
 
     public String location;
@@ -28,6 +31,11 @@ public class WeatherReading {
     public double wind_gust;
     public double wind_speed;
 
+    /**
+     * Returns a list that consists of the corresponding {@link Field} instances for each attribute of the class.
+     *
+     * @return a list that consists of the corresponding {@link Field} instances for each attribute of the class.
+     */
     public static List<Field> getFields() {
         ArrayList<Field> fields = new ArrayList<>();
         fields.add(new Field("location", String.class, false));

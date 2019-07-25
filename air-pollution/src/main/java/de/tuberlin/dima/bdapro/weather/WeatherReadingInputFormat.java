@@ -7,6 +7,11 @@ import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
 
+/**
+ * This class contains the logic to format, read and parse the csv weather input.
+ *
+ * @author Ricardo Salazar
+ */
 public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReading> {
     private static final long serialVersionUID = 1L;
     /**
@@ -16,7 +21,12 @@ public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReadi
 
     private WeatherReadingParser parser;
 
-
+    /**
+     * Creates a new WeatherReadingInputFormat instance
+     *
+     * @param filePath a valid path for the weather input data
+     * @param parser a {@link WeatherReadingParser} containing the corresponding valid fields of the {@link WeatherReading} class.
+     */
     public WeatherReadingInputFormat(Path filePath, WeatherReadingParser parser) {
         super(filePath, null);
         this.parser = parser;
