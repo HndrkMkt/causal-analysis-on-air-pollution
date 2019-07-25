@@ -19,7 +19,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 /**
  * The feature table is the core abstraction in the data processing component. It encapsulates all necessary data and
  * metadata to create an intermediate dataset that contains all key columns and all feature columns.
- *
+ * <p>
  * Feature tables can be joined by specifying a join predicate and referring to columns to their full names. The full
  * names should not change in nested joins when using {@link Column}.
  *
@@ -93,15 +93,17 @@ public class FeatureTable {
      * by a semicolon. If the file already exists, it is overwritten.
      *
      * @param outputPath The file path of the output file including the full filename.
-     * @param tEnv The table environment to use.
+     * @param tEnv       The table environment to use.
      */
     public void write(Path outputPath, TableEnvironment tEnv) {
         TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
 
         ArrayList<String> columnNameList = new ArrayList<>();
+        ArrayList<String> keyColumnNameList = new ArrayList<>();
         ArrayList<TypeInformation> columnTypes = new ArrayList<>();
         for (Column keyColumn : keyColumns) {
             columnNameList.add(keyColumn.getFullName());
+            keyColumnNameList.add(keyColumn.getFullName());
             columnTypes.add(keyColumn.getTypeInformation());
         }
 
@@ -112,6 +114,7 @@ public class FeatureTable {
             }
         }
         String[] columnNames = columnNameList.toArray(new String[columnNameList.size()]);
+        String[] keyColumnNames = keyColumnNameList.toArray(new String[keyColumnNameList.size()]);
 
         tEnv.registerTableSink("output", columnNames, columnTypes.toArray(new TypeInformation[columnTypes.size()]), sink);
         // TODO: Add column names to file!
@@ -129,6 +132,15 @@ public class FeatureTable {
     public FeatureTable join(FeatureTable tableTwo, List<? extends Column> keyColumns, String joinPredicate,
                              BatchTableEnvironment batchTableEnvironment) {
         return new FeatureTable(this, tableTwo, keyColumns, joinPredicate, batchTableEnvironment);
+    }
+
+    /**
+     * Returns the columns of the feature table.
+     *
+     * @return the columns of the feature table
+     */
+    public List<Column> getColumns() {
+        return columns;
     }
 
     /**
