@@ -28,6 +28,10 @@ public class TimeWindow extends ScalarFunction {
      * @return The end timestamp of the corresponding window.
      */
     public Timestamp eval(Timestamp input) {
-        return new Timestamp(input.getTime() + windowInMillis - (input.getTime() % windowInMillis));
+        long offset = input.getTime() % windowInMillis;
+        if (offset > 0) {
+            input = new Timestamp(input.getTime() + windowInMillis - offset);
+        }
+        return input;
     }
 }
