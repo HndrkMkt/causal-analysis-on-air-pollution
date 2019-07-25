@@ -16,15 +16,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class FeatureTableTest {
+class FeatureTableTest {
     private ExecutionEnvironment env;
     private BatchTableEnvironment tEnv;
 
@@ -45,8 +45,7 @@ public class FeatureTableTest {
 
         // To refer to column by its full name, it must be assigned to a feature table.
         Assertions.assertThrows(NullPointerException.class, column::getFullName);
-
-        FeatureTable parentTable = new FeatureTable("foo", table, columns, columns, tEnv);
+        new FeatureTable("foo", table, columns, columns, tEnv);
         Assertions.assertEquals("foo_bar", column.getFullName());
     }
 
@@ -66,26 +65,23 @@ public class FeatureTableTest {
         FeatureTable featureTable = new FeatureTable("student", table, columns, keyColumns, tEnv);
 
         // id renamed to student_id
-        Assertions.assertThrows(ValidationException.class, () -> {
-            tEnv.toDataSet(featureTable.data.select("id"), Integer.class).collect();
-        });
+        Assertions.assertThrows(ValidationException.class,
+                () -> tEnv.toDataSet(featureTable.data.select("id"), Integer.class).collect());
         Assertions.assertEquals(
                 getStudentIds(),
                 tEnv.toDataSet(featureTable.data.select("student_id"), Integer.class).collect()
         );
 
         // name renamed to student_name
-        Assertions.assertThrows(ValidationException.class, () -> {
-            tEnv.toDataSet(featureTable.data.select("name"), String.class).collect();
-        });
+        Assertions.assertThrows(ValidationException.class,
+                () -> tEnv.toDataSet(featureTable.data.select("name"), String.class).collect());
         Assertions.assertEquals(
                 getStudentNames(),
                 tEnv.toDataSet(featureTable.data.select("student_name"), String.class).collect()
         );
         // enrolled renamed to student_enrolled
-        Assertions.assertThrows(ValidationException.class, () -> {
-            tEnv.toDataSet(featureTable.data.select("enrolled"), Boolean.class).collect();
-        });
+        Assertions.assertThrows(ValidationException.class,
+                () -> tEnv.toDataSet(featureTable.data.select("enrolled"), Boolean.class).collect());
         Assertions.assertEquals(
                 getStudentEnrolledValues(),
                 tEnv.toDataSet(featureTable.data.select("student_enrolled"), Boolean.class).collect()
@@ -93,7 +89,7 @@ public class FeatureTableTest {
     }
 
     @Test
-    void testColumnSubsetting() throws Exception {
+    void testColumnReduction() throws Exception {
         Column nameColumn = new BasicColumn("id", Types.INT(), false);
         List<Column> columns = new ArrayList<>();
         columns.add(nameColumn);
@@ -119,12 +115,10 @@ public class FeatureTableTest {
         );
 
         // age is not included in column list and should be removed from data
-        Assertions.assertThrows(ValidationException.class, () -> {
-            tEnv.toDataSet(featureTable.data.select("age"), Integer.class).collect();
-        });
-        Assertions.assertThrows(ValidationException.class, () -> {
-            tEnv.toDataSet(featureTable.data.select("student_age"), Integer.class).collect();
-        });
+        Assertions.assertThrows(ValidationException.class,
+                () -> tEnv.toDataSet(featureTable.data.select("age"), Integer.class).collect());
+        Assertions.assertThrows(ValidationException.class,
+                () -> tEnv.toDataSet(featureTable.data.select("student_age"), Integer.class).collect());
     }
 
     @Test
@@ -133,7 +127,7 @@ public class FeatureTableTest {
         List<Column> columns = Arrays.asList(nameColumn,
                 new BasicColumn("name", Types.STRING(), false),
                 new BasicColumn("age", Types.INT(), true));
-        List<Column> keyColumns = Arrays.asList(nameColumn);
+        List<Column> keyColumns = Collections.singletonList(nameColumn);
         FeatureTable studentFeatureTable = new FeatureTable("student", getStudentTable(), columns, keyColumns, tEnv);
         FeatureTable gradeFeatureTable = getGradeFeatureTable();
 
@@ -148,7 +142,8 @@ public class FeatureTableTest {
 
         // TODO: Test correct data in there
         List<Tuple6<Integer, String, Integer, Integer, Integer, Double>> joinedData = tEnv.toDataSet(joined.data, TypeInformation.of(
-                new TypeHint<Tuple6<Integer, String, Integer, Integer, Integer, Double>>(){})).collect();
+                new TypeHint<Tuple6<Integer, String, Integer, Integer, Integer, Double>>() {
+                })).collect();
         Assertions.assertEquals(4, joinedData.size());
 
         List<Tuple6<Integer, String, Integer, Integer, Integer, Double>> expected = Arrays.asList(
@@ -176,12 +171,12 @@ public class FeatureTableTest {
     }
 
     @Test
-    void testWritingFeatureTable(@TempDir Path tempDir) throws IOException, Exception {
+    void testWritingFeatureTable(@TempDir Path tempDir) throws Exception {
         Column nameColumn = new BasicColumn("id", Types.INT(), false);
         List<Column> columns = Arrays.asList(nameColumn,
                 new BasicColumn("name", Types.STRING(), false),
                 new BasicColumn("age", Types.INT(), true));
-        List<Column> keyColumns = Arrays.asList(nameColumn);
+        List<Column> keyColumns = Collections.singletonList(nameColumn);
         FeatureTable studentFeatureTable = new FeatureTable("student", getStudentTable(), columns, keyColumns, tEnv);
         FeatureTable gradeFeatureTable = getGradeFeatureTable();
 

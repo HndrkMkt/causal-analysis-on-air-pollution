@@ -2,24 +2,19 @@ package de.tuberlin.dima.bdapro.sensor;
 
 import org.apache.flink.api.common.io.GlobFilePathFilter;
 import org.apache.flink.core.fs.FileInputSplit;
-import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.core.fs.local.LocalFileStatus;
 import org.apache.flink.core.fs.local.LocalFileSystem;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class SensorReadingCsvInputFormatTest {
+class SensorReadingCsvInputFormatTest {
     @Test
     void testSkipFirstLine() throws IOException {
         SensorReadingCsvInputFormat format = new SensorReadingCsvInputFormat(
@@ -56,10 +51,7 @@ public class SensorReadingCsvInputFormatTest {
         expected.humidity = 5.6;
         UnifiedSensorReading first = format.nextRecord(new UnifiedSensorReading());
         Assertions.assertEquals(expected, first);
-
-        Assertions.assertThrows(IOException.class, () -> {
-            format.nextRecord(null);
-        });
+        Assertions.assertThrows(IOException.class, () -> format.nextRecord(null));
     }
 
     @Test

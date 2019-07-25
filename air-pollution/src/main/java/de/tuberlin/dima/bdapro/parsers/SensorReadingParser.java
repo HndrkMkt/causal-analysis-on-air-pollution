@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.tuberlin.dima.bdapro.sensor.Type;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * The SensorReadingParser splits input strings from the luftdaten.info data for a given sensor type and generates
@@ -20,9 +18,8 @@ import org.slf4j.Logger;
  * @author Hendrik Makait
  */
 public class SensorReadingParser implements Serializable {
-    Logger LOG = LoggerFactory.getLogger(SensorReadingParser.class);
     private static final String DELIMITER = ";";
-    private List<Field> fields;
+    private final List<Field> fields;
 
     /**
      * Creates a new SensorReadingParser instance that can parse data of the given sensor type.
@@ -39,11 +36,11 @@ public class SensorReadingParser implements Serializable {
      *
      * @param input A string representing the sensor data.
      * @return a {@link UnifiedSensorReading} with the appropriate fields set to their values and all other fields null
-     * @throws NoSuchFieldException TODO: Comment
+     * @throws NoSuchFieldException     TODO: Comment
      * @throws IllegalArgumentException TODO: Comment
-     * @throws IllegalAccessException TODO: Comment
+     * @throws IllegalAccessException   TODO: Comment
      */
-    public UnifiedSensorReading readRecord(String input) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+    public UnifiedSensorReading readRecord(String input) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
         String[] tokens = input.split(DELIMITER);
 

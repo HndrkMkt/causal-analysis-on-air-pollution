@@ -16,9 +16,9 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
     /**
      * The name of the charset to use for decoding.
      */
-    private String charsetName = "UTF-8";
+    private final static String CHARSET_NAME = "UTF-8";
 
-    private SensorReadingParser parser;
+    private final SensorReadingParser parser;
 
 
     public SensorReadingCsvInputFormat(Path filePath, Type sensorType) {
@@ -28,7 +28,7 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
 
     @Override
     public UnifiedSensorReading readRecord(UnifiedSensorReading reuse, byte[] bytes, int offset, int numBytes) throws IOException {
-        String line = new String(bytes, offset, numBytes, charsetName);
+        String line = new String(bytes, offset, numBytes, CHARSET_NAME);
         try {
             return parser.readRecord(line);
         } catch (Exception e) {

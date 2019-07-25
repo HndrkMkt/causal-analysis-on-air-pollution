@@ -8,9 +8,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
  * @author Hendrik Makait
  */
 public class BasicColumn extends Column {
-    private String name;
-    private TypeInformation typeInformation;
-    private boolean isFeature;
+    private final String name;
+    private final TypeInformation typeInformation;
+    private final boolean isFeature;
 
     /**
      * Creates an new BasicColumn from the given input.

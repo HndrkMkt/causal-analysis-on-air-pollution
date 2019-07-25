@@ -27,10 +27,10 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  */
 public class FeatureTable {
 
-    private String name;
-    public Table data; // TODO: Make private
-    private List<Column> columns;
-    private List<Column> keyColumns;
+    private final String name;
+    public final Table data; // TODO: Make private
+    private final List<Column> columns;
+    private final List<Column> keyColumns;
 
     /**
      * Creates a new feature table from the given data and metadata.
@@ -69,7 +69,7 @@ public class FeatureTable {
      * @param joinPredicate         The join predicate defining how to join the tables.
      * @param batchTableEnvironment The table environment in which the feature tables are registered.
      */
-    public FeatureTable(FeatureTable tableOne, FeatureTable tableTwo, List<? extends Column> keyColumns, String joinPredicate, BatchTableEnvironment batchTableEnvironment) {
+    private FeatureTable(FeatureTable tableOne, FeatureTable tableTwo, List<? extends Column> keyColumns, String joinPredicate, BatchTableEnvironment batchTableEnvironment) {
         Table data = batchTableEnvironment.sqlQuery("SELECT * FROM " + tableOne.getName() + " INNER JOIN " + tableTwo.getName() +
                 " ON " + joinPredicate);
         this.data = data;
@@ -99,11 +99,9 @@ public class FeatureTable {
         TableSink<Row> sink = new CsvTableSink(outputPath.getPath(), ";", 1, OVERWRITE);
 
         ArrayList<String> columnNameList = new ArrayList<>();
-        ArrayList<String> keyColumnNameList = new ArrayList<>();
         ArrayList<TypeInformation> columnTypes = new ArrayList<>();
         for (Column keyColumn : keyColumns) {
             columnNameList.add(keyColumn.getFullName());
-            keyColumnNameList.add(keyColumn.getFullName());
             columnTypes.add(keyColumn.getTypeInformation());
         }
 
@@ -114,8 +112,6 @@ public class FeatureTable {
             }
         }
         String[] columnNames = columnNameList.toArray(new String[columnNameList.size()]);
-        String[] keyColumnNames = keyColumnNameList.toArray(new String[keyColumnNameList.size()]);
-
         tEnv.registerTableSink("output", columnNames, columnTypes.toArray(new TypeInformation[columnTypes.size()]), sink);
         // TODO: Add column names to file!
         data.select(StringUtils.join(columnNames, ", ")).insertInto("output");

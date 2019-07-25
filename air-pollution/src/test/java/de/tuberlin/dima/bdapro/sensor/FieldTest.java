@@ -3,11 +3,10 @@ package de.tuberlin.dima.bdapro.sensor;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.Timestamp;
 
-public class FieldTest {
+class FieldTest {
     @Test
     void testIntegerField() {
         Field field = new Field("test", Integer.class, true);

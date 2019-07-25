@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicColumnTest {
+class BasicColumnTest {
     @Test
     void testFullName() {
         String tableName = "foo";

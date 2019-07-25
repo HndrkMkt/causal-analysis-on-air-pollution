@@ -1,24 +1,20 @@
-package tuberlin.dima.bdapro.parsers;
+package de.tuberlin.dima.bdapro.parsers;
 
-import de.tuberlin.dima.bdapro.parsers.SensorReadingParser;
 import de.tuberlin.dima.bdapro.sensor.Type;
 import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.Timestamp;
 
-public class SensorReadingParserTest {
+class SensorReadingParserTest {
     @Test
-    void testReadRecordThrowsExceptionIfColumnNumberDoesNotMatch() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    void testReadRecordThrowsExceptionIfColumnNumberDoesNotMatch() throws IllegalArgumentException {
         SensorReadingParser parser = new SensorReadingParser(Type.BME280);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51\n");
-        });
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51;53.47;1\n");
-        });
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51\n"));
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51;53.47;1\n"));
     }
 
     @Test

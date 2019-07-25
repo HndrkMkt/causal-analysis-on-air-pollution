@@ -1,7 +1,5 @@
-package tuberlin.dima.bdapro.sensor;
+package de.tuberlin.dima.bdapro.sensor;
 
-import de.tuberlin.dima.bdapro.sensor.Type;
-import de.tuberlin.dima.bdapro.sensor.UnifiedSensorReading;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +7,7 @@ import java.sql.Timestamp;
 
 
 // TODO: Test ALL functionality
-public class UnifiedSensorReadingTest {
+class UnifiedSensorReadingTest {
     @Test
     void testEqualsAndHash() {
         UnifiedSensorReading reading1 = new UnifiedSensorReading();

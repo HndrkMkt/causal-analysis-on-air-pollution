@@ -6,7 +6,7 @@ import org.apache.flink.api.java.io.TextOutputFormat;
  * An Flink TextFormatter that formats {@link UnifiedSensorReading} based on a given {@link Type}.
  */
 public class SensorReadingFormatter implements TextOutputFormat.TextFormatter<UnifiedSensorReading> {
-    private Type sensorType;
+    private final Type sensorType;
 
     /**
      * Creates a new SensorReadingFormatter for a given sensor type.

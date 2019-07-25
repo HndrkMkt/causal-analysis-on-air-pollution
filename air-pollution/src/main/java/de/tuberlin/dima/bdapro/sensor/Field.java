@@ -13,13 +13,13 @@ import java.text.SimpleDateFormat;
  * TODO: Comment
  */
 public class Field extends Column implements Serializable {
-    Logger LOG = LoggerFactory.getLogger(Field.class);
-    private static final String TIMESTAMP_FORMATSTR = "yyyy-MM-dd'T'HH:mm:ss";
+    private final Logger LOG = LoggerFactory.getLogger(Field.class);
+    private static final String TIMESTAMP_FORMAT_STR = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private String name;
-    private Class<?> clazz;
+    private final String name;
+    private final  Class<?> clazz;
     private Object value;
-    private boolean isFeature;
+    private final boolean isFeature;
 
     /**
      * Creates a new field.
@@ -91,7 +91,7 @@ public class Field extends Column implements Serializable {
                     value = Double.parseDouble(str);
                 }
             } else if (clazz.equals(Timestamp.class)) {
-                value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMATSTR)).parse(str).getTime());
+                value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMAT_STR)).parse(str).getTime());
             } else if (clazz.equals(Boolean.class)) {
                 value = str.equals("1");
 //                TODO: Fail on other values not implemented

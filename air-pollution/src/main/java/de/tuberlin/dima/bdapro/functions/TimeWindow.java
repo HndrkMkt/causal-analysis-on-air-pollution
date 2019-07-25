@@ -10,12 +10,12 @@ import java.sql.Timestamp;
  *
  */
 public class TimeWindow extends ScalarFunction {
-    private long windowInMillis;
+    private final long windowInMillis;
 
     /**
      * Creates a new time window that rounds timestamps up to the given window size in minutes.
      *
-     * @param windowInMinutes
+     * @param windowInMinutes The window size in minutes.
      */
     public TimeWindow(int windowInMinutes) {
         windowInMillis = windowInMinutes * 60 * 1000;
