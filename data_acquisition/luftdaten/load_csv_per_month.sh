@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Loads the zip-compressed monthly sensor data from luftdaten for all months between the first and the second input date into
+# data/raw/csv_per_month/<YYYY-MM>/.
+#
 d=$1
 while [ "$d" != "$2" ]; do
   month=$(date -ud "$d" +%Y-%m)

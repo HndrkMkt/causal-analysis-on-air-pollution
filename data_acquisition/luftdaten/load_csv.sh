@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Loads the raw daily sensor data from luftdaten for all dates between the first and the second input date into
+# data/raw/<YYYY-MM-DD>/ and compresses the csv files using gzip.
+#
 d=$1
 while [ "$d" != "$2" ]; do
   echo $d

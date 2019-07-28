@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Loads the monthly .parquet files for each sensor type from luftdaten for all months between the first and the second input date into
+# data/raw/parquet/<YYYY-MM>/<sensor_type>/.
+#
 d=$1
 while [ "$d" != "$2" ]; do
   month=$(date -ud "$d" +%Y-%m)
