@@ -15,13 +15,13 @@ import java.text.SimpleDateFormat;
  * @author Ricardo Salazar
  */
 public class Field extends Column implements Serializable {
-    Logger LOG = LoggerFactory.getLogger(Field.class);
+    private final Logger LOG = LoggerFactory.getLogger(Field.class);
     private static final String TIMESTAMP_FORMAT_STR = "yyyy-MM-dd HH:mm:ss";
 
-    private String name;
-    private Class<?> clazz;
+    private final String name;
+    private final Class<?> clazz;
     private Object value;
-    private boolean isFeature;
+    private final boolean isFeature;
 
     /**
      * Creates a new field
@@ -88,6 +88,7 @@ public class Field extends Column implements Serializable {
         }
         try {
             if (clazz.equals(Integer.class)) {
+                assert str != null;
                 value = Integer.parseInt(str);
             } else if (clazz.equals(Double.class)) {
                 if (str.equalsIgnoreCase("NaN")) {
@@ -98,6 +99,7 @@ public class Field extends Column implements Serializable {
             } else if (clazz.equals(Timestamp.class)) {
                 value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMAT_STR)).parse(str).getTime());
             } else if (clazz.equals(Boolean.class)) {
+                assert str != null;
                 value = str.equals("1");
             } else if (clazz.equals(String.class)) {
                 value = str;

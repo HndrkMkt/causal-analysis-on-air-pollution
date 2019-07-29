@@ -21,7 +21,7 @@ import java.util.List;
  * the requested fields previously defined in the logic of the WeatherReading class.
  */
 public class WeatherJob {
-    private static String weatherDataPath = "data/raw/weather/weather_data.csv";
+    private static final String weatherDataPath = "data/raw/weather/weather_data.csv";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
@@ -63,7 +63,7 @@ public class WeatherJob {
      * @param fields a {@link List} containing the requested fields defined in the logic of the WeatherReading class.
      * @return a {@link DataSet} with the requested weather fields defined in the logic of the WeatherReading class.
      */
-    public static DataSet<WeatherReading> readWeather(ExecutionEnvironment env, String weatherDataPath, List<Field> fields) {
+    private static DataSet<WeatherReading> readWeather(ExecutionEnvironment env, String weatherDataPath, List<Field> fields) {
         WeatherReadingInputFormat fileFormat = new WeatherReadingInputFormat(new Path(weatherDataPath),
                 new WeatherReadingParser(fields));
         return env.createInput(fileFormat, TypeInformation.of(WeatherReading.class)).setParallelism(1);

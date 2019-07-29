@@ -15,10 +15,10 @@ import java.util.List;
  * @author Ricardo Salazar
  */
 public class WeatherReadingParser implements Serializable {
-    Logger LOG = LoggerFactory.getLogger(WeatherReadingParser.class);
+    private final Logger LOG = LoggerFactory.getLogger(WeatherReadingParser.class);
     private static final String DELIMITER = ";";
 
-    private List<Field> fields;
+    private final List<Field> fields;
 
     /**
      * Creates a new WeatherReadingParser instance that can parse data from the input weather data fields
@@ -33,7 +33,7 @@ public class WeatherReadingParser implements Serializable {
      *Parses the weather input data and returns a new {@link WeatherReading} with the corresponding valid fields set to their values
      * and all other fields set to null.
      *
-     * @param input
+     * @param input A {@link List} of the required weather fields, defined in the logic of the WeatherReading class
      * @return a {@link WeatherReading} with the corresponding valid fields set to their values and all other fields set to null
      * @throws Exception catch exception when a a field from the input data does not exist in the WeatherReading class
      */

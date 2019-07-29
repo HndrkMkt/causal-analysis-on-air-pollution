@@ -14,12 +14,8 @@ import java.io.IOException;
  */
 public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReading> {
     private static final long serialVersionUID = 1L;
-    /**
-     * The name of the charset to use for decoding.
-     */
-    private String charsetName = "UTF-8";
 
-    private WeatherReadingParser parser;
+    private final WeatherReadingParser parser;
 
     /**
      * Creates a new WeatherReadingInputFormat instance
@@ -34,6 +30,10 @@ public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReadi
 
     @Override
     public WeatherReading readRecord(WeatherReading reuse, byte[] bytes, int offset, int numBytes) throws IOException {
+        /**
+         * The name of the charset to use for decoding.
+         */
+        String charsetName = "UTF-8";
         String line = new String(bytes, offset, numBytes, charsetName);
         try {
             return parser.readRecord(line);
