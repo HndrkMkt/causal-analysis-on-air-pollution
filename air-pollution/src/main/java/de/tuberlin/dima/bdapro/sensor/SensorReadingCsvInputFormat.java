@@ -45,7 +45,7 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Skips the first line of the CSV file that includes the column names.
      */
     @Override
@@ -60,7 +60,7 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Recursively searches all directories except for hidden and magic directories. Applies the filter logic only to
      * files.
      */

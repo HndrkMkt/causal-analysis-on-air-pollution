@@ -64,10 +64,10 @@ abstract public class UnifiedSensorJob {
      * Recursively retrieves all files containing data of a given sensor type from the base directory and loads the data
      * into a dataset of {@link UnifiedSensorReading}.
      *
-     * @param sensorType The sensor type to load.
+     * @param sensorType         The sensor type to load.
      * @param sensorDataBasePath The base path containing all data.
-     * @param env A execution environment to use
-     * @param compressed Whether the files are compressed as csv.gz or raw csv.
+     * @param env                A execution environment to use
+     * @param compressed         Whether the files are compressed as csv.gz or raw csv.
      * @return the dataset of all data for the given sensor type
      */
     protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env, boolean compressed) {
@@ -84,9 +84,9 @@ abstract public class UnifiedSensorJob {
      * Recursively retrieves all csv.gz files containing data of a given sensor type from the base directory and loads the data
      * into a dataset of {@link UnifiedSensorReading} (Wrapper around readSensor(...,compressed=True) for backwards compatibility.
      *
-     * @param sensorType The sensor type to load.
+     * @param sensorType         The sensor type to load.
      * @param sensorDataBasePath The base path containing all data.
-     * @param env A execution environment to use
+     * @param env                A execution environment to use
      * @return the dataset of all data for the given sensor type
      */
     protected static DataSet<UnifiedSensorReading> readSensor(Type sensorType, String sensorDataBasePath, ExecutionEnvironment env) {
@@ -98,8 +98,8 @@ abstract public class UnifiedSensorJob {
      * dataset of {@link UnifiedSensorReading}.
      *
      * @param sensorDataBasePath The base path containing all data.
-     * @param env A execution environment to use
-     * @param compressed Whether the files are compressed as csv.gz or raw csv.
+     * @param env                A execution environment to use
+     * @param compressed         Whether the files are compressed as csv.gz or raw csv.
      * @return the dataset of all sensor data
      */
     protected static DataSet<UnifiedSensorReading> readAllSensors(String sensorDataBasePath, ExecutionEnvironment env, boolean compressed) {
@@ -114,12 +114,12 @@ abstract public class UnifiedSensorJob {
      * Helper function that performs a union operation all datasets in the given list and returns their combined dataset.
      *
      * @param list A list of datasets to unionize.
-     * @param <T> The type of the individual entries in the datasets.
+     * @param <T>  The type of the individual entries in the datasets.
      * @return the unionized dataset
      */
     protected static <T> DataSet<T> unionAll(List<DataSet<T>> list) {
         DataSet<T> unionDataset = null;
-        for (DataSet<T> dataset: list) {
+        for (DataSet<T> dataset : list) {
             if (unionDataset == null) {
                 unionDataset = dataset;
             } else {

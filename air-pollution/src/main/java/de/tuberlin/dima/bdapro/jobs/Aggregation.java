@@ -136,7 +136,7 @@ public class Aggregation extends UnifiedSensorJob {
         }
         return featureColumns;
     }
-
+    
     public static final TypeInformation[] getAggregationFieldTypes() {
         return FIELD_TYPES;
     }

@@ -4,7 +4,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 
 /**
  * This class encapsulates all column metadata used in the {@link FeatureTable}.
- *
+ * <p>
  * It specifies data types and whether or
  * not the column is a feature and generates a globally unique full name as a combination of the parent table name and
  * the column's own name. This name can be used to uniquely reference a column even in nested combinations of feature

@@ -20,15 +20,15 @@ public class Field extends Column implements Serializable {
     private static final String TIMESTAMP_FORMAT_STR = "yyyy-MM-dd'T'HH:mm:ss";
 
     private final String name;
-    private final  Class<?> clazz;
+    private final Class<?> clazz;
     private Object value;
     private final boolean isFeature;
 
     /**
      * Creates a new field.
      *
-     * @param name The name of the field.
-     * @param clazz The class of the field.
+     * @param name      The name of the field.
+     * @param clazz     The class of the field.
      * @param isFeature Whether the field is a feature of a feature table.
      */
     public Field(String name, Class<?> clazz, boolean isFeature) {
@@ -68,7 +68,7 @@ public class Field extends Column implements Serializable {
 
     /**
      * Parses the input string and sets its value to the parsed one or null in case of any parsing errors.
-     *
+     * <p>
      * On parsing errors, this method does throw an exception to be able to deal with errors in the input data.
      * Instead, it sets the value to null and writes the error to the log.
      *

@@ -64,7 +64,7 @@ public class SensorStatistics extends UnifiedSensorJob {
     /**
      * Generates a {@link Table of} aggregated statistics for the given sensor data.
      *
-     * @param tEnv A table environment to execute the workflow in.
+     * @param tEnv       A table environment to execute the workflow in.
      * @param sensorData The sensor data from which to calculate statistics.
      * @return the aggregated statistics for the sensors
      */
@@ -79,10 +79,10 @@ public class SensorStatistics extends UnifiedSensorJob {
      * Calculates aggregated statistics for all sensor data of a given type in the base directory and stores it in a
      * csv-file.
      *
-     * @param sensorType The sensor type for which the statistics should be calculated.
+     * @param sensorType    The sensor type for which the statistics should be calculated.
      * @param dataDirectory The base directory containing all sensor data.
-     * @param env An execution environment to use.
-     * @param tEnv A table execution environment to use.
+     * @param env           An execution environment to use.
+     * @param tEnv          A table execution environment to use.
      */
     private static void collectStatistics(Type sensorType, String dataDirectory, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
         Path sensorDataBasePath = new Path(dataDirectory, basePath);
