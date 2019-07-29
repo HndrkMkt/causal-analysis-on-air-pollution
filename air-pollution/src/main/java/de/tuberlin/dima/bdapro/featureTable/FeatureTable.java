@@ -28,7 +28,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
 public class FeatureTable {
 
     private final String name;
-    public final Table data; // TODO: Make private
+    private final Table data;
     private final List<Column> columns;
     private final List<Column> keyColumns;
 
@@ -137,6 +137,15 @@ public class FeatureTable {
      */
     public List<Column> getColumns() {
         return columns;
+    }
+
+    /**
+     * Returns the data of the feature table.
+     *
+     * @return the data of the feature table
+     */
+    public Table getData() {
+        return data;
     }
 
     /**

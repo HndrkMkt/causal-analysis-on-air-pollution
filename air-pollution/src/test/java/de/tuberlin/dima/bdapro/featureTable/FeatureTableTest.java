@@ -66,25 +66,25 @@ class FeatureTableTest {
 
         // id renamed to student_id
         Assertions.assertThrows(ValidationException.class,
-                () -> tEnv.toDataSet(featureTable.data.select("id"), Integer.class).collect());
+                () -> tEnv.toDataSet(featureTable.getData().select("id"), Integer.class).collect());
         Assertions.assertEquals(
                 getStudentIds(),
-                tEnv.toDataSet(featureTable.data.select("student_id"), Integer.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_id"), Integer.class).collect()
         );
 
         // name renamed to student_name
         Assertions.assertThrows(ValidationException.class,
-                () -> tEnv.toDataSet(featureTable.data.select("name"), String.class).collect());
+                () -> tEnv.toDataSet(featureTable.getData().select("name"), String.class).collect());
         Assertions.assertEquals(
                 getStudentNames(),
-                tEnv.toDataSet(featureTable.data.select("student_name"), String.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_name"), String.class).collect()
         );
         // enrolled renamed to student_enrolled
         Assertions.assertThrows(ValidationException.class,
-                () -> tEnv.toDataSet(featureTable.data.select("enrolled"), Boolean.class).collect());
+                () -> tEnv.toDataSet(featureTable.getData().select("enrolled"), Boolean.class).collect());
         Assertions.assertEquals(
                 getStudentEnrolledValues(),
-                tEnv.toDataSet(featureTable.data.select("student_enrolled"), Boolean.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_enrolled"), Boolean.class).collect()
         );
     }
 
@@ -103,22 +103,22 @@ class FeatureTableTest {
         // All columns but age are referenced in the column list and should be included
         Assertions.assertEquals(
                 getStudentIds(),
-                tEnv.toDataSet(featureTable.data.select("student_id"), Integer.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_id"), Integer.class).collect()
         );
         Assertions.assertEquals(
                 getStudentNames(),
-                tEnv.toDataSet(featureTable.data.select("student_name"), String.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_name"), String.class).collect()
         );
         Assertions.assertEquals(
                 getStudentIds(),
-                tEnv.toDataSet(featureTable.data.select("student_id"), Integer.class).collect()
+                tEnv.toDataSet(featureTable.getData().select("student_id"), Integer.class).collect()
         );
 
         // age is not included in column list and should be removed from data
         Assertions.assertThrows(ValidationException.class,
-                () -> tEnv.toDataSet(featureTable.data.select("age"), Integer.class).collect());
+                () -> tEnv.toDataSet(featureTable.getData().select("age"), Integer.class).collect());
         Assertions.assertThrows(ValidationException.class,
-                () -> tEnv.toDataSet(featureTable.data.select("student_age"), Integer.class).collect());
+                () -> tEnv.toDataSet(featureTable.getData().select("student_age"), Integer.class).collect());
     }
 
     @Test
@@ -140,7 +140,7 @@ class FeatureTableTest {
         Assertions.assertEquals(2, joined.getKeyColumns().size());
         Assertions.assertTrue(joined.getKeyColumns().containsAll(gradeFeatureTable.getKeyColumns()));
 
-        List<Tuple6<Integer, String, Integer, Integer, Integer, Double>> joinedData = tEnv.toDataSet(joined.data, TypeInformation.of(
+        List<Tuple6<Integer, String, Integer, Integer, Integer, Double>> joinedData = tEnv.toDataSet(joined.getData(), TypeInformation.of(
                 new TypeHint<Tuple6<Integer, String, Integer, Integer, Integer, Double>>() {
                 })).collect();
         Assertions.assertEquals(4, joinedData.size());
@@ -156,15 +156,15 @@ class FeatureTableTest {
         Assertions.assertEquals("student_id", joined.getColumns().get(0).getFullName());
         Assertions.assertEquals(
                 Arrays.asList(1, 1, 4, 2),
-                tEnv.toDataSet(joined.data.select("student_id"), Integer.class).collect()
+                tEnv.toDataSet(joined.getData().select("student_id"), Integer.class).collect()
         );
         Assertions.assertEquals(
                 Arrays.asList("John", "John", "Bob", "Peter"),
-                tEnv.toDataSet(joined.data.select("student_name"), String.class).collect()
+                tEnv.toDataSet(joined.getData().select("student_name"), String.class).collect()
         );
         Assertions.assertEquals(
                 Arrays.asList(1.0, 1.7, 2.3, 1.3),
-                tEnv.toDataSet(joined.data.select("grade_grade"), Double.class).collect()
+                tEnv.toDataSet(joined.getData().select("grade_grade"), Double.class).collect()
         );
     }
 

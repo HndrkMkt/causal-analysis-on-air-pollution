@@ -3,7 +3,12 @@ package de.tuberlin.dima.bdapro.featureTable;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 
 /**
- * TODO: Comment
+ * This class encapsulates all column metadata used in the {@link FeatureTable}.
+ *
+ * It specifies data types and whether or
+ * not the column is a feature and generates a globally unique full name as a combination of the parent table name and
+ * the column's own name. This name can be used to uniquely reference a column even in nested combinations of feature
+ * tables.
  */
 public abstract class Column {
     private FeatureTable parentTable;
