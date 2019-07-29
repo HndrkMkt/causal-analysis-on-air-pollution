@@ -1,3 +1,8 @@
+"""TODO: Add DOCSTRING
+"""
+
+__author__ = 'Ricardo Salazar'
+
 import pyowm
 import pyowm
 import forecastio

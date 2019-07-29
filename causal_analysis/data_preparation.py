@@ -1,3 +1,11 @@
+"""Data preparation for causal discovery.
+
+This module contains functions to generate a TIGRAMITE dataframe from the intermediate data created by the data
+processing component.
+"""
+
+__author__ = 'Ricardo Salazar'
+
 import pandas as pd
 from datetime import datetime
 import numpy as np
