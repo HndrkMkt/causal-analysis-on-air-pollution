@@ -38,8 +38,10 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  * <p>
  * This workflow contains methods to calculate the filtered dataset from scratch and return it directly, as well as to
  * precalculate the filtered data and store it to file, from where it can then be loaded again.
+ *
+ * @author Hendrik Makait
  */
-public class Filtering extends UnifiedSensorJob {
+public class SensorFiltering extends UnifiedSensorJob {
     // relative path of the raw sensor data
     private static String rawSensorDataPath = "raw/csv_per_month";
     // relative path to store filtered data in

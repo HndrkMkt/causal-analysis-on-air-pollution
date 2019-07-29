@@ -80,7 +80,7 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     Walk through `ExtractSensorsForWeatherStations.ipynb`.
 5. Filter raw sensor to the sensors for which we have weather data:
     ```
-    $ flink run -c de.tuberlin.dima.bdapro.jobs.Filtering air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+    $ flink run -c de.tuberlin.dima.bdapro.jobs.SensorFiltering air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
 6. Join all the datasets together and create output data for causal analysis:
     ```

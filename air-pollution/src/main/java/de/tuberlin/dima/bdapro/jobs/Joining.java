@@ -29,7 +29,7 @@ public class Joining extends UnifiedSensorJob {
 
         ParameterTool params = ParameterTool.fromArgs(args);
         final String dataDirectory = params.get("data_dir", "data");
-        FeatureTable sensor = Aggregation.generateFeatureTable(env, dataDirectory, 60, tEnv);
+        FeatureTable sensor = SensorFeatureTable.generateFeatureTable(env, dataDirectory, 60, tEnv);
         FeatureTable sensorStationMapping = generateSensorStationMappingFeatureTable(dataDirectory, env, tEnv);
         FeatureTable weather = WeatherJob.generateFeatureTable(env, tEnv);
         FeatureTable mappedSensors = sensor.join(sensorStationMapping, sensor.getKeyColumns(), "sensor_station_mapping_location = sensor_location", tEnv);
