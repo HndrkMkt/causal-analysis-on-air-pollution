@@ -36,9 +36,6 @@ public class SensorReadingParser implements Serializable {
      *
      * @param input A string representing the sensor data.
      * @return a {@link UnifiedSensorReading} with the appropriate fields set to their values and all other fields null
-     * @throws NoSuchFieldException     TODO: Comment
-     * @throws IllegalArgumentException TODO: Comment
-     * @throws IllegalAccessException   TODO: Comment
      */
     public UnifiedSensorReading readRecord(String input) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 

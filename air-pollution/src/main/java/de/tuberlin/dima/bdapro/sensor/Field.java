@@ -10,7 +10,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 /**
- * TODO: Comment
+ * The Field class parses field content from the sensor data and extends the {@link Column} class used
+ * for specifying feature tables.
+ *
+ * @author Hendrik Makait
  */
 public class Field extends Column implements Serializable {
     private final Logger LOG = LoggerFactory.getLogger(Field.class);
@@ -94,7 +97,6 @@ public class Field extends Column implements Serializable {
                 value = new Timestamp((new SimpleDateFormat(TIMESTAMP_FORMAT_STR)).parse(str).getTime());
             } else if (clazz.equals(Boolean.class)) {
                 value = str.equals("1");
-//                TODO: Fail on other values not implemented
             } else if (clazz.equals(String.class)) {
                 value = str;
             } else {

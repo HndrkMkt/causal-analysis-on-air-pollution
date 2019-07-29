@@ -9,7 +9,8 @@ import org.apache.flink.core.fs.Path;
 import java.io.IOException;
 
 /**
- * TODO: Comment EVERYTHING
+ * This class extends the DelimitedInputFormat to recursively find all files matching a given filter
+ * for a sensor type.
  */
 public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSensorReading> {
     private static final long serialVersionUID = 1L;
@@ -21,6 +22,12 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
     private final SensorReadingParser parser;
 
 
+    /**
+     * Creates a new SensorReadingCsvInputFormat for a given base file path and sensor type.
+     *
+     * @param filePath   The base path to start the search for matching input files
+     * @param sensorType The sensor type to retrieve.
+     */
     public SensorReadingCsvInputFormat(Path filePath, Type sensorType) {
         super(filePath, null);
         this.parser = new SensorReadingParser(sensorType);
@@ -36,6 +43,11 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Skips the first line of the CSV file that includes the column names.
+     */
     @Override
     public void open(FileInputSplit split) throws IOException {
         super.open(split);
@@ -45,6 +57,13 @@ public class SensorReadingCsvInputFormat extends DelimitedInputFormat<UnifiedSen
         }
     }
 
+
+    /**
+     * {@inheritDoc}
+     *
+     * Recursively searches all directories except for hidden and magic directories. Applies the filter logic only to
+     * files.
+     */
     @Override
     public boolean acceptFile(FileStatus fileStatus) {
         if (fileStatus.isDir() && enumerateNestedFiles) {

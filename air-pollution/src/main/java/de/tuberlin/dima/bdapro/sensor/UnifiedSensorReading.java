@@ -39,7 +39,7 @@ public class UnifiedSensorReading {
     public Double durP2;
     public Double ratioP2;
 
-    // TODO: Comment
+    // All fields that are used to aggregate sensor readings in order to reduce noise
     public static final String[] AGGREGATION_FIELDS = {"pressure", "altitude", "pressure_sealevel", "temperature", "humidity",
             "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"};
 

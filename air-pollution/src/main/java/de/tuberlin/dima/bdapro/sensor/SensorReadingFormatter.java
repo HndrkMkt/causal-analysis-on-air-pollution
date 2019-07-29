@@ -18,9 +18,7 @@ public class SensorReadingFormatter implements TextOutputFormat.TextFormatter<Un
     }
 
     /**
-     * Formats the sensor reading.
-     *
-     * TODO: Comment and explain delimiter and where to use.
+     * Formats the sensor reading in a semicolon-separated format.
      *
      * @param value The sensor reading to format.
      * @return The string representation of the sensor reading.
