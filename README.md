@@ -84,7 +84,7 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     ```
 6. Join all the datasets together and create output data for causal analysis:
     ```
-    $ flink run -c de.tuberlin.dima.bdapro.jobs.Joining air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+    $ flink run -c de.tuberlin.dima.bdapro.jobs.FeatureTableCombination air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
 7. Run causal analysis pipeline with activated virtual environment and store standard output to output.log:
     ```
