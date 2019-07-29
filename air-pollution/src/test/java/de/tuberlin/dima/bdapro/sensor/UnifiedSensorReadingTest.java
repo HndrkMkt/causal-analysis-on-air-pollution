@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import java.sql.Timestamp;
 
 
-// TODO: Test ALL functionality
 class UnifiedSensorReadingTest {
     @Test
     void testEqualsAndHash() {
@@ -21,7 +20,6 @@ class UnifiedSensorReadingTest {
         assertHashAndEquality(reading1, reading2, false);
         reading2.sensorId = 1;
         assertHashAndEquality(reading1, reading2, true);
-
 
         // sensorType
         reading1.sensorType = "foo";
@@ -197,6 +195,4 @@ class UnifiedSensorReadingTest {
             Assertions.assertNotEquals(reading1.hashCode(), reading2.hashCode());
         }
     }
-
-
 }

@@ -140,7 +140,6 @@ class FeatureTableTest {
         Assertions.assertEquals(2, joined.getKeyColumns().size());
         Assertions.assertTrue(joined.getKeyColumns().containsAll(gradeFeatureTable.getKeyColumns()));
 
-        // TODO: Test correct data in there
         List<Tuple6<Integer, String, Integer, Integer, Integer, Double>> joinedData = tEnv.toDataSet(joined.data, TypeInformation.of(
                 new TypeHint<Tuple6<Integer, String, Integer, Integer, Integer, Double>>() {
                 })).collect();
@@ -153,9 +152,8 @@ class FeatureTableTest {
                 new Tuple6<>(2, "Peter", 25, 103, 2, 1.3)
         );
         Assertions.assertTrue(joinedData.containsAll(expected));
-        // TODO: Test correct namings
-        Assertions.assertEquals("student_id", joined.getColumns().get(0).getFullName());
 
+        Assertions.assertEquals("student_id", joined.getColumns().get(0).getFullName());
         Assertions.assertEquals(
                 Arrays.asList(1, 1, 4, 2),
                 tEnv.toDataSet(joined.data.select("student_id"), Integer.class).collect()
