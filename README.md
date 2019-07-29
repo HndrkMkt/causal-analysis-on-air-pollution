@@ -45,6 +45,9 @@ There is also several other scripts for downloading data from the project root:
     $ scripts/luftdaten/load_parquet.sh 2019-01-01 2019-05-01
     ```
 
+Due to daily limit API calls constraints, in order to get the weather data used in the project, the following script  must be run 7 times in 7 different days
+1. $ scripts/weather/weather_api.py
+
 ## Jupyter Lab
 Create kernel to use virtual environment:
 ```

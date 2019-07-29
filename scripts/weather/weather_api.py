@@ -8,7 +8,7 @@ import os.path
 from os import path
 
 
-days_back=2
+days_back=118
 latitude=52.52
 longitude=13.40
 forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
