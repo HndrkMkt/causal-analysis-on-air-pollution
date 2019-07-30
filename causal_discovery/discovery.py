@@ -6,7 +6,7 @@ from tigramite.independence_tests import RCOT
 import time
 
 def generate_dataframe(var_names, start_index=None, end_index=None):
-    data = load_data('../data/processed/causalDiscoveryData.csv')
+    data = load_data('data/processed/causalDiscoveryData.csv')
     data = localize(data, 52.496, 13.338, 1)
     data = input_na(data, columns=["temperature", "humidity", "p1", "p2", "apparent_temperature", "cloud_cover",
                                    "dew_point", "humidity", "visibility", "wind_bearing", "wind_gust", "wind_speed",
