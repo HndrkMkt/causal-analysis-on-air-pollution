@@ -16,13 +16,13 @@ public class SensorStatisticsTest {
     void testReadUncompressedFiles() throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSet<UnifiedSensorReading> dataset = SensorStatistics.readAllSensors("src/test/resources/data", env, false);
-        Assertions.assertEquals(6, dataset.count());
+        Assertions.assertEquals(8, dataset.count());
     }
 
     @Test
     void testReadCompressedFiles() throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSet<UnifiedSensorReading> dataset = SensorStatistics.readAllSensors("src/test/resources/data", env, true);
-        Assertions.assertEquals(6, dataset.count());
+        Assertions.assertEquals(8, dataset.count());
     }
 }

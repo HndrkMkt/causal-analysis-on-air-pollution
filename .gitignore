@@ -2,7 +2,7 @@ experiments/causal_discovery/results/
 experiments/performance/results/
 images/
 *.log
-data/
+/data/
 .idea
 *.iml
 # Byte-compiled / optimized / DLL files

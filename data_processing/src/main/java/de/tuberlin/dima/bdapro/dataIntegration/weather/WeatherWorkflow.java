@@ -17,7 +17,7 @@ import java.util.List;
  * the requested fields previously defined in the logic of the WeatherReading class.
  */
 public class WeatherWorkflow {
-    private static final String weatherDataPath = "data/raw/weather/weather_data.csv";
+    private static final String weatherDataPath = "raw/weather/weather_data.csv";
 
     public static void main(String[] args) throws Exception {
         // set up the batch execution environment
@@ -29,12 +29,13 @@ public class WeatherWorkflow {
 
     /**
      * Creates a new {@link FeatureTable} from the weather input data
-     * @param env the Flink execution environment
+     *
+     * @param env                   the Flink execution environment
      * @param batchTableEnvironment the Flink batch table environment
      * @return a {@link FeatureTable} containing the requested fields previously defined in the logic of the WeatherReading class.
      */
-    public static FeatureTable generateFeatureTable(ExecutionEnvironment env, BatchTableEnvironment batchTableEnvironment) {
-        DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, weatherDataPath, WeatherReading.getFields());
+    public static FeatureTable generateFeatureTable(String dataDirectory, ExecutionEnvironment env, BatchTableEnvironment batchTableEnvironment) {
+        DataSet<WeatherReading> weatherReadingDataSet = readWeather(env, new Path(dataDirectory, weatherDataPath).toString(), WeatherReading.getFields());
         Table weatherTable = batchTableEnvironment.fromDataSet(weatherReadingDataSet);
         List<? extends Column> columns = WeatherReading.getFields();
         List<Column> keyColumns = new ArrayList<>();
@@ -54,9 +55,9 @@ public class WeatherWorkflow {
      * Creates a new {@link WeatherReading} DataSet from the csv input weather data from OpenWeatherMap web APIs and the requested weather
      * fields defined in the logic of the WeatherReading class.
      *
-     * @param env the Flink execution environment
+     * @param env             the Flink execution environment
      * @param weatherDataPath a valid {@link Path} containing the csv input weather data from OpenWeatherMap web APIs
-     * @param fields a {@link List} containing the requested fields defined in the logic of the WeatherReading class.
+     * @param fields          a {@link List} containing the requested fields defined in the logic of the WeatherReading class.
      * @return a {@link DataSet} with the requested weather fields defined in the logic of the WeatherReading class.
      */
     private static DataSet<WeatherReading> readWeather(ExecutionEnvironment env, String weatherDataPath, List<Field> fields) {

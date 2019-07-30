@@ -47,6 +47,9 @@ public class FeatureTableCombination extends UnifiedSensorWorkflow {
 
     /**
      * Generates a combined feature table by combining the sensor and weather feature tables.
+     * <p>
+     * Developer Note: This method uses precalculated filtered sensor data to avoid unnecessary computation and is
+     * kept for compatability.
      *
      * @param env           An execution environment.
      * @param tEnv          A table environment.
@@ -54,9 +57,28 @@ public class FeatureTableCombination extends UnifiedSensorWorkflow {
      * @return the combined feature table.
      */
     private static FeatureTable generateCombinedFeatureTable(ExecutionEnvironment env, BatchTableEnvironment tEnv, String dataDirectory) {
-        FeatureTable sensor = SensorFeatureTableGeneration.generateFeatureTable(env, dataDirectory, 60, tEnv);
+        FeatureTable sensor = SensorFeatureTableGeneration.generateFeatureTable(true, env, dataDirectory, 60, tEnv);
         FeatureTable sensorStationMapping = generateSensorStationMappingFeatureTable(dataDirectory, env, tEnv);
-        FeatureTable weather = WeatherWorkflow.generateFeatureTable(env, tEnv);
+        FeatureTable weather = WeatherWorkflow.generateFeatureTable(dataDirectory, env, tEnv);
+        FeatureTable mappedSensors = sensor.join(sensorStationMapping, sensor.getKeyColumns(), "sensor_station_mapping_location = sensor_location", tEnv);
+        return mappedSensors.join(weather, sensor.getKeyColumns(),
+                "sensor_station_mapping_closest_weather_station = weather_location AND " +
+                        "FLOOR(sensor_timestamp TO HOUR) = FLOOR(weather_time TO HOUR)", tEnv);
+    }
+
+    /**
+     * Generates a combined feature table by combining the sensor and weather feature tables.
+     *
+     * @param useCached     Whether or not to load prefiltered data from file or load raw data and apply filtering directly.
+     * @param env           An execution environment.
+     * @param tEnv          A table environment.
+     * @param dataDirectory The base path of the data directory.
+     * @return the combined feature table.
+     */
+    public static FeatureTable generateCombinedFeatureTable(boolean useCached, ExecutionEnvironment env, BatchTableEnvironment tEnv, String dataDirectory) {
+        FeatureTable sensor = SensorFeatureTableGeneration.generateFeatureTable(useCached, env, dataDirectory, 60, tEnv);
+        FeatureTable sensorStationMapping = generateSensorStationMappingFeatureTable(dataDirectory, env, tEnv);
+        FeatureTable weather = WeatherWorkflow.generateFeatureTable(dataDirectory, env, tEnv);
         FeatureTable mappedSensors = sensor.join(sensorStationMapping, sensor.getKeyColumns(), "sensor_station_mapping_location = sensor_location", tEnv);
         return mappedSensors.join(weather, sensor.getKeyColumns(),
                 "sensor_station_mapping_closest_weather_station = weather_location AND " +

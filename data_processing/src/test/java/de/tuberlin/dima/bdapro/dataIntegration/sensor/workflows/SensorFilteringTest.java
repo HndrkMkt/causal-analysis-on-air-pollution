@@ -16,6 +16,6 @@ public class SensorFilteringTest {
     void testFiltering() throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSet<UnifiedSensorReading> dataset = SensorFiltering.getFilteredSensors(false, "src/test/resources/data", env);
-        Assertions.assertEquals(4, dataset.count());
+        Assertions.assertEquals(7, dataset.count());
     }
 }

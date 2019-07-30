@@ -1,0 +1,3 @@
+location;time;longitude;latitude;temperature;apparent_temperature;cloud_cover;dew_point;humidity;ozone;precip_intensity;precip_probability;precip_type;pressure;uv_index;visibility;wind_bearing;wind_gust;wind_speed
+Berlin;2019-01-01 01:00:00;1.2,3.4;4.63;4.63;0.0;-0.73;0.68;427.53;0.0;0.0;;1016.6;0.0;16.09;212.0;1.24;1.23
+Berlin;2019-02-01 01:00:00;1.2,3.4;4.63;4.63;0.0;-0.73;0.68;427.53;0.0;0.0;;1016.6;0.0;16.09;212.0;1.24;1.23
