@@ -1,10 +1,9 @@
 from causal_analysis.data_preparation import load_data, subset, localize, input_na, create_tigramite_dataframe
 from tigramite import plotting as tp
 from tigramite.pcmci import PCMCI
-from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb, RCOT
+from tigramite.independence_tests import RCOT
 
 import time
-
 
 def generate_dataframe(var_names, start_index=None, end_index=None):
     data = load_data('../data/processed/causalDiscoveryData.csv')
@@ -108,16 +107,6 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
     )
 
 
-def linear_dependencies_experiment():
-    var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
-                 "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
-    dataframe, var_list = generate_dataframe(var_names)
-    print(f"Variable names: {var_names}")
-    parcorr = ParCorr(significance='analytic')
-    alphas = [3 ** -n for n in range(1, 9)]
-    test_alphas(dataframe, parcorr, alphas, var_names)
-
-
 def select_links(var_names, tau_min, tau_max):
     if tau_min > 0:
         raise ValueError(f"tau_min must be 0 to incorporate prior knowledge, is {tau_min}")
@@ -160,22 +149,3 @@ def select_links(var_names, tau_min, tau_max):
                     link_list.append(link)
 
     return selected_links
-
-
-def rcot_hyperparam_experiment():
-    var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
-                 "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
-    tau_min = 0
-    tau_max = 12
-
-    dataframe, var_list = generate_dataframe(var_names)
-    print(f"Variable names: {var_names}")
-    num_fs = [2 ** n for n in range(9, 11)]
-    for num_f in num_fs:
-        rcot = ParCorr() #RCOT(significance='analytic', num_f=num_f)
-        test_alphas(dataframe, rcot, [0.0125, 0.025, 0.05, 0.1, 0.2], var_names, tau_min=tau_min, tau_max=tau_max,
-                    selected_links=select_links(var_names, tau_min, tau_max))
-
-
-if __name__ == "__main__":
-    rcot_hyperparam_experiment()
