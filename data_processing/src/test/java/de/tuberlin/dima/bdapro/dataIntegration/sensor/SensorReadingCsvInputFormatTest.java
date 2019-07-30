@@ -14,6 +14,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Test cases for the {@link SensorReadingCsvInputFormat}
+ *
+ * @author Hendrik Makait
+ */
 class SensorReadingCsvInputFormatTest {
     @Test
     void testSkipFirstLine() throws IOException {

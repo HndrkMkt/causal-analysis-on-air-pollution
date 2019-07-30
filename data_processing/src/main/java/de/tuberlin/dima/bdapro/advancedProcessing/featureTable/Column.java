@@ -1,4 +1,4 @@
-package de.tuberlin.dima.bdapro.featureTable;
+package de.tuberlin.dima.bdapro.advancedProcessing.featureTable;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 

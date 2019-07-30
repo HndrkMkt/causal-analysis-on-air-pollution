@@ -1,4 +1,4 @@
-package de.tuberlin.dima.bdapro.featureTable;
+package de.tuberlin.dima.bdapro.advancedProcessing.featureTable;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -24,6 +24,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+
+/**
+ * Test cases for the {@link FeatureTable}
+ *
+ * @author Hendrik Makait
+ */
 class FeatureTableTest {
     private ExecutionEnvironment env;
     private BatchTableEnvironment tEnv;

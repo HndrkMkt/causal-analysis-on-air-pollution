@@ -1,8 +1,8 @@
 package de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows;
 
-import de.tuberlin.dima.bdapro.featureTable.Column;
-import de.tuberlin.dima.bdapro.featureTable.BasicColumn;
-import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.Column;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.BasicColumn;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.FeatureTable;
 import de.tuberlin.dima.bdapro.functions.TimeWindow;
 import de.tuberlin.dima.bdapro.dataIntegration.sensor.UnifiedSensorReading;
 import org.apache.commons.lang3.ArrayUtils;

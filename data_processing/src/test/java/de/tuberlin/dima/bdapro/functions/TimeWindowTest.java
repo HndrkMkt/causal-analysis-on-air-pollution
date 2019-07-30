@@ -5,6 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
+/**
+ * Test cases for the {@link TimeWindow}
+ *
+ * @author Hendrik Makait
+ */
 class TimeWindowTest {
     @Test
     void testTimeWindowing() {

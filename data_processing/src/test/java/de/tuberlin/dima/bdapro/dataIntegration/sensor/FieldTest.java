@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
+/**
+ * Test cases for the {@link Field}
+ *
+ * @author Hendrik Makait
+ */
 class FieldTest {
     @Test
     void testIntegerField() {

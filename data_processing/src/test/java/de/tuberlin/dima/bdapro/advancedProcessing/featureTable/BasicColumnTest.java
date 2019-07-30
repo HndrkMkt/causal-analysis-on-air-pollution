@@ -1,4 +1,4 @@
-package de.tuberlin.dima.bdapro.featureTable;
+package de.tuberlin.dima.bdapro.advancedProcessing.featureTable;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -11,6 +11,11 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Test cases for the {@link BasicColumn}, also tests {@link Column} functionality.
+ *
+ * @author Hendrik Makait
+ */
 class BasicColumnTest {
     @Test
     void testFullName() {

@@ -1,4 +1,4 @@
-package de.tuberlin.dima.bdapro.parsers;
+package de.tuberlin.dima.bdapro.dataIntegration.sensor;
 
 import de.tuberlin.dima.bdapro.dataIntegration.sensor.SensorReadingParser;
 import de.tuberlin.dima.bdapro.dataIntegration.sensor.Type;
@@ -8,6 +8,11 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
+/**
+ * Test cases for the {@link SensorReadingParser}
+ *
+ * @author Hendrik Makait
+ */
 class SensorReadingParserTest {
     @Test
     void testReadRecordThrowsExceptionIfInputHasTooManyFields() throws IllegalArgumentException {

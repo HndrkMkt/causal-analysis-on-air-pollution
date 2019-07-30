@@ -5,7 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 
-
+/**
+ * Test cases for the {@link UnifiedSensorReading}
+ *
+ * @author Hendrik Makait
+ */
 class UnifiedSensorReadingTest {
     @Test
     void testEqualsAndHash() {

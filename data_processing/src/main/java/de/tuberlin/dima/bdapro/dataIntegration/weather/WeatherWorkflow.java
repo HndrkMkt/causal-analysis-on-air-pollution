@@ -1,11 +1,7 @@
 package de.tuberlin.dima.bdapro.dataIntegration.weather;
 
-import de.tuberlin.dima.bdapro.featureTable.Column;
-import de.tuberlin.dima.bdapro.featureTable.FeatureTable;
-import de.tuberlin.dima.bdapro.dataIntegration.weather.WeatherReadingParser;
-import de.tuberlin.dima.bdapro.dataIntegration.weather.Field;
-import de.tuberlin.dima.bdapro.dataIntegration.weather.WeatherReadingInputFormat;
-import de.tuberlin.dima.bdapro.dataIntegration.weather.WeatherReading;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.Column;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.FeatureTable;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;

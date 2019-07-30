@@ -66,7 +66,7 @@ public class SensorStatistics extends UnifiedSensorWorkflow {
      * @param env           An execution environment to use.
      * @param tEnv          A table execution environment to use.
      */
-    private static void collectStatistics(Type sensorType, String dataDirectory, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
+    static void collectStatistics(Type sensorType, String dataDirectory, ExecutionEnvironment env, BatchTableEnvironment tEnv) {
         Path sensorDataBasePath = new Path(dataDirectory, basePath);
         String sensorPattern = getSensorPattern(sensorType);
         DataSet<UnifiedSensorReading> sensorReadingDataSet = readSensor(sensorType, sensorDataBasePath.toString(), env);

@@ -1,6 +1,6 @@
 package de.tuberlin.dima.bdapro.dataIntegration.sensor;
 
-import de.tuberlin.dima.bdapro.featureTable.Column;
+import de.tuberlin.dima.bdapro.advancedProcessing.featureTable.Column;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
