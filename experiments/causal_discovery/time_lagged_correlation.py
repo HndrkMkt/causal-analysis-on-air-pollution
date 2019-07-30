@@ -1,4 +1,4 @@
-from causal_discovery.discovery import generate_dataframe
+from causal_analysis.discovery import generate_dataframe
 
 from tigramite.independence_tests import ParCorr
 from tigramite.pcmci import PCMCI
@@ -24,7 +24,7 @@ def time_lagged_correlation():
         verbosity=1)
     correlations = pcmci.get_lagged_dependencies(tau_min=tau_min, tau_max=tau_max)
     lag_func_matrix = tp.plot_lagfuncs(
-        name="lagged_dependencies.png",
+        name="experiments/causal_discovery/images/time_lagged_correlation.png",
         val_matrix=correlations,
         setup_args={'var_names': var_names,
                     'figsize': (50, 25),

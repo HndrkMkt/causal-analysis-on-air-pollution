@@ -1,4 +1,4 @@
-from causal_discovery.discovery import generate_dataframe, generate_links_from_prior_knowledge, test_alphas
+from causal_analysis.discovery import generate_dataframe, generate_links_from_prior_knowledge, test_alphas
 
 from tigramite.independence_tests import RCOT
 

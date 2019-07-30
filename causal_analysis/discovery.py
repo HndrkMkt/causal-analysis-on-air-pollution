@@ -1,3 +1,8 @@
+"""Helper functions for running causal discovery experiments.
+"""
+
+__author__ = 'Hendrik Makait'
+
 from causal_analysis.data_preparation import load_data, subset, localize, input_na, create_tigramite_dataframe
 from tigramite import plotting as tp
 from tigramite.pcmci import PCMCI
