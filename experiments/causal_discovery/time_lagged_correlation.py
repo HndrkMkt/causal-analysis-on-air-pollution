@@ -24,7 +24,7 @@ def time_lagged_correlation():
         verbosity=1)
     correlations = pcmci.get_lagged_dependencies(tau_min=tau_min, tau_max=tau_max)
     lag_func_matrix = tp.plot_lagfuncs(
-        name="experiments/causal_discovery/images/time_lagged_correlation.png",
+        name="experiments/causal_discovery/results/time_lagged_correlation.png",
         val_matrix=correlations,
         setup_args={'var_names': var_names,
                     'figsize': (50, 25),
