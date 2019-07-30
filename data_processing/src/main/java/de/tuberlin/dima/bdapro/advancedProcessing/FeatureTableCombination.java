@@ -1,6 +1,6 @@
 package de.tuberlin.dima.bdapro.advancedProcessing;
 
-import de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFeatureTableGenerator;
+import de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFeatureTableGeneration;
 import de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.UnifiedSensorWorkflow;
 import de.tuberlin.dima.bdapro.dataIntegration.weather.WeatherWorkflow;
 import de.tuberlin.dima.bdapro.featureTable.Column;
@@ -54,7 +54,7 @@ public class FeatureTableCombination extends UnifiedSensorWorkflow {
      * @return the combined feature table.
      */
     private static FeatureTable generateCombinedFeatureTable(ExecutionEnvironment env, BatchTableEnvironment tEnv, String dataDirectory) {
-        FeatureTable sensor = SensorFeatureTableGenerator.generateFeatureTable(env, dataDirectory, 60, tEnv);
+        FeatureTable sensor = SensorFeatureTableGeneration.generateFeatureTable(env, dataDirectory, 60, tEnv);
         FeatureTable sensorStationMapping = generateSensorStationMappingFeatureTable(dataDirectory, env, tEnv);
         FeatureTable weather = WeatherWorkflow.generateFeatureTable(env, tEnv);
         FeatureTable mappedSensors = sensor.join(sensorStationMapping, sensor.getKeyColumns(), "sensor_station_mapping_location = sensor_location", tEnv);

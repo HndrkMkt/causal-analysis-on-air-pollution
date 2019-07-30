@@ -29,7 +29,7 @@ import static org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE;
  *
  * @author Hendrik Makait
  */
-public class SensorFeatureTableGenerator extends UnifiedSensorWorkflow {
+public class SensorFeatureTableGeneration extends UnifiedSensorWorkflow {
     private static boolean compressed = false;
 
     private static final TypeInformation[] FIELD_TYPES = {Types.INT, Types.DOUBLE, Types.DOUBLE, Types.SQL_TIMESTAMP, Types.LONG,
@@ -148,8 +148,8 @@ public class SensorFeatureTableGenerator extends UnifiedSensorWorkflow {
     private static List<Column> getFeatureColumns() {
         List<Column> featureColumns = new ArrayList<>();
         featureColumns.add(new BasicColumn("location", Types.INT, false));
-        featureColumns.add(new BasicColumn("lat", Types.DOUBLE, false));
-        featureColumns.add(new BasicColumn("lon", Types.DOUBLE, false));
+        featureColumns.add(new BasicColumn("lat", Types.DOUBLE, true));
+        featureColumns.add(new BasicColumn("lon", Types.DOUBLE, true));
         featureColumns.add(new BasicColumn("timestamp", Types.SQL_TIMESTAMP, true));
         featureColumns.add(new BasicColumn("dayOfYear", Types.LONG, true));
         featureColumns.add(new BasicColumn("minuteOfDay", Types.LONG, true));

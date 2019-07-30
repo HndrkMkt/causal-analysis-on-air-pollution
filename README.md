@@ -64,7 +64,7 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     ```
 2. Navigate to the `<project_root>` and calculate sensor statistics:
     ```
-    $ flink run -c de.tuberlin.dima.bdapro.jobs.SensorStatistics air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+    $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorStatistics air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
 3. Download weather data:
     Due to daily limit API calls constraints, in order to get the weather data used in the project, the following script must be run in 7 different days:
@@ -80,11 +80,11 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     Walk through `ExtractSensorsForWeatherStations.ipynb`.
 5. Filter raw sensor to the sensors for which we have weather data:
     ```
-    $ flink run -c de.tuberlin.dima.bdapro.jobs.SensorFiltering air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+    $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFiltering air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
 6. Join all the datasets together and create output data for causal analysis:
     ```
-    $ flink run -c de.tuberlin.dima.bdapro.jobs.FeatureTableCombination air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+    $ flink run -c de.tuberlin.dima.bdapro.advancedProcessing.FeatureTableCombination air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
 7. Run causal analysis pipeline with activated virtual environment and store standard output to output.log:
     ```

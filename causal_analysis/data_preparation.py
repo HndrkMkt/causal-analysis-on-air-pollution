@@ -16,16 +16,15 @@ from tigramite import data_processing as pp
 
 def feature_list():
     return ["location",
+            "timestamp",
             "lat",
             "lon",
-            "timestamp",
             "dayOfYear",
             "minuteOfDay",
             "minuteOfYear",
             "dayOfWeek",
             "isWeekend",
             "pressure_1",
-            "altitude",
             "pressure_sealevel",
             "temperature",
             "humidity_sensor",
@@ -53,7 +52,7 @@ def feature_list():
 
 
 def sensor_family():
-    return ["location", "lat", "lon", "altitude", "pressure_sealevel", "temperature",
+    return ["location", "lat", "lon", "pressure_sealevel", "temperature",
             "humidity_1", "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"]
 
 

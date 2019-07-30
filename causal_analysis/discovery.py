@@ -127,6 +127,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         tau_max: The maximum lag.
         var_names: The names of the variables in the data.
     """
+    base_path = "experiments/causal_discovery/results/"
     q_matrix = pcmci.get_corrected_pvalues(p_matrix=results['p_matrix'], fdr_method='fdr_bh')
 
     link_matrix = pcmci.return_significant_parents(
@@ -138,7 +139,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         class_prefix = f"{cond_ind_test.measure}_num_f_{cond_ind_test.num_f}"
     else:
         class_prefix = cond_ind_test.measure
-    file_name_prefix = f"images/{class_prefix}_alpha_{pc_alpha:.5f}_tau_{tau_min}to{tau_max}"
+    file_name_prefix = f"{class_prefix}_alpha_{pc_alpha:.5f}_tau_{tau_min}to{tau_max}"
 
     tp.plot_graph(
         val_matrix=results['val_matrix'],
@@ -147,7 +148,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         link_colorbar_label='cross-MCI',
         node_colorbar_label='auto-MCI',
         figsize=(20, 20),
-        save_name=file_name_prefix + "_graph.png"
+        save_name= base_path + file_name_prefix + "_graph.png"
     )
 
     tp.plot_time_series_graph(
@@ -156,7 +157,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         var_names=var_names,
         link_colorbar_label='MCI',
         figsize=(20, 20),
-        save_name=file_name_prefix + "_time_series_graph.png"
+        save_name= base_path + file_name_prefix + "_time_series_graph.png"
     )
 
 
