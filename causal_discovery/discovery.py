@@ -5,7 +5,22 @@ from tigramite.independence_tests import RCOT
 
 import time
 
+
 def generate_dataframe(var_names, start_index=None, end_index=None):
+    """Generates a TIGRAMITE dataframe from the intermediate data.
+
+    This function loads the intermediate data from disk, preprocesses it and subsets it to use only a single sensor
+     location. It then creates a TIGRAMITE dataframe from the resulting data that includes the given columns. If either
+    a start or an end index are given, it uses the subset of the preprocessed data defined by the given range.
+
+    Args:
+        var_names: The names of the variables to use in the dataframe.
+        start_index: The start index of the row range to use.
+        end_index: The end index of the row range to use (excluded).
+
+    Returns:
+
+    """
     data = load_data('data/processed/causalDiscoveryData.csv')
     data = localize(data, 52.496, 13.338, 1)
     data = input_na(data, columns=["temperature", "humidity", "p1", "p2", "apparent_temperature", "cloud_cover",
@@ -26,6 +41,17 @@ def generate_dataframe(var_names, start_index=None, end_index=None):
 
 
 def test_alphas(dataframe, cond_ind_test, alphas, var_names, tau_min=0, tau_max=1, selected_links=None):
+    """Executes the PCMCI algorithm over a list of different alphas and plots the results.
+
+    Args:
+        dataframe: The TIGRAMITE dataframe to use.
+        cond_ind_test: The conditional independence test to use.
+        alphas: The list of individual alphas.
+        var_names: The names of the variables contained in the dataframe.
+        tau_min: The minimum lag.
+        tau_max: The maximum lag.
+        selected_links: Dictionalry specifying whether only selected links should be tested.
+    """
     pcmci = PCMCI(
         dataframe=dataframe,
         cond_ind_test=cond_ind_test,
@@ -35,6 +61,17 @@ def test_alphas(dataframe, cond_ind_test, alphas, var_names, tau_min=0, tau_max=
 
 
 def run_experiment(pcmci, cond_ind_test, pc_alpha, tau_min, tau_max, var_names, selected_links):
+    """Runs the PCMCI algorithm with the specified input and generates plots for the results.
+
+    Args:
+        pcmci: The PCMCI object to use.
+        cond_ind_test: The conditional independence test used.
+        pc_alpha: Alpha threshold for significance of links.
+        tau_min: The minimum lag.
+        tau_max: The maximum lag.
+        var_names: The names of the variables in the data.
+        selected_links: The links to investigate in the model. Investigates all links if none given.
+    """
     start = time.time()
     if selected_links:
         lagged_links = {key: [tpl for tpl in val if tpl[1] < 0] for key, val in selected_links.items()}
@@ -74,6 +111,17 @@ def run_experiment(pcmci, cond_ind_test, pc_alpha, tau_min, tau_max, var_names, 
 
 
 def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_names):
+    """Generates a network and a timeseries plot for the given results of the PCMCI algorithm and saves them as files.
+
+    Args:
+        pcmci: The PCMCI object used.
+        results: The results of the PCMCI algorithm.
+        cond_ind_test: The conditional independence test used.
+        pc_alpha: Alpha threshold for significance of links.
+        tau_min: The minimum lag.
+        tau_max: The maximum lag.
+        var_names: The names of the variables in the data.
+    """
     q_matrix = pcmci.get_corrected_pvalues(p_matrix=results['p_matrix'], fdr_method='fdr_bh')
 
     link_matrix = pcmci.return_significant_parents(
@@ -107,7 +155,22 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
     )
 
 
-def select_links(var_names, tau_min, tau_max):
+def generate_links_from_prior_knowledge(var_names, tau_min, tau_max):
+    """Generates the link dictionary from prior knowledge.
+
+    This function creates the dictionary of the possible dependencies in the causal model used by the PCMCI algorithm
+    and only includes those links where dependencies may exist according to our domain knowledge. Specifically, it
+    removes all incoming links into time-based variables except for those specifying their functional dependencies.
+    Time dimensions also can only influence other variables with a lag of 0.
+
+    Args:
+        var_names: The names of the variables used in the data.
+        tau_min: The minimum lag.
+        tau_max: The maximum lag.
+
+    Returns: Dictionary specifying the selected links for the PCMCI algorithm.
+
+    """
     if tau_min > 0:
         raise ValueError(f"tau_min must be 0 to incorporate prior knowledge, is {tau_min}")
     if tau_max < 1:
