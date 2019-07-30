@@ -183,5 +183,4 @@ public class SensorFeatureTableGenerator extends UnifiedSensorJob {
     private static TypeInformation[] getAggregationFieldTypes() {
         return FIELD_TYPES;
     }
-
 }
