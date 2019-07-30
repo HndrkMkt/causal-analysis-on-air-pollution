@@ -1,4 +1,5 @@
-causal_discovery/experiments/results/
+experiments/causal_discovery/images/
+experiments/performance/results/
 images/
 *.log
 data/
