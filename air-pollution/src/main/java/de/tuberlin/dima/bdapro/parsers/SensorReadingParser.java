@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.tuberlin.dima.bdapro.sensor.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The SensorReadingParser splits input strings from the luftdaten.info data for a given sensor type and generates
@@ -18,8 +20,10 @@ import de.tuberlin.dima.bdapro.sensor.Type;
  * @author Hendrik Makait
  */
 public class SensorReadingParser implements Serializable {
+    private final Logger LOG = LoggerFactory.getLogger(SensorReadingParser.class);
     private static final String DELIMITER = ";";
     private final List<Field> fields;
+    private Type type;
 
     /**
      * Creates a new SensorReadingParser instance that can parse data of the given sensor type.
@@ -28,6 +32,7 @@ public class SensorReadingParser implements Serializable {
      */
     public SensorReadingParser(Type type) {
         this.fields = getSensorFields(type);
+        this.type = type;
     }
 
     /**
@@ -43,7 +48,8 @@ public class SensorReadingParser implements Serializable {
 
         // TODO: Test on entire dataset to ensure no regression
         if (tokens.length != fields.size() && (input.chars().filter(ch -> ch == ';').count() + 1 != fields.size())) {
-            throw new IllegalArgumentException("The input contains a different number of fields than the sensor type");
+            LOG.error(String.format("The input contains a different number of fields than the sensor type %s:\n'%s'",
+                    type, input));
         }
 
         for (int i = 0, j = 0; i < tokens.length; j++) {

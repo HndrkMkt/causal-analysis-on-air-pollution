@@ -113,7 +113,6 @@ public class FeatureTable {
         }
         String[] columnNames = columnNameList.toArray(new String[columnNameList.size()]);
         tEnv.registerTableSink("output", columnNames, columnTypes.toArray(new TypeInformation[columnTypes.size()]), sink);
-        // TODO: Add column names to file!
         data.select(StringUtils.join(columnNames, ", ")).insertInto("output");
     }
 
