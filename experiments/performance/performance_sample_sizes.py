@@ -1,3 +1,7 @@
+"""
+    This module performs a performance experiment for learning times varying sample sizes and different conditional independence tests
+"""
+
 import pandas as pd
 import time
 from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb, RCOT
@@ -7,6 +11,15 @@ from causal_analysis.data_preparation import load_data, subset, localize, input_
 
 
 def generate_DF(complexity = [5],instances = 1000,sample_sizes = [1000]):
+    ''' Generates a list of TIGRAMITE dataframes
+    Args:
+        complexity: The total number of raw features to include in the TIGRAMITE dataframes
+        instances: Desired number of dataframes
+        sample_sizes: A list containing the different desired sample sizes
+
+    Returns: A list of TIGRAMITE dataframes
+
+    '''
 
     path = '../../data/processed/causalDiscoveryData.csv'
 
@@ -133,6 +146,18 @@ def generate_DF(complexity = [5],instances = 1000,sample_sizes = [1000]):
     return tigramite_dataframes
 
 def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
+    ''' This function performs the PCMCI algorithm for all the dataframes received as parameters, given the hyper-parameters of the conditional
+        independence test
+    Args:
+        dataframes: A list of TIGRAMITE dataframes
+        max_lags: Maximum number of lags to consider for the laggd time series
+        alpha: Significance level to perform the parent test
+        tests: A list of conditional independence test to be performed
+        limit: A limit for the instances to be considered
+
+    Returns:
+
+    '''
     test_results = []
     random.shuffle(dataframes)
     total = limit*len(max_lags)*len(alpha)*len(tests)
@@ -194,8 +219,9 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                             results_df = pd.DataFrame(test_results,
                                                               columns=['representation', 'complexity', 'sample_size', 'max_lag','test','alpha','valid_links_at_alpha',
                                                                        'learning_time'])
+                            print('results ready to be saved')
                             results_df.to_csv(
-                                        '../results/results_sample_sizes.csv',
+                                        'results/performance_sample_sizes.csv',
                                         index=False)
 
                             counts[i[1]] += 1

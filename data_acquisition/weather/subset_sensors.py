@@ -100,8 +100,7 @@ def create_enrichable_sensors_and_save_result(unique_closest_weather_stations):
     unique_locations = weather["location"].unique()
 
 
-    berlin_enrichable_sensors = berlin_enrichable_sensors[
-        berlin_enrichable_sensors.apply(filter_for_weather_stations, axis=1)]
+    berlin_enrichable_sensors = berlin_enrichable_sensors[berlin_enrichable_sensors.apply(filter_for_weather_stations, axis=1)]
     berlin_enrichable_sensors.to_csv("../../data/intermediate/berlin_enrichable_sensors.csv", sep=",", index=False)
 
 
