@@ -9,11 +9,9 @@ import java.sql.Timestamp;
 
 class SensorReadingParserTest {
     @Test
-    void testReadRecordThrowsExceptionIfColumnNumberDoesNotMatch() throws IllegalArgumentException {
+    void testReadRecordThrowsExceptionIfInputHasTooManyFields() throws IllegalArgumentException {
         SensorReadingParser parser = new SensorReadingParser(Type.BME280);
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51\n"));
-        Assertions.assertThrows(IllegalArgumentException.class,
+        Assertions.assertThrows(IndexOutOfBoundsException.class,
                 () -> parser.readRecord("21847;BME280;11086;52.728;5.760;2019-04-01T00:00:00;102775.66;1.0;2.1;8.51;53.47;1\n"));
     }
 
