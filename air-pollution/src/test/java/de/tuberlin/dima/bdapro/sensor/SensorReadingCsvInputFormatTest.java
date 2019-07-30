@@ -51,7 +51,6 @@ class SensorReadingCsvInputFormatTest {
         expected.humidity = 5.6;
         UnifiedSensorReading first = format.nextRecord(new UnifiedSensorReading());
         Assertions.assertEquals(expected, first);
-        Assertions.assertThrows(IOException.class, () -> format.nextRecord(null));
     }
 
     @Test
