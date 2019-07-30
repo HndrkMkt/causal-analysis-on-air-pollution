@@ -15,6 +15,11 @@ from tigramite import data_processing as pp
 
 
 def feature_list():
+    ''' Creates a list with the final features included in the intermediate dataset
+
+    Returns: A list containing the final features in the intermediate dataset
+
+    '''
     return ["location",
             "timestamp",
             "lat",
@@ -52,30 +57,86 @@ def feature_list():
 
 
 def sensor_family():
-    return ["location", "lat", "lon", "pressure_sealevel", "temperature",
-            "humidity_1", "p1", "p2", "p0", "durP1", "ratioP1", "durP2", "ratioP2"]
+    ''' returns a list with the features that belong to the sensor family
+
+    Returns: returns a list with the features that belong to the sensor family
+
+    '''
+    return ["location",
+            "timestamp",
+            "lat",
+            "lon",
+            "pressure_1",
+            "pressure_sealevel",
+            "temperature",
+            "humidity_sensor",
+            "p1",
+            "p2",
+            "p0",
+            "durP1",
+            "ratioP1",
+            "durP2",
+            "ratioP2"]
 
 
 def time_family():
-    return ["timestamp", "dayOfYear", "minuteOfDay", "minuteOfYear", "dayOfWeek", "isWeekend"]
+    ''' returns a list with the features that belong to the time family
+
+    Returns: returns a list with the features that belong to the time family
+
+    '''
+    return ["dayOfYear",
+            "minuteOfDay",
+            "minuteOfYear",
+            "dayOfWeek",
+            "isWeekend"]
 
 
 def weather_family():
-    return ["apparent_temperature", "cloud_cover", "dew_point", "humidity", "ozone",
-            "precip_intensity", "precip_probability", "precip_type", "pressure", "uv_index", "visibility",
-            "wind_bearing", "wind_gust", "wind_speed"]
+    ''' returns a list with the features that belong to the weather family
 
+    Returns: returns a list with the features that belong to the weather family
 
+    '''
+    return ["apparent_temperature",
+            "cloud_cover",
+            "dew_point",
+            "humidity",
+            "ozone",
+            "precip_intensity",
+            "precip_probability",
+            "precip_type",
+            "pressure",
+            "uv_index",
+            "visibility",
+            "wind_bearing",
+            "wind_gust",
+            "wind_speed"]
+
+# Create lists of families
 sensor_family = sensor_family()
 time_family = time_family()
 weather_family = weather_family()
 
 
 def family_list():
+    ''' returns a list of the families list
+
+    Returns: returns a list of the families list
+
+    '''
     return [sensor_family, time_family, weather_family]
 
 
 def load_data(path):
+    ''' This function loads the intermediate dataset from csv
+
+    Args:
+        path: The path where the intermidiate csv lies
+
+    Returns: a pandas dataframe containing the original features of the csv file plus some new time features
+
+    '''
     features = feature_list()
     features.remove("minuteOfYear")
     sensor_data = pd.read_csv(path, sep=";", names=features, true_values=["true"], false_values=["false"])
@@ -89,6 +150,19 @@ def load_data(path):
 
 
 def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
+    ''' This function allows subsetting the intermidiate data set by either choosing the desired family of features or by column.
+        Also, a time frame can be selected choosing a start and end dates
+
+    Args:
+        data: A pandas dataframe with the intermidiate data
+        by_family: A list with the desired families to be included in the subsetting
+        by_columns: A list with the desired columns to be included in the subsetting
+        start_date: The start date of the time frame
+        end_date: The end date of the time frame
+
+    Returns: A subset of the original dataframe
+
+    '''
     if by_family or by_columns:
         final_feature_list = ['timestamp']
         if by_family:
@@ -103,7 +177,7 @@ def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
                     # for j in weather_family:
                     final_feature_list.extend(weather_family)
                 else:
-                    #TODO: BETTER EXCEPTION HANDLING
+                    print('Oops! are you sure all the families exist?, maybe check spelling')
                     raise Exception
 
         if by_columns:
@@ -111,7 +185,7 @@ def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
                 if i in feature_list():
                     final_feature_list.extend([i])
                 else:
-                    #TODO: BETTER EXCEPTION HANDLING
+                    print('Oops! are you sure all the columns exist in the dataframe?, maybe check spelling')
                     raise Exception
 
         final_feature_list = list(dict.fromkeys(final_feature_list))
@@ -132,6 +206,17 @@ def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
 
 
 def localize(data, lat, lon, results=1):
+    ''' This function localize a user-specified number of sensors around a set of coordinates by computing the euclidian distance
+
+    Args:
+        data: a pandas dataframe
+        lat: latitude
+        lon: longitude
+        results: the desired number of sensors around the specified location
+
+    Returns: a dataframe containing the observations that were included in the localization
+
+    '''
     must = ['location', 'lat', 'lon']
     if all([i in list(data) for i in must]):
         locations_array = np.asarray(data[['location', 'lat', 'lon']].drop_duplicates())
@@ -142,13 +227,25 @@ def localize(data, lat, lon, results=1):
         slices = [i[0] for i in distances[0:results]]
         localized_data = data.loc[data['location'].isin(slices)]
     else:
-        #TODO: BETTER EXCEPTION HANDLING
+        print('Oops! are you sure you included the <location>, <lat> and <lon> fields in the dataframe?'  )
         raise Exception
 
     return localized_data
 
 
 def input_na(data, columns, method=None, value=None):
+    ''' This function allows na imputation in a given pandas dataframe. User can either select a method from {‘backfill’, ‘bfill’, ‘pad’, ‘ffill’, None}
+        or a specific value
+
+    Args:
+        data: A pandas dataframe
+        columns: A list of columns to perform the na imputation
+        method: A method from this list {‘backfill’, ‘bfill’, ‘pad’, ‘ffill’, None}
+        value: An specific value to fill the na's
+
+    Returns: A pandas dataframe with modified null values.
+
+    '''
     must = ['location', 'timestamp']
     if all([i in list(data) for i in must]):
         x = data.sort_values(by=["location", "timestamp"])
@@ -164,7 +261,7 @@ def input_na(data, columns, method=None, value=None):
                 elif value != None:
                     x[i].fillna(value=value, inplace=True)
         else:
-            #TODO: BETTER EXCEPTION HANDLING
+            print('Oops! are you sure all the columns exist in the dataframe?, maybe check spelling')
             raise Exception
 
         no_nulls_list = []
@@ -178,13 +275,22 @@ def input_na(data, columns, method=None, value=None):
 
 
 def create_tigramite_dataframe(dataset, exclude):
+    ''' Creates a TIGRAMITE datframe from a pandas dataframe
+
+    Args:
+        dataset: A pandas dataframe with a timestamp column in it an numeric measures
+        exclude: A list of columns to be excluded from the TIGRAMITEs dataframe
+
+    Returns: A TIGRAMITE dataframe
+
+    '''
     must = ['timestamp']
     var_list = list(dataset)
     if all([i in var_list for i in exclude]):
         for i in exclude:
             var_list.remove(i)
     else:
-        #TODO: BETTER EXCEPTION HANDLING
+        print('Oops! are you sure all the columns to exclude exist in the dataframe?, maybe check spelling')
         raise Exception
 
     data = dataset[var_list]
@@ -192,7 +298,7 @@ def create_tigramite_dataframe(dataset, exclude):
     if 'timestamp' in list(dataset):
         datatime = dataset["timestamp"]
     else:
-        #TODO: BETTER EXCEPTION HANDLING
+        print('Oops! are you sure you included <timestamp> in the dataframe?, maybe check spelling')
         raise Exception
 
     dataframe = pp.DataFrame(data.values, datatime=datatime.values, var_names=var_list)
