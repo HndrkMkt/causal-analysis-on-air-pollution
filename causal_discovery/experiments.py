@@ -5,7 +5,12 @@ from tigramite.pcmci import PCMCI
 from tigramite import plotting as tp
 
 
-def lagged_dependencies():
+def time_lagged_correlation():
+    """Runs the time-lagged correlation analysis experiment.
+
+    This function alculates the time-lagged correlation between the variables for lags of up to 48 hours and plots the
+    result as a scatterplot matrix.
+    """
     var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
                  "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
     tau_min = 0
@@ -33,6 +38,11 @@ def lagged_dependencies():
 
 
 def linear_model():
+    """Runs the linear causal model experiment mentioned in the report.
+
+    This function creates causal linear models for a variety of different alphas and plots the results as
+    network and timeseries graphs. The maximum lag is 24.
+    """
     var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
                  "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
     tau_min = 0
@@ -45,6 +55,11 @@ def linear_model():
 
 
 def rcot_hyperparameter_tuning():
+    """Runs the experiment for tuning the hyperparameters of the non-linear causal model using RCOT.
+
+    This function creates causal models using the RCOT test for a variety of different alphas and numbers of random
+    Fourier transformations (num_f). The results are plotted as network and timeseries graphs. The maximum lag is 1.
+    """
     var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
                  "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
     tau_min = 0
@@ -58,6 +73,11 @@ def rcot_hyperparameter_tuning():
 
 
 def rcot_causal_model():
+    """Runs the second experiment for creating non-linear causal model using RCOT.
+
+    This function creates causal models using the RCOT test for a variety of alphas and small range of random Fourier
+    transformations (num_f). The results are plotted as network and timeseries graphs. The maximum lag is 24.
+    """
     var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
                  "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
     tau_min = 0
@@ -71,6 +91,13 @@ def rcot_causal_model():
 
 
 def prior_knowledge():
+    """Runs the experiment for incorporating prior knowledge into the non-linear causal model using RCOT.
+
+    This function creates causal models using the RCOT test for a variety of alphas and small range of random Fourier
+    transformations (num_f). It further limits the solution space by limiting the selected_links used in the PCMCI
+    algorithm, which effectively enforced independencies in the result. The results are plotted as network and
+    timeseries graphs. The maximum lag is 1.
+    """
     var_names = ["dayOfYear", "minuteOfYear", "minuteOfDay", "dayOfWeek", "isWeekend", "humidity_sensor", "temperature",
                  "precip_intensity", "cloud_cover", "p1", "p2", "dew_point", "wind_speed"]
     tau_min = 0
@@ -86,4 +113,4 @@ def prior_knowledge():
 
 
 if __name__ == "__main__":
-    lagged_dependencies()
+    linear_model()
