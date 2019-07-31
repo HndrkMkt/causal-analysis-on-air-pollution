@@ -43,6 +43,9 @@ public class WeatherReadingInputFormat extends DelimitedInputFormat<WeatherReadi
 
     @Override
     public void open(FileInputSplit split) throws IOException {
+        /**
+         * Skips the first line of the CSV file that includes the column names.
+         */
         super.open(split);
 
         if (this.splitStart == 0L) {
