@@ -21,43 +21,26 @@ Learning how to recover causal structures from large and heterogeneous observati
 * Project Report
 * Project Implementation
 
-
-## Project Implementation Structure
-* causal_analysis/
-    - In this directory lie neccesary scripts and one Python package to process intermediate datasets 
-* data/
-    * intermediate/
-        * filtered/
-            - Filetered sensor data is placed here after been processed by the data processing component using Flink
-    * processed/
-        * statistics/
-            - Intermediate data is placed in this folder after been processed by the data processing component using Flink
-    * raw/
-        * csv_per_month/ (NEED TO ADD .gitkeep)
-            - Bash scripts place the sensor raw data in this directory
-         weather/
-            - Weather csv containing weather data is placed here after running the corresponding Python script
-* data_acquisition/
-    * luftdaten/
-        -In this directory lie the neccesary bash scripts to pull the sensor data from the luftdaten.org project
-    * weather/
-        -In this directory the weather api Python script can be found
-* data_processing/
-    - This directory contains the Java project that processess the sensor and weather data to output filtered and intermediate results to be used later in causal discovery
-* docs/
-    - In this folder can be found all the documentation for the project code 
-        * diagrams/
-        * javadoc/
-        * pythondoc/
+## Overview of Project Structure
+* causal_analysis/: the Python component to process the intermediate data and run causal experiments
+* data/: all the data for the causal analysis pipeline will be placed here after downloading/calculating
+    * intermediate/: intermediate data used in subsequent jobs and not used for further analysis
+        * filtered/: prefiltered sensor data is stored here to avoid unnecessary computations
+    * processed/: processed data such as the intermediate data CSV file 
+        * statistics/: statistics calculated for individual sensors
+    * raw/: all raw data downloaded from the sources
+         weather/: weather data from OpenWeatherMap
+* data_acquisition/: scripts for downloading and handling the raw data
+    * luftdaten/: bash scripts to pull the sensor data from the luftdaten.org and change their compression
+    * weather/: Python scripts for downloading weather data and subsetting sensors using the OpenWeatherMap API
+* data_processing/: Java/Flink component that processes the sensor and weather data and generates intermediate data file to be used later in causal discovery
+* docs/: documentation of Java and Python components
+        * diagrams/: class diagrams of Java component
+        * javadoc/: documentation of data_processing Java component
+        * pythondoc/: documentation of causal_analysis and data_acquisition Python code
     
-* experiments/
-    - In this directory the scripts to run the performance and causal discovery experiments can be found
-        * causal_discovery/
-        * performance/
-* notebooks/
-    - In this folder some notebooks can be found, to illustrate some guided work trough sensor localization and causal discovery
-* README.md
-* requirements.txt
-* setup.py
-    
-    
+* experiments/:  scripts to run the performance and causal discovery experiments
+        * causal_discovery/: scripts for causal discovery experiments
+        * performance/: scripts for performance evaluation experiments
+* notebooks/: Jupyter notebooks used for data and causal exploration of the data
+* README.md: instructions around installing dependencies, as well as running the pipeline and experiments
