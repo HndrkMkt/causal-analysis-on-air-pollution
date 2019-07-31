@@ -199,7 +199,7 @@ def subset(data, by_family=[], by_columns=[], start_date='', end_date=''):
         s = datetime.strptime(start_date, '%Y-%m-%d')
         e = datetime.strptime(end_date, '%Y-%m-%d')
 
-        sensor_data = sensor_data.loc[(sensor_data['timestamp'] < e) & (sensor_data['timestamp'] > s)]
+        sensor_data = sensor_data.loc[(sensor_data['timestamp'] <= e) & (sensor_data['timestamp'] >= s)]
     else:
         pass
     return sensor_data.drop_duplicates()
@@ -274,7 +274,7 @@ def input_na(data, columns, method=None, value=None):
     return x
 
 
-def create_tigramite_dataframe(dataset, exclude):
+def create_tigramite_dataframe(dataset, exclude=None):
     ''' Creates a TIGRAMITE datframe from a pandas dataframe
 
     Args:
@@ -286,12 +286,15 @@ def create_tigramite_dataframe(dataset, exclude):
     '''
     must = ['timestamp']
     var_list = list(dataset)
-    if all([i in var_list for i in exclude]):
-        for i in exclude:
-            var_list.remove(i)
+    if exclude != None:
+        if all([i in var_list for i in exclude]):
+            for i in exclude:
+                var_list.remove(i)
+        else:
+            print('Oops! are you sure all the columns to exclude exist in the dataframe?, maybe check spelling')
+            raise Exception
     else:
-        print('Oops! are you sure all the columns to exclude exist in the dataframe?, maybe check spelling')
-        raise Exception
+        pass
 
     data = dataset[var_list]
 

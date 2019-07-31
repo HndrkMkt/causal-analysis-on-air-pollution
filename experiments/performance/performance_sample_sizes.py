@@ -235,9 +235,11 @@ def test(dataframes,max_lags=[4],alpha=[None],tests=['ParCorr'],limit=1):
                 for i in unique_complexities:
                     counts[i] = 0
 
+def performance_sample_sizes():
 
-networks = generate_DF(complexity=[10],sample_sizes=[250,500,750,1000])
+    networks = generate_DF(complexity=[10],sample_sizes=[250,500,750,1000])
+    print(str(len(networks)) + ' dataframes created ')
+    test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['RCOT','GPDC','ParCorr'],limit = 1)
 
-print(str(len(networks)) + ' dataframes created ')
-
-test(dataframes=networks,max_lags=[4],alpha=[0.05],tests=['RCOT','GPDC','ParCorr'],limit = 1)
+if __name__ == '__main__':
+    performance_sample_sizes()

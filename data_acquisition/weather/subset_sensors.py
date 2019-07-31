@@ -103,14 +103,13 @@ def create_enrichable_sensors_and_save_result(unique_closest_weather_stations):
     berlin_enrichable_sensors = berlin_enrichable_sensors[berlin_enrichable_sensors.apply(filter_for_weather_stations, axis=1)]
     berlin_enrichable_sensors.to_csv("../../data/intermediate/berlin_enrichable_sensors.csv", sep=",", index=False)
 
+def subset_sensors():
 
-# Create sensor dataframe
-total_sensors = create_sensors_dataframe()
-# Filter the sensors that fall into the maximum radius defined by the user
-total_sensors = total_sensors[total_sensors.apply(filter_sensors, axis=1)]
+    total_sensors = create_sensors_dataframe()
+    total_sensors = total_sensors[total_sensors.apply(filter_sensors, axis=1)]
+    closest_weather_stations = map_sensors(total_sensors)
+    unique_closest_weather_stations=np.unique(np.asarray(closest_weather_stations),axis=0)
+    create_enrichable_sensors_and_save_result(unique_closest_weather_stations)
 
-# Creates a set of unique weather stations based on a previous mapping
-closest_weather_stations = map_sensors(total_sensors)
-unique_closest_weather_stations=np.unique(np.asarray(closest_weather_stations),axis=0)
-# Creates a pandas dataframe containing the set of enrichable sensors
-create_enrichable_sensors_and_save_result(unique_closest_weather_stations)
+if __name__ == '__main__':
+    subset_sensors()
