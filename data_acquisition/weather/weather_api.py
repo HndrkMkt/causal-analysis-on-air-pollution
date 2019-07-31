@@ -22,7 +22,7 @@ longitude=13.40
 #forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
 forecastio_api_key = '677e17ccb348e07d52486ae3857a2d84'
 pyowm_key = '48dae982f9e685eee268e90dafba5041'
-data_path = '../../data/raw/weather/weather_data.csv'
+data_path = '/../../data/raw/weather/weather_data.csv'
 
 
 def load_csv(data_path):
@@ -52,7 +52,9 @@ def load_csv(data_path):
                                      'wind_bearing',
                                      'wind_gust',
                                      'wind_speed'])
-        old_data.to_csv(path_or_buf=data_path, index=False, sep=',')
+
+        old_data['time']=datetime.now().date()
+        old_data.to_csv(path_or_buf=data_path, index=False, sep=';')
 
     #old_data.set_index(['location','time'])
     old_data['time'] = pd.to_datetime(old_data['time'], format='%Y-%m-%d %H:%M:%S')
@@ -89,7 +91,7 @@ def get_min_date(old_data):
     Returns:
 
     '''
-    if old_data['time'].min():
+    if old_data.shape[0]>0:
         min_date=old_data['time'].min()
     else:
         min_date = datetime.now()
