@@ -1,5 +1,7 @@
 #  Causal Analysis Pipeline for Air Pollution Data
 
+This file contains instructions in how to setup the project and run its individual steps.
+
 ## Virtual environment
 Create a new virtual environment with:
 ```
@@ -68,7 +70,7 @@ Run:
 $ jupyter lab
 ```
 
-# Create intermediate data
+# Creating intermediate data
 To run the pipeline for creating the intermediate data in CSV-format, execute the following steps:
 1. Navigate to `<project_root>/data_processing` and package the application:
     ```
@@ -95,10 +97,10 @@ $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFi
 ```
 and changing the boolean flag ``useCached`` in the corresponding workflows. 
 
-## Performance experiments
+## Running performance experiments
 TODO
 
-## Causal discovery
+## Running causal discovery
 To run the individual experiments, activate the virtual environment, navigate to the project root and execute the corresponding 
 Python script, e.g.
 ```
