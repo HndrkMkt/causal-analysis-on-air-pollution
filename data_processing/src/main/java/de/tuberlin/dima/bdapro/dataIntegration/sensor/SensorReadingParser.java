@@ -42,7 +42,6 @@ public class SensorReadingParser implements Serializable {
 
         String[] tokens = input.split(DELIMITER);
 
-        // TODO: Test on entire dataset to ensure no regression
         if (tokens.length != fields.size() && (input.chars().filter(ch -> ch == ';').count() + 1 != fields.size())) {
             LOG.error(String.format("The input contains a different number of fields than the sensor type %s:\n'%s'",
                     type, input));

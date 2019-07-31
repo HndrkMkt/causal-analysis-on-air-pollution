@@ -15,7 +15,7 @@ def rcot_hyperparameter_tuning():
     tau_max = 1
     dataframe, var_list = generate_dataframe(var_names, start_index=0, end_index=2000)
     print(f"Variable names: {var_names}")
-    num_fs = [2 ** n for n in range(1, 11)]
+    num_fs = [2 ** n for n in range(1, 14)]
     for num_f in num_fs:
         ci_test = RCOT(significance='analytic', num_f=num_f)
         test_alphas(dataframe, ci_test, [0.05, 0.1, 0.2], var_names, tau_min=tau_min, tau_max=tau_max)

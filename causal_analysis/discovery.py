@@ -148,6 +148,9 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         link_colorbar_label='cross-MCI',
         node_colorbar_label='auto-MCI',
         figsize=(20, 20),
+        label_fontsize=24,
+        node_label_size=24,
+        link_label_fontsize=14,
         save_name= base_path + file_name_prefix + "_graph.png"
     )
 
@@ -157,6 +160,8 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         var_names=var_names,
         link_colorbar_label='MCI',
         figsize=(20, 20),
+        label_fontsize=24,
+        node_label_size=24,
         save_name= base_path + file_name_prefix + "_time_series_graph.png"
     )
 
