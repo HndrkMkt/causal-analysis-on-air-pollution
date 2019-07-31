@@ -43,6 +43,14 @@ There is also several other scripts for downloading data from the project root:
 - Download monthly parquet files:
     ```
     $ scripts/luftdaten/load_parquet.sh 2019-01-01 2019-05-01
+ 
+    ```
+
+4. Download weather data:
+    Due to daily limit API calls constraints, in order to get the weather data used in the project, the following script must be run in 7 different days:
+    ```
+    $ cd <project_root>/scripts/weather
+    $ python weather_api.py
     ```
 
 ## Jupyter Lab
@@ -66,27 +74,21 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     ```
     $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorStatistics air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
-3. Download weather data:
-    Due to daily limit API calls constraints, in order to get the weather data used in the project, the following script must be run in 7 different days:
+3. Calculate sensor matchings:
     ```
-    $ cd <project_root>/scripts/weather
-    $ python weather_api.py
-    ```
-4. Calculate sensor matchings:
-    ```
-    $ cd <project_root>/notebooks
-    $ jupyter lab
+    $ cd <project_root>/data_acquisition/weather
+    $ python subset_sensors.py
     ```
     Walk through `ExtractSensorsForWeatherStations.ipynb`.
-5. Filter raw sensor to the sensors for which we have weather data:
+4. Filter raw sensor to the sensors for which we have weather data:
     ```
     $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFiltering air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
-6. Join all the datasets together and create output data for causal analysis:
+5. Join all the datasets together and create output data for causal analysis:
     ```
     $ flink run -c de.tuberlin.dima.bdapro.advancedProcessing.FeatureTableCombination air-pollution/target/air-pollution-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
-7. Run causal analysis pipeline with activated virtual environment and store standard output to output.log:
+6. Run causal analysis pipeline with activated virtual environment and store standard output to output.log:
     ```
     $ cd <project_root>/notebooks
     $ python causal_discovery.py > output.log
