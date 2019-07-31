@@ -3,6 +3,7 @@ package de.tuberlin.dima.bdapro.dataIntegration.weather;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class is a representation of the data variables available in the OpenWeatherMap web APIs
@@ -57,5 +58,41 @@ public class WeatherReading {
         fields.add(new Field("wind_gust", Double.class, true));
         fields.add(new Field("wind_speed", Double.class, true));
         return fields;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == this) return true;
+        if (!(o instanceof WeatherReading)) {
+            return false;
+        }
+        WeatherReading reading = (WeatherReading) o;
+        return Objects.equals(location, reading.location) &&
+                Objects.equals(time, reading.time) &&
+                Objects.equals(longitude, reading.longitude) &&
+                Objects.equals(latitude, reading.latitude) &&
+                Objects.equals(temperature, reading.temperature) &&
+                Objects.equals(apparent_temperature, reading.apparent_temperature) &&
+                Objects.equals(cloud_cover, reading.cloud_cover) &&
+                Objects.equals(dew_point, reading.dew_point) &&
+                Objects.equals(humidity, reading.humidity) &&
+                Objects.equals(ozone, reading.ozone) &&
+                Objects.equals(precip_intensity, reading.precip_intensity) &&
+                Objects.equals(precip_probability, reading.precip_probability) &&
+                Objects.equals(precip_type, reading.precip_type) &&
+                Objects.equals(pressure, reading.pressure) &&
+                Objects.equals(uv_index, reading.uv_index) &&
+                Objects.equals(visibility, reading.visibility) &&
+                Objects.equals(wind_bearing, reading.wind_bearing) &&
+                Objects.equals(wind_gust, reading.wind_gust) &&
+                Objects.equals(wind_speed, reading.wind_speed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location,time,longitude,latitude,temperature,apparent_temperature,cloud_cover,dew_point,humidity,ozone,
+                precip_intensity,precip_probability,precip_type,pressure,uv_index,visibility,wind_bearing,wind_gust,wind_speed);
     }
 }

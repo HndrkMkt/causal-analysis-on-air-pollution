@@ -37,12 +37,13 @@ public class WeatherReadingInputTest {
         WeatherReading reading2 = new WeatherReading();
 
         // location
+        assertHashAndEquality(reading1, reading2, true);
         reading1.location = "Mitte";
+        assertHashAndEquality(reading1, reading2, false);
         reading2.location = "Kreuzberg";
-        Assertions.assertNotEquals(reading1.location,reading2.location);
-        reading1.location = "Mitte";
+        assertHashAndEquality(reading1, reading2, false);
         reading2.location = "Mitte";
-        Assertions.assertEquals(reading1.location,reading2.location);
+        assertHashAndEquality(reading1, reading2, true);
 
         // time
         assertHashAndEquality(reading1, reading2, true);
@@ -54,7 +55,7 @@ public class WeatherReadingInputTest {
         assertHashAndEquality(reading1, reading2, true);
 
         // longitude
-        /*assertHashAndEquality(reading1, reading2, true);
+        assertHashAndEquality(reading1, reading2, true);
         reading1.longitude = 13.2;
         assertHashAndEquality(reading1, reading2, false);
         reading2.longitude = 13.5;
@@ -204,46 +205,7 @@ public class WeatherReadingInputTest {
         reading2.wind_speed = 13.5;
         assertHashAndEquality(reading1, reading2, false);
         reading2.wind_speed = 13.2;
-        assertHashAndEquality(reading1, reading2, true);*/
-    }
-
-    @Test
-    void testReadRecord() throws IOException{
-        ArrayList<Field> fields = new ArrayList<>();
-        WeatherReadingParser parser = new WeatherReadingParser(WeatherReading.getFields());
-        WeatherReadingInputFormat format = new WeatherReadingInputFormat(new Path("file:///some/file/that/will/not/be/read"),parser);
-
-        final String weatherString = "location;time;longitude;latitude;temperature;apparent_temperature;cloud_cover;dew_point;humidity;ozone;precip_intensity;\n" +
-                                        "precip_probability;precip_type;pressure;uv_index;visibility;wind_bearing;wind_gust;wind_speed\n" +
-                                    "Berlin Mitte;2019-05-07 22:00:00;13.4049;52.52;4.63;4.63;0.0;-0.73;0.68;427.53;0.0;0.0;;1016.6;0.0;16.09;212.0;1.24;1.23";
-
-        final FileInputSplit split = createTempFile(weatherString);
-        format.setBufferSize(100);
-        format.open(split);
-        WeatherReading expected = new WeatherReading();
-        expected.location = "Berlin Mitte";
-        expected.time = Timestamp.valueOf("2019-05-07 22:00:00");
-        expected.longitude = 13.4049;
-        expected.latitude = 52.52;
-        expected.temperature = 4.63;
-        expected.apparent_temperature = 0.0;
-        expected.cloud_cover = -0.73;
-        expected.dew_point = 0.68;
-        expected.humidity = 427.53;
-        expected.ozone = 0.0;
-        expected.precip_intensity = 0.0;
-        expected.precip_probability = 0.2;
-        expected.precip_type = "";
-        expected.pressure = 1016.6;
-        expected.uv_index = 0.0;
-        expected.visibility = 16.09;
-        expected.wind_bearing = 212.0;
-        expected.wind_gust = 1.24;
-        expected.wind_speed = 1.23;
-
-        WeatherReading first = format.nextRecord(new WeatherReading());
-        Assertions.assertEquals(expected, first);
-
+        assertHashAndEquality(reading1, reading2, true);
     }
 
     static FileInputSplit createTempFile(String contents) throws IOException {
