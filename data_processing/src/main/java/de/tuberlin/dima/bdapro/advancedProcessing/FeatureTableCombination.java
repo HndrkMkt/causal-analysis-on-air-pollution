@@ -38,7 +38,7 @@ public class FeatureTableCombination extends UnifiedSensorWorkflow {
         ParameterTool params = ParameterTool.fromArgs(args);
         final String dataDirectory = params.get("data_dir", "data");
 
-        FeatureTable result = generateCombinedFeatureTable(env, tEnv, dataDirectory);
+        FeatureTable result = generateCombinedFeatureTable(false, env, tEnv, dataDirectory);
 
         Path outputPath = new Path(dataDirectory, "processed/causalDiscoveryData.csv");
         result.write(outputPath, tEnv);
