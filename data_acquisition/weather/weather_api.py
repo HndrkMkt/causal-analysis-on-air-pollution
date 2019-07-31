@@ -12,13 +12,15 @@ from datetime import datetime
 from datetime import timedelta
 import pandas as pd
 import os.path
+import numpy as np
 from os import path
 
 
-days_back=118
+days_back=2
 latitude=52.52
 longitude=13.40
-forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
+#forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
+forecastio_api_key = '677e17ccb348e07d52486ae3857a2d84'
 pyowm_key = '48dae982f9e685eee268e90dafba5041'
 data_path = '../../data/raw/weather/weather_data.csv'
 
@@ -239,13 +241,15 @@ def save_df(df,data_path):
     '''
     df.to_csv(path_or_buf=data_path,index=False,sep=';')
 
-old_data = load_csv(data_path)
-weather_list = get_weather_stations(pyowm_key,latitude,longitude,limit=5)
-start_date = get_min_date(old_data)
-weather_data = fetch_weather_data(weather_list,forecastio_api_key,start_date,days_back)
-pandas_df = create_pandas_df(weather_data)
-new_df = append_df(old_data,pandas_df)
+def weather_api():
 
-save_df(new_df,data_path)
+    old_data = load_csv(data_path)
+    weather_list = get_weather_stations(pyowm_key,latitude,longitude,limit=5)
+    start_date = get_min_date(old_data)
+    weather_data = fetch_weather_data(weather_list,forecastio_api_key,start_date,days_back)
+    pandas_df = create_pandas_df(weather_data)
+    new_df = append_df(old_data,pandas_df)
+    save_df(new_df,data_path)
 
-print('success!')
+if __name__ == "__main__":
+    weather_api()
