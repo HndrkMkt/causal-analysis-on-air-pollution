@@ -62,7 +62,7 @@ public class FieldTest {
         Assertions.assertEquals(Types.SQL_TIMESTAMP, field.getTypeInformation());
         field.setValue("2019-01-01 12:00:00");
         Assertions.assertEquals(Timestamp.valueOf("2019-01-01 12:00:00"), field.getValue());
-        field.setValue("2019-01-01 12:00:00");
+        field.setValue("2019-01-01T12:00:00");
         Assertions.assertNull(field.getValue());
         field.setValue("");
         Assertions.assertNull(field.getValue());
@@ -81,8 +81,6 @@ public class FieldTest {
         field.setValue("foo");
         Assertions.assertEquals("foo", field.getValue());
         field.setValue("");
-        Assertions.assertNull(field.getValue());
-        field.setValue("null");
         Assertions.assertNull(field.getValue());
     }
 
