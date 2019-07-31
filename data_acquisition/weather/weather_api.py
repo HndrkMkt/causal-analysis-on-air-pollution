@@ -22,7 +22,7 @@ longitude=13.40
 #forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
 forecastio_api_key = '677e17ccb348e07d52486ae3857a2d84'
 pyowm_key = '48dae982f9e685eee268e90dafba5041'
-data_path = '/../../data/raw/weather/weather_data.csv'
+data_path = '../../data/raw/weather/weather_data.csv'
 
 
 def load_csv(data_path):
