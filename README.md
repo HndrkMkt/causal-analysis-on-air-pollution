@@ -98,16 +98,16 @@ $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFi
 and changing the boolean flag ``useCached`` in the corresponding workflows. 
 
 ## Running performance experiments
-To run the individual performance experiments, activate the virtual environment, navigate to the project root and execute the corresponding 
+To run the individual performance experiments, activate the virtual environment, navigate to the `<project_root>/experiments/performance` and execute the corresponding 
 Python scripts:
 ```
-$ python experiments/performance/performance_sample_sizes.py > sample_sizes_experiment.log
-$ pyhton experiments/performance/performance_complexity.py > complexity_experiment.log
+$ python performance_sample_sizes.py > results/sample_sizes_experiment.log
+$ pyhton performance_complexity.py > results/complexity_experiment.log
 ```
 
 ## Running causal discovery
 To run the individual experiments, activate the virtual environment, navigate to the project root and execute the corresponding 
 Python script, e.g.
 ```
-$ python experiments/causal_discovery/linear_causal_model.py > linear_causal_model.log
+$ python experiments/causal_discovery/linear_causal_model.py > experiments/causal_discovery/results/linear_causal_model.log
 ```
