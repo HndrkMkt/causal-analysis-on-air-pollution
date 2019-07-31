@@ -68,8 +68,8 @@ Run:
 $ jupyter lab
 ```
 
-# Running the pipelines
-To run the pipeline on the sensor data that you downloaded, execute the following steps:
+# Create intermediate data
+To run the pipeline for creating the intermediate data in CSV-format, execute the following steps:
 1. Navigate to `<project_root>/data_processing` and package the application:
     ```
     mvn clean package
@@ -84,16 +84,23 @@ To run the pipeline on the sensor data that you downloaded, execute the followin
     $ python subset_sensors.py
     ```
     Walk through `ExtractSensorsForWeatherStations.ipynb`.
-4. Filter raw sensor to the sensors for which we have weather data:
-    ```
-    $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFiltering data_processing/target/air-pollution-data-processing-1.0-SNAPSHOT.jar --data_dir <project_root>/data
-    ```
 5. Join all the datasets together and create output data for causal analysis:
     ```
     $ flink run -c de.tuberlin.dima.bdapro.advancedProcessing.FeatureTableCombination data_processing/target/air-pollution-data-processing-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
-6. Run causal analysis pipeline with activated virtual environment and store standard output to output.log:
-    ```
-    $ cd <project_root>/notebooks
-    $ python causal_discovery.py > output.log
-    ```
+
+In addtion, you can also filter raw sensor once and use it in subsequent computations by running:
+```
+$ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFiltering data_processing/target/air-pollution-data-processing-1.0-SNAPSHOT.jar --data_dir <project_root>/data
+```
+and changing the boolean flag ``useCached`` in the corresponding workflows. 
+
+## Performance experiments
+TODO
+
+## Causal discovery
+To run the individual experiments, activate the virtual environment, navigate to the project root and execute the corresponding 
+Python script, e.g.
+```
+$ python experiments/causal_discovery/linear_causal_model.py > linear_causal_model.log
+```
