@@ -20,6 +20,6 @@ public class FeatureTableCombinationTest {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
         FeatureTable dataset = FeatureTableCombination.generateCombinedFeatureTable(false, env, tEnv, "src/test/resources/data");
-        Assertions.assertEquals(2, tEnv.toDataSet(dataset.getData(), Row.class).count());
+        Assertions.assertEquals(3, tEnv.toDataSet(dataset.getData(), Row.class).count());
     }
 }

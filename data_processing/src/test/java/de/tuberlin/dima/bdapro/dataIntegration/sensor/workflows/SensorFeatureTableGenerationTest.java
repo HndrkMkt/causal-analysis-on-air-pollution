@@ -20,6 +20,6 @@ public class SensorFeatureTableGenerationTest {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
         FeatureTable dataset = SensorFeatureTableGeneration.generateFeatureTable(false, env, "src/test/resources/data", 60, tEnv);
-        Assertions.assertEquals(6, tEnv.toDataSet(dataset.getData(), Row.class).count());
+        Assertions.assertEquals(7, tEnv.toDataSet(dataset.getData(), Row.class).count());
     }
 }
