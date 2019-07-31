@@ -87,7 +87,7 @@ def filter_for_weather_stations(sensor):
     Returns:
 
     '''
-    weather = pd.read_csv("../../data/raw/weather_data.csv", sep=";")
+    weather = pd.read_csv("../../data/raw/weather/weather_data.csv", sep=";")
 
     unique_locations = weather["location"].unique()
 
@@ -99,7 +99,7 @@ def create_enrichable_sensors_and_save_result(unique_closest_weather_stations):
                                              columns=["sensorId", "sensorType", "lon", "lat", "location", "stationName",
                                                       "stationLon", "stationLat"])
 
-    weather = pd.read_csv("../../data/raw/weather_data.csv", sep=";")
+    weather = pd.read_csv("../../data/raw/weather/weather_data.csv", sep=";")
 
     unique_locations = weather["location"].unique()
 
