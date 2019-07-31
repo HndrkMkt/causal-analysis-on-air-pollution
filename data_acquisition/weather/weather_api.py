@@ -15,11 +15,10 @@ import os.path
 import numpy as np
 from os import path
 
-
-days_back=2
-latitude=52.52
-longitude=13.40
-#forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
+days_back = 2
+latitude = 52.52
+longitude = 13.40
+# forecastio_api_key = '500c5418e313c7fcb7ac6dc5ba73cdab'
 forecastio_api_key = '677e17ccb348e07d52486ae3857a2d84'
 pyowm_key = '48dae982f9e685eee268e90dafba5041'
 data_path = '../../data/raw/weather/weather_data.csv'
@@ -35,33 +34,34 @@ def load_csv(data_path):
 
     '''
     if path.exists(data_path):
-        old_data=pd.read_csv(data_path,sep=';')
+        old_data = pd.read_csv(data_path, sep=';')
     else:
-        old_data=pd.DataFrame(columns = ['location' , 'longitude', 'latitude','time','temperature',
-                                     'apparent_temperature',
-                                     'cloud_cover',
-                                     'dew_point',
-                                     'humidity',
-                                     'ozone',
-                                     'precip_intensity',
-                                     'precip_probability',
-                                     'precip_type',
-                                     'pressure',
-                                     'uv_index',
-                                     'visibility',
-                                     'wind_bearing',
-                                     'wind_gust',
-                                     'wind_speed'])
+        old_data = pd.DataFrame(columns=['location', 'longitude', 'latitude', 'time', 'temperature',
+                                         'apparent_temperature',
+                                         'cloud_cover',
+                                         'dew_point',
+                                         'humidity',
+                                         'ozone',
+                                         'precip_intensity',
+                                         'precip_probability',
+                                         'precip_type',
+                                         'pressure',
+                                         'uv_index',
+                                         'visibility',
+                                         'wind_bearing',
+                                         'wind_gust',
+                                         'wind_speed'])
 
-        old_data['time']=datetime.now().date()
+        old_data['time'] = datetime.now().date()
         old_data.to_csv(path_or_buf=data_path, index=False, sep=';')
 
-    #old_data.set_index(['location','time'])
+    # old_data.set_index(['location','time'])
     old_data['time'] = pd.to_datetime(old_data['time'], format='%Y-%m-%d %H:%M:%S')
 
     return old_data
 
-def get_weather_stations(pyowm_key,latitude,longitude,limit):
+
+def get_weather_stations(pyowm_key, latitude, longitude, limit):
     ''' This function get the closest weather stations for an especified location, with the help of the pyowm wrapper.
 
     Args:
@@ -75,13 +75,14 @@ def get_weather_stations(pyowm_key,latitude,longitude,limit):
     '''
 
     owm = pyowm.OWM(pyowm_key)
-    obs_list = owm.weather_around_coords(latitude,longitude,limit=limit)
-    lon_lat_list=[]
-    for i,location in enumerate(obs_list):
+    obs_list = owm.weather_around_coords(latitude, longitude, limit=limit)
+    lon_lat_list = []
+    for i, location in enumerate(obs_list):
         l = obs_list[i].get_location()
-        lon_lat_list.append([l.get_name(),l.get_lat(),l.get_lon()])
+        lon_lat_list.append([l.get_name(), l.get_lat(), l.get_lon()])
 
     return lon_lat_list
+
 
 def get_min_date(old_data):
     ''' This function gets the oldest date in the historical data. If the historical data does not exist, the current date is returned.
@@ -91,14 +92,15 @@ def get_min_date(old_data):
     Returns:
 
     '''
-    if old_data.shape[0]>0:
-        min_date=old_data['time'].min()
+    if old_data.shape[0] > 0:
+        min_date = old_data['time'].min()
     else:
         min_date = datetime.now()
 
     return min_date
 
-def fetch_weather_data(weather_stations_list,forecastio_api_key,start_date,days_back):
+
+def fetch_weather_data(weather_stations_list, forecastio_api_key, start_date, days_back):
     ''' This function fetchs weather data through a foracstio forecast object for the requested weather stations.
     Args:
         weather_stations_list: A list containing tuples composed by the weather station name, its latituded, its longitude
@@ -110,13 +112,16 @@ def fetch_weather_data(weather_stations_list,forecastio_api_key,start_date,days_
             longitude of the weather station
 
     '''
-    data_block_list=[]
+    data_block_list = []
     for d in range(days_back):
-        for i,location in enumerate(weather_stations_list):
-            forecast = forecastio.load_forecast(forecastio_api_key, weather_stations_list[i][1], weather_stations_list[i][2],time=start_date-timedelta(days=d))
-            data_block_list.append([forecast.hourly(),start_date-timedelta(days=d),weather_stations_list[i][0],weather_stations_list[i][1],weather_stations_list[i][2]])
+        for i, location in enumerate(weather_stations_list):
+            forecast = forecastio.load_forecast(forecastio_api_key, weather_stations_list[i][1],
+                                                weather_stations_list[i][2], time=start_date - timedelta(days=d))
+            data_block_list.append([forecast.hourly(), start_date - timedelta(days=d), weather_stations_list[i][0],
+                                    weather_stations_list[i][1], weather_stations_list[i][2]])
 
     return data_block_list
+
 
 def create_pandas_df(data_block_list):
     ''' This function creates a pandas dataframe from the forecastio forecast objects for the different required weather stations
@@ -127,14 +132,14 @@ def create_pandas_df(data_block_list):
     Returns: A pandas dataframe containing the weather variables for the requested weather stations
 
     '''
-    tuples=[]
-    for i,data_block in enumerate(data_block_list):
-        for j,hourlyData in enumerate(data_block_list[i][0].data):
-            t=[]
+    tuples = []
+    for i, data_block in enumerate(data_block_list):
+        for j, hourlyData in enumerate(data_block_list[i][0].data):
+            t = []
             t.extend([data_block_list[i][2],
-                           data_block_list[i][4],
-                           data_block_list[i][3],
-                           data_block_list[i][0].data[j].time])
+                      data_block_list[i][4],
+                      data_block_list[i][3],
+                      data_block_list[i][0].data[j].time])
             try:
                 t.extend([data_block_list[i][0].data[j].temperature])
             except:
@@ -195,30 +200,31 @@ def create_pandas_df(data_block_list):
                 t.extend([data_block_list[i][0].data[j].windSpeed])
             except:
                 t.extend([None])
-            
-            tuples.append(t)
-                   
-    df=pd.DataFrame(tuples,columns = ['location' , 'longitude', 'latitude','time','temperature',
-                                     'apparent_temperature',
-                                     'cloud_cover',
-                                     'dew_point',
-                                     'humidity',
-                                     'ozone',
-                                     'precip_intensity',
-                                     'precip_probability',
-                                     'precip_type',
-                                     'pressure',
-                                     'uv_index',
-                                     'visibility',
-                                     'wind_bearing',
-                                     'wind_gust',
-                                     'wind_speed'])
 
-    df.set_index(['location','time'])
+            tuples.append(t)
+
+    df = pd.DataFrame(tuples, columns=['location', 'longitude', 'latitude', 'time', 'temperature',
+                                       'apparent_temperature',
+                                       'cloud_cover',
+                                       'dew_point',
+                                       'humidity',
+                                       'ozone',
+                                       'precip_intensity',
+                                       'precip_probability',
+                                       'precip_type',
+                                       'pressure',
+                                       'uv_index',
+                                       'visibility',
+                                       'wind_bearing',
+                                       'wind_gust',
+                                       'wind_speed'])
+
+    df.set_index(['location', 'time'])
 
     return df
 
-def append_df(old_data,new_data):
+
+def append_df(old_data, new_data):
     ''' This function appends the new data to the old dataframe containing the historical weather measures. If there is not an historical
         dataframe then it creates a new one.
     Args:
@@ -228,36 +234,42 @@ def append_df(old_data,new_data):
     Returns: A pandas dataframe containing the union of the old and new dataframes
 
     '''
-    weather_data=old_data.append(new_data,ignore_index=True)
-    #weather_data.set_index(['location','time'])
-    weather_data.sort_values(by=['location','time']).drop_duplicates(subset=['location', 'time'],inplace=True)
-    my_index = ['location','time','longitude','latitude','temperature','apparent_temperature','cloud_cover','dew_point','humidity','ozone','precip_intensity',
-                'precip_probability','precip_type','pressure','uv_index','visibility','wind_bearing','wind_gust','wind_speed']
+    weather_data = old_data.append(new_data, ignore_index=True)
+    # weather_data.set_index(['location','time'])
+    weather_data.sort_values(by=['location', 'time']).drop_duplicates(subset=['location', 'time'], inplace=True)
+    my_index = ['location', 'time', 'longitude', 'latitude', 'temperature', 'apparent_temperature', 'cloud_cover',
+                'dew_point', 'humidity', 'ozone', 'precip_intensity',
+                'precip_probability', 'precip_type', 'pressure', 'uv_index', 'visibility', 'wind_bearing', 'wind_gust',
+                'wind_speed']
     weather_data.reindex(my_index, axis=1)
 
     return weather_data
 
-def save_df(df,data_path):
+
+def save_df(df, data_path):
     ''' This function saves a pandas dataframe into a specific path
     Args:
         df: A pandas dataframe
         data_path: A path where to save the dataframe
 
     '''
-    df.to_csv(path_or_buf=data_path,index=False,sep=';')
+    df.to_csv(path_or_buf=data_path, index=False, sep=';')
+
 
 def weather_api():
-
     old_data = load_csv(data_path)
-    weather_list = get_weather_stations(pyowm_key,latitude,longitude,limit=5)
+    weather_list = get_weather_stations(pyowm_key, latitude, longitude, limit=5)
     start_date = get_min_date(old_data)
-    weather_data = fetch_weather_data(weather_list,forecastio_api_key,start_date,days_back)
+    weather_data = fetch_weather_data(weather_list, forecastio_api_key, start_date, days_back)
     pandas_df = create_pandas_df(weather_data)
-    new_df = append_df(old_data,pandas_df)
-    my_index = ['location','time','longitude','latitude','temperature','apparent_temperature','cloud_cover','dew_point','humidity','ozone','precip_intensity',
-                'precip_probability','precip_type','pressure','uv_index','visibility','wind_bearing','wind_gust','wind_speed']
+    new_df = append_df(old_data, pandas_df)
+    my_index = ['location', 'time', 'longitude', 'latitude', 'temperature', 'apparent_temperature', 'cloud_cover',
+                'dew_point', 'humidity', 'ozone', 'precip_intensity',
+                'precip_probability', 'precip_type', 'pressure', 'uv_index', 'visibility', 'wind_bearing', 'wind_gust',
+                'wind_speed']
     new_df = new_df.reindex(my_index, axis=1)
-    save_df(new_df,data_path)
+    save_df(new_df, data_path)
+
 
 if __name__ == "__main__":
     weather_api()

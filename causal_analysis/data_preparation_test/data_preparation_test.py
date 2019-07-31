@@ -1,11 +1,6 @@
 import unittest
-import pandas as pd
-import time
 from datetime import datetime
-from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb, RCOT
-from tigramite.pcmci import PCMCI
-import random
-from causal_analysis.data_preparation import load_data, subset, localize, input_na, create_tigramite_dataframe,sensor_family,weather_family
+from causal_analysis.data_preparation import load_data, subset, localize, create_tigramite_dataframe
 
 class DataPreparationTest(unittest.TestCase):
     def test_csv_load_shape(self):
