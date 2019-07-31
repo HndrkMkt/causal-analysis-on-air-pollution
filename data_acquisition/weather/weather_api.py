@@ -52,9 +52,9 @@ def load_csv(data_path):
                                      'wind_bearing',
                                      'wind_gust',
                                      'wind_speed'])
-        old_data.to_csv(path_or_buf=data_path, index=False, sep=';')
+        old_data.to_csv(path_or_buf=data_path, index=False, sep=',')
 
-    old_data.set_index(['location','time'])
+    #old_data.set_index(['location','time'])
     old_data['time'] = pd.to_datetime(old_data['time'], format='%Y-%m-%d %H:%M:%S')
 
     return old_data
@@ -227,8 +227,11 @@ def append_df(old_data,new_data):
 
     '''
     weather_data=old_data.append(new_data,ignore_index=True)
-    weather_data.set_index(['location','time'])
+    #weather_data.set_index(['location','time'])
     weather_data.sort_values(by=['location','time']).drop_duplicates(subset=['location', 'time'],inplace=True)
+    my_index = ['location','time','longitude','latitude','temperature','apparent_temperature','cloud_cover','dew_point','humidity','ozone','precip_intensity',
+                'precip_probability','precip_type','pressure','uv_index','visibility','wind_bearing','wind_gust','wind_speed']
+    weather_data.reindex(my_index, axis=1)
 
     return weather_data
 
@@ -249,6 +252,9 @@ def weather_api():
     weather_data = fetch_weather_data(weather_list,forecastio_api_key,start_date,days_back)
     pandas_df = create_pandas_df(weather_data)
     new_df = append_df(old_data,pandas_df)
+    my_index = ['location','time','longitude','latitude','temperature','apparent_temperature','cloud_cover','dew_point','humidity','ozone','precip_intensity',
+                'precip_probability','precip_type','pressure','uv_index','visibility','wind_bearing','wind_gust','wind_speed']
+    new_df = new_df.reindex(my_index, axis=1)
     save_df(new_df,data_path)
 
 if __name__ == "__main__":
