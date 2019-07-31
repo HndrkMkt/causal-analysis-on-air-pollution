@@ -2,12 +2,12 @@
 
 ## Issue # 12
 
-## Assigned to:
+## Assignees:
 
 * Hendrik Makait - @HndrkMkt
 * Ricardo Salazar - @ricardo8914
 
-## Mentored by:
+## Mentor:
 
 * Tilmann Rabl - @tilmannrabl
 
@@ -37,8 +37,10 @@ Learning how to recover causal structures from large and heterogeneous observati
     * weather/
 * data_processing/
 * docs/
+    * diagrams/
     * javadoc/
     * pythondoc/
+    
 * experiments/
     * causal_discovery/
     * performance/
