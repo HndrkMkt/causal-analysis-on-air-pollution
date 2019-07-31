@@ -16,3 +16,4 @@ scipy
 sklearn
 Cython
 -e git://github.com/jakobrunge/tigramite.git@4.0.0-beta#egg=tigramite
+Sphinx

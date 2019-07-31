@@ -142,7 +142,7 @@ def percentile(n):
 
 
 def make_agg_df(df):
-    ''' agregates a dataframe containing sensor measures by creating new columns containing the min,percentile_percentile_25,
+    ''' agregates a dataframe containing sensor measures by creating new columns containing the min,percentile_percentile_25, \
         mean,percentile_75 and maximum values of it
     Args:
         df: a pandas dataframe with the sensor data

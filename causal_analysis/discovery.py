@@ -14,8 +14,8 @@ import time
 def generate_dataframe(var_names, start_index=None, end_index=None):
     """Generates a TIGRAMITE dataframe from the intermediate data.
 
-    This function loads the intermediate data from disk, preprocesses it and subsets it to use only a single sensor
-     location. It then creates a TIGRAMITE dataframe from the resulting data that includes the given columns. If either
+    This function loads the intermediate data from disk, preprocesses it and subsets it to use only a single sensor \
+    location. It then creates a TIGRAMITE dataframe from the resulting data that includes the given columns. If either \
     a start or an end index are given, it uses the subset of the preprocessed data defined by the given range.
 
     Args:
@@ -23,7 +23,7 @@ def generate_dataframe(var_names, start_index=None, end_index=None):
         start_index: The start index of the row range to use.
         end_index: The end index of the row range to use (excluded).
 
-    Returns:
+    Returns: The TIGRAMITE dataframe
 
     """
     data = load_data('data/processed/causalDiscoveryData.csv')
@@ -151,7 +151,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         label_fontsize=24,
         node_label_size=24,
         link_label_fontsize=14,
-        save_name= base_path + file_name_prefix + "_graph.png"
+        save_name=base_path + file_name_prefix + "_graph.png"
     )
 
     tp.plot_time_series_graph(
@@ -162,7 +162,7 @@ def plot_results(pcmci, results, cond_ind_test, pc_alpha, tau_min, tau_max, var_
         figsize=(20, 20),
         label_fontsize=24,
         node_label_size=24,
-        save_name= base_path + file_name_prefix + "_time_series_graph.png"
+        save_name=base_path + file_name_prefix + "_time_series_graph.png"
     )
 
 

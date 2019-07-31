@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to Causal Analysis Pipeline for Air Pollution Data’s documentation! &#8212; Causal Analysis Pipeline for Air Pollution Data  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-causal-analysis-pipeline-for-air-pollution-data-s-documentation">
+<h1>Welcome to Causal Analysis Pipeline for Air Pollution Data’s documentation!<a class="headerlink" href="#welcome-to-causal-analysis-pipeline-for-air-pollution-data-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="module-data_acquisition.weather.weather_api">
+<span id="weather-api"></span><h2>Weather API<a class="headerlink" href="#module-data_acquisition.weather.weather_api" title="Permalink to this headline">¶</a></h2>
+<p>This module fetchs weather variables for an specific location defined by the user and creates a pandas dataframe which is saved as csv
+in a defined path. If the user specifies an old dataframe the new data will be concatenated to the old one and the new dataframe returned
+and saved in the specified path</p>
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.append_df">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">append_df</code><span class="sig-paren">(</span><em class="sig-param">old_data</em>, <em class="sig-param">new_data</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.append_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function appends the new data to the old dataframe containing the historical weather measures. If there is not an historical         dataframe then it creates a new one.
+:param old_data: The old pandas dataframe containing the historical weather measures
+:param new_data: The new pandas dataframe containing the new weather measures</p>
+<p>Returns: A pandas dataframe containing the union of the old and new dataframes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.create_pandas_df">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">create_pandas_df</code><span class="sig-paren">(</span><em class="sig-param">data_block_list</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.create_pandas_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates a pandas dataframe from the forecastio forecast objects for the different required weather stations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data_block_list</strong> – A list of tuples composed by a forecastio forecast object, the date, the name of the weather station, the latitude and             longitude of the weather station</p>
+</dd>
+</dl>
+<p>Returns: A pandas dataframe containing the weather variables for the requested weather stations</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.fetch_weather_data">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">fetch_weather_data</code><span class="sig-paren">(</span><em class="sig-param">weather_stations_list</em>, <em class="sig-param">forecastio_api_key</em>, <em class="sig-param">start_date</em>, <em class="sig-param">days_back</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.fetch_weather_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function fetchs weather data through a foracstio forecast object for the requested weather stations.
+:param weather_stations_list: A list containing tuples composed by the weather station name, its latituded, its longitude
+:param forecastio_api_key: A secret key for the forecastio wrapper.
+:param start_date: The start date from where weather data will start being pulled
+:param days_back: The amount of days to look back to pull weather data</p>
+<dl class="simple">
+<dt>Returns: A list of tuples composed by a forecastio forecast object, the date, the name of the weather station, the latitude and</dt><dd><p>longitude of the weather station</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.get_min_date">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">get_min_date</code><span class="sig-paren">(</span><em class="sig-param">old_data</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.get_min_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function gets the oldest date in the historical data. If the historical data does not exist, the current date is returned.
+:param old_data: A pandas dataframe containing the historical weather data</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.get_weather_stations">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">get_weather_stations</code><span class="sig-paren">(</span><em class="sig-param">pyowm_key</em>, <em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">limit</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.get_weather_stations" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function get the closest weather stations for an especified location, with the help of the pyowm wrapper.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pyowm_key</strong> – A secret key for the pyowm wrapper</p></li>
+<li><p><strong>latitude</strong> – The latitud of the desired place to retrieve the closest weather stations</p></li>
+<li><p><strong>longitude</strong> – The longitud of the desired place to retrieve the closest weather stations</p></li>
+<li><p><strong>limit</strong> – The number of closest weather stations to include in the list</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: A list of tuples composed by the name of the weather stations and its latitude and longitude</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.load_csv">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">load_csv</code><span class="sig-paren">(</span><em class="sig-param">data_path</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.load_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to load an existing csv with historical weather data. If such file does not exist a new one is created in the specified path
+:param data_path: The path where the file exists. If the file does not exist, then the path where the new csv file will be created</p>
+<dl class="simple">
+<dt>Returns: If the historical csv file exists it returns a pandas dataframe with the weather fields and the corresponding values.</dt><dd><p>If the historical csv does not exists it returns an empty pandas dataframe with the corresponding columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.weather_api.save_df">
+<code class="sig-prename descclassname">data_acquisition.weather.weather_api.</code><code class="sig-name descname">save_df</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">data_path</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.weather_api.save_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function saves a pandas dataframe into a specific path
+:param df: A pandas dataframe
+:param data_path: A path where to save the dataframe</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-data_acquisition.weather.subset_sensors">
+<span id="subset-sensors"></span><h2>Subset Sensors<a class="headerlink" href="#module-data_acquisition.weather.subset_sensors" title="Permalink to this headline">¶</a></h2>
+<p>This script maps the sensors from a specific location given its coordinates constraint by a maximum radius defined by the user to their
+closest weather stations, it saves the final results to the relative path: ../../data/intermediate/berlin_enrichable_sensors.csv</p>
+<dl class="function">
+<dt id="data_acquisition.weather.subset_sensors.create_sensors_dataframe">
+<code class="sig-prename descclassname">data_acquisition.weather.subset_sensors.</code><code class="sig-name descname">create_sensors_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.subset_sensors.create_sensors_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates a pandas dataframe containing all sensors in the processed data folder</p>
+<p>Returns: a pandas dataframe containing all the sensors in the processed data folder</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.subset_sensors.filter_for_weather_stations">
+<code class="sig-prename descclassname">data_acquisition.weather.subset_sensors.</code><code class="sig-name descname">filter_for_weather_stations</code><span class="sig-paren">(</span><em class="sig-param">sensor</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.subset_sensors.filter_for_weather_stations" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter out the sensors whose closest weather station is not in the list of unique weather locations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sensor</strong> – A valid sensor observation</p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.subset_sensors.filter_sensors">
+<code class="sig-prename descclassname">data_acquisition.weather.subset_sensors.</code><code class="sig-name descname">filter_sensors</code><span class="sig-paren">(</span><em class="sig-param">sensor</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.subset_sensors.filter_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function filters the sensors based on its distance to a given Berlin Mitte coordinates
+:param sensor: a tuple containing a sensor latitude and longitude</p>
+<p>Returns: a boolean result, true if valid tuple false otherwise</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="data_acquisition.weather.subset_sensors.map_sensors">
+<code class="sig-prename descclassname">data_acquisition.weather.subset_sensors.</code><code class="sig-name descname">map_sensors</code><span class="sig-paren">(</span><em class="sig-param">total_sensors</em><span class="sig-paren">)</span><a class="headerlink" href="#data_acquisition.weather.subset_sensors.map_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps the sensors to their closest weather station</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>total_sensors</strong> – A pandas dataframe containing the sensors to be mapped</p>
+</dd>
+</dl>
+<p>Returns:  a list with the sensor geographical information and its closest weather station details</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-causal_analysis.data_preparation">
+<span id="data-preparation"></span><h2>Data Preparation<a class="headerlink" href="#module-causal_analysis.data_preparation" title="Permalink to this headline">¶</a></h2>
+<p>Data preparation for causal discovery.</p>
+<p>This module contains functions to generate a TIGRAMITE dataframe from the intermediate data created by the data
+processing component.</p>
+<dl class="function">
+<dt id="causal_analysis.data_preparation.create_tigramite_dataframe">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">create_tigramite_dataframe</code><span class="sig-paren">(</span><em class="sig-param">dataset</em>, <em class="sig-param">exclude=None</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.create_tigramite_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a TIGRAMITE datframe from a pandas dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – A pandas dataframe with a timestamp column in it an numeric measures</p></li>
+<li><p><strong>exclude</strong> – A list of columns to be excluded from the TIGRAMITEs dataframe</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: A TIGRAMITE dataframe</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.family_list">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">family_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.family_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of the families list</p>
+<p>Returns: returns a list of the families list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.feature_list">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">feature_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.feature_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a list with the final features included in the intermediate dataset</p>
+<p>Returns: A list containing the final features in the intermediate dataset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.input_na">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">input_na</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">columns</em>, <em class="sig-param">method=None</em>, <em class="sig-param">value=None</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.input_na" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>This function allows na imputation in a given pandas dataframe. User can either select a method from {‘backfill’, ‘bfill’, ‘pad’, ‘ffill’, None}</dt><dd><p>or a specific value</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – A pandas dataframe</p></li>
+<li><p><strong>columns</strong> – A list of columns to perform the na imputation</p></li>
+<li><p><strong>method</strong> – A method from this list {‘backfill’, ‘bfill’, ‘pad’, ‘ffill’, None}</p></li>
+<li><p><strong>value</strong> – An specific value to fill the na’s</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: A pandas dataframe with modified null values.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.load_data">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">load_data</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads the intermediate dataset from csv</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – The path where the intermidiate csv lies</p>
+</dd>
+</dl>
+<p>Returns: a pandas dataframe containing the original features of the csv file plus some new time features</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.localize">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">localize</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">lat</em>, <em class="sig-param">lon</em>, <em class="sig-param">results=1</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.localize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function localize a user-specified number of sensors around a set of coordinates by computing the euclidian distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – a pandas dataframe</p></li>
+<li><p><strong>lat</strong> – latitude</p></li>
+<li><p><strong>lon</strong> – longitude</p></li>
+<li><p><strong>results</strong> – the desired number of sensors around the specified location</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: a dataframe containing the observations that were included in the localization</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.data_preparation.subset">
+<code class="sig-prename descclassname">causal_analysis.data_preparation.</code><code class="sig-name descname">subset</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">by_family=[]</em>, <em class="sig-param">by_columns=[]</em>, <em class="sig-param">start_date=''</em>, <em class="sig-param">end_date=''</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.data_preparation.subset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>This function allows subsetting the intermidiate data set by either choosing the desired family of features or by column.</dt><dd><p>Also, a time frame can be selected choosing a start and end dates</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – A pandas dataframe with the intermidiate data</p></li>
+<li><p><strong>by_family</strong> – A list with the desired families to be included in the subsetting</p></li>
+<li><p><strong>by_columns</strong> – A list with the desired columns to be included in the subsetting</p></li>
+<li><p><strong>start_date</strong> – The start date of the time frame</p></li>
+<li><p><strong>end_date</strong> – The end date of the time frame</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: A subset of the original dataframe</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-causal_analysis.discovery">
+<span id="causal-discovery"></span><h2>Causal Discovery<a class="headerlink" href="#module-causal_analysis.discovery" title="Permalink to this headline">¶</a></h2>
+<p>Helper functions for running causal discovery experiments.</p>
+<dl class="function">
+<dt id="causal_analysis.discovery.generate_dataframe">
+<code class="sig-prename descclassname">causal_analysis.discovery.</code><code class="sig-name descname">generate_dataframe</code><span class="sig-paren">(</span><em class="sig-param">var_names</em>, <em class="sig-param">start_index=None</em>, <em class="sig-param">end_index=None</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.discovery.generate_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a TIGRAMITE dataframe from the intermediate data.</p>
+<p>This function loads the intermediate data from disk, preprocesses it and subsets it to use only a single sensor     location. It then creates a TIGRAMITE dataframe from the resulting data that includes the given columns. If either     a start or an end index are given, it uses the subset of the preprocessed data defined by the given range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_names</strong> – The names of the variables to use in the dataframe.</p></li>
+<li><p><strong>start_index</strong> – The start index of the row range to use.</p></li>
+<li><p><strong>end_index</strong> – The end index of the row range to use (excluded).</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: The TIGRAMITE dataframe</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.discovery.generate_links_from_prior_knowledge">
+<code class="sig-prename descclassname">causal_analysis.discovery.</code><code class="sig-name descname">generate_links_from_prior_knowledge</code><span class="sig-paren">(</span><em class="sig-param">var_names</em>, <em class="sig-param">tau_min</em>, <em class="sig-param">tau_max</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.discovery.generate_links_from_prior_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the link dictionary from prior knowledge.</p>
+<p>This function creates the dictionary of the possible dependencies in the causal model used by the PCMCI algorithm
+and only includes those links where dependencies may exist according to our domain knowledge. Specifically, it
+removes all incoming links into time-based variables except for those specifying their functional dependencies.
+Time dimensions also can only influence other variables with a lag of 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_names</strong> – The names of the variables used in the data.</p></li>
+<li><p><strong>tau_min</strong> – The minimum lag.</p></li>
+<li><p><strong>tau_max</strong> – The maximum lag.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: Dictionary specifying the selected links for the PCMCI algorithm.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.discovery.plot_results">
+<code class="sig-prename descclassname">causal_analysis.discovery.</code><code class="sig-name descname">plot_results</code><span class="sig-paren">(</span><em class="sig-param">pcmci</em>, <em class="sig-param">results</em>, <em class="sig-param">cond_ind_test</em>, <em class="sig-param">pc_alpha</em>, <em class="sig-param">tau_min</em>, <em class="sig-param">tau_max</em>, <em class="sig-param">var_names</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.discovery.plot_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a network and a timeseries plot for the given results of the PCMCI algorithm and saves them as files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pcmci</strong> – The PCMCI object used.</p></li>
+<li><p><strong>results</strong> – The results of the PCMCI algorithm.</p></li>
+<li><p><strong>cond_ind_test</strong> – The conditional independence test used.</p></li>
+<li><p><strong>pc_alpha</strong> – Alpha threshold for significance of links.</p></li>
+<li><p><strong>tau_min</strong> – The minimum lag.</p></li>
+<li><p><strong>tau_max</strong> – The maximum lag.</p></li>
+<li><p><strong>var_names</strong> – The names of the variables in the data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.discovery.run_experiment">
+<code class="sig-prename descclassname">causal_analysis.discovery.</code><code class="sig-name descname">run_experiment</code><span class="sig-paren">(</span><em class="sig-param">pcmci</em>, <em class="sig-param">cond_ind_test</em>, <em class="sig-param">pc_alpha</em>, <em class="sig-param">tau_min</em>, <em class="sig-param">tau_max</em>, <em class="sig-param">var_names</em>, <em class="sig-param">selected_links</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.discovery.run_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the PCMCI algorithm with the specified input and generates plots for the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pcmci</strong> – The PCMCI object to use.</p></li>
+<li><p><strong>cond_ind_test</strong> – The conditional independence test used.</p></li>
+<li><p><strong>pc_alpha</strong> – Alpha threshold for significance of links.</p></li>
+<li><p><strong>tau_min</strong> – The minimum lag.</p></li>
+<li><p><strong>tau_max</strong> – The maximum lag.</p></li>
+<li><p><strong>var_names</strong> – The names of the variables in the data.</p></li>
+<li><p><strong>selected_links</strong> – The links to investigate in the model. Investigates all links if none given.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.discovery.test_alphas">
+<code class="sig-prename descclassname">causal_analysis.discovery.</code><code class="sig-name descname">test_alphas</code><span class="sig-paren">(</span><em class="sig-param">dataframe</em>, <em class="sig-param">cond_ind_test</em>, <em class="sig-param">alphas</em>, <em class="sig-param">var_names</em>, <em class="sig-param">tau_min=0</em>, <em class="sig-param">tau_max=1</em>, <em class="sig-param">selected_links=None</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.discovery.test_alphas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the PCMCI algorithm over a list of different alphas and plots the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> – The TIGRAMITE dataframe to use.</p></li>
+<li><p><strong>cond_ind_test</strong> – The conditional independence test to use.</p></li>
+<li><p><strong>alphas</strong> – The list of individual alphas.</p></li>
+<li><p><strong>var_names</strong> – The names of the variables contained in the dataframe.</p></li>
+<li><p><strong>tau_min</strong> – The minimum lag.</p></li>
+<li><p><strong>tau_max</strong> – The maximum lag.</p></li>
+<li><p><strong>selected_links</strong> – Dictionalry specifying whether only selected links should be tested.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-causal_analysis.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-causal_analysis.utils" title="Permalink to this headline">¶</a></h2>
+<p>”
+This module contains a set of functions that support some of the scripts needed to subset and localize the sensors and the weather
+stations</p>
+<dl class="function">
+<dt id="causal_analysis.utils.get_closest_weather_station">
+<code class="sig-prename descclassname">causal_analysis.utils.</code><code class="sig-name descname">get_closest_weather_station</code><span class="sig-paren">(</span><em class="sig-param">latitude</em>, <em class="sig-param">longitude</em>, <em class="sig-param">credentials</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.utils.get_closest_weather_station" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the closest weather station for the requested coordinates
+:param latitude: The latitude of interest
+:param longitude: The longitude of interest
+:param credentials: The pyowm secret key</p>
+<p>Returns: The closest weather station name and coordinates for the location</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.utils.get_weather_variables_for_locations">
+<code class="sig-prename descclassname">causal_analysis.utils.</code><code class="sig-name descname">get_weather_variables_for_locations</code><span class="sig-paren">(</span><em class="sig-param">list_of_locations</em>, <em class="sig-param">start_date</em>, <em class="sig-param">days_back</em>, <em class="sig-param">credentials</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.utils.get_weather_variables_for_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetchs historical weather data for a list of locations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_of_locations</strong> – A list of weather stations with their coordinates</p></li>
+<li><p><strong>start_date</strong> – The date from where start pulling data</p></li>
+<li><p><strong>days_back</strong> – The amount of days to go back with the data</p></li>
+<li><p><strong>credentials</strong> – A forecastio secret key</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.utils.make_agg_df">
+<code class="sig-prename descclassname">causal_analysis.utils.</code><code class="sig-name descname">make_agg_df</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.utils.make_agg_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>agregates a dataframe containing sensor measures by creating new columns containing the min,percentile_percentile_25,         mean,percentile_75 and maximum values of it
+:param df: a pandas dataframe with the sensor data</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="causal_analysis.utils.percentile">
+<code class="sig-prename descclassname">causal_analysis.utils.</code><code class="sig-name descname">percentile</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#causal_analysis.utils.percentile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the value of the requested percentile in an array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> – the requested percentile</p>
+</dd>
+</dl>
+<p>Returns: The value of the requested percentile</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Causal Analysis Pipeline for Air Pollution Data</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Ricardo Salazar Diaz & Hendrik Makait.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

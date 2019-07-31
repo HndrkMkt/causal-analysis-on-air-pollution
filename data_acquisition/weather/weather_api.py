@@ -125,8 +125,9 @@ def fetch_weather_data(weather_stations_list, forecastio_api_key, start_date, da
 
 def create_pandas_df(data_block_list):
     ''' This function creates a pandas dataframe from the forecastio forecast objects for the different required weather stations
+
     Args:
-        data_block_list: A list of tuples composed by a forecastio forecast object, the date, the name of the weather station, the latitude and
+        data_block_list: A list of tuples composed by a forecastio forecast object, the date, the name of the weather station, the latitude and \
             longitude of the weather station
 
     Returns: A pandas dataframe containing the weather variables for the requested weather stations
@@ -225,7 +226,7 @@ def create_pandas_df(data_block_list):
 
 
 def append_df(old_data, new_data):
-    ''' This function appends the new data to the old dataframe containing the historical weather measures. If there is not an historical
+    ''' This function appends the new data to the old dataframe containing the historical weather measures. If there is not an historical \
         dataframe then it creates a new one.
     Args:
         old_data: The old pandas dataframe containing the historical weather measures
