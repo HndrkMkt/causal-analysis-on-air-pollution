@@ -86,7 +86,7 @@ To run the pipeline for creating the intermediate data in CSV-format, execute th
     $ python subset_sensors.py
     ```
     Walk through `ExtractSensorsForWeatherStations.ipynb`.
-5. Join all the datasets together and create output data for causal analysis:
+4. Join all the datasets together and create output data for causal analysis:
     ```
     $ flink run -c de.tuberlin.dima.bdapro.advancedProcessing.FeatureTableCombination data_processing/target/air-pollution-data-processing-1.0-SNAPSHOT.jar --data_dir <project_root>/data
     ```
@@ -98,7 +98,12 @@ $ flink run -c de.tuberlin.dima.bdapro.dataIntegration.sensor.workflows.SensorFi
 and changing the boolean flag ``useCached`` in the corresponding workflows. 
 
 ## Running performance experiments
-TODO
+To run the individual performance experiments, activate the virtual environment, navigate to the project root and execute the corresponding 
+Python scripts:
+```
+$ python experiments/performance/performance_sample_sizes.py > sample_sizes_experiment.log
+$ pyhton experiments/performance/performance_complexity.py > complexity_experiment.log
+```
 
 ## Running causal discovery
 To run the individual experiments, activate the virtual environment, navigate to the project root and execute the corresponding 

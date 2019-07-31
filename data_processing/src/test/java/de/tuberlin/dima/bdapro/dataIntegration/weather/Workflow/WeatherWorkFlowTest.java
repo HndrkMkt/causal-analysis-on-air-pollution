@@ -20,6 +20,6 @@ public class WeatherWorkFlowTest {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         BatchTableEnvironment tEnv = BatchTableEnvironment.create(env);
         FeatureTable dataset = WeatherWorkflow.generateFeatureTable("src/test/resources/data",env,tEnv);
-        Assertions.assertEquals(19, tEnv.toDataSet(dataset.getData(), Row.class).count());
+        Assertions.assertEquals(2, tEnv.toDataSet(dataset.getData(), Row.class).count());
     }
 }
